@@ -1,2 +1,2 @@
-rootProject.name = "akkarestaurant"
+rootProject.name = "shardworld"
 

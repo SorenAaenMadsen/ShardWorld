@@ -1,0 +1,18 @@
+@startuml
+[*] --> ShardWorld : tick
+ShardWorld --> ShardCountry : tick
+ShardCountry --> GiaRepresentative: 1_pricelist
+ShardCountry --> GiaCompany: 1_pricelist
+GiaRepresentative --> ShardCountry : 2_buyOrder
+GiaCompany --> Trader_X : 2_buyOrder
+ShardCountry --> GiaRepresentative: 3_tradeComplete
+ShardCountry --> GiaCompany: 3_tradeComplete
+
+
+
+
+GiaRepresentative : On 3_tradeComplete, decide if go back to 2_buyOrder
+GiaCompany : On 3_tradeComplete, decide if go back to 2_buyOrder
+
+
+@enduml
