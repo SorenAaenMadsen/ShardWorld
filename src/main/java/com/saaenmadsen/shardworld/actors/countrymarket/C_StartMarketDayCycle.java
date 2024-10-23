@@ -4,8 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public record C_StartMarketDayCycle(
-        int dayId
-)implements CountryMarket.CountryMarketCommand {
+        int dayId,
+        java.util.List<akka.actor.typed.ActorRef<com.saaenmadsen.shardworld.actors.company.ShardCompany.ShardCompanyCommand>> allCompanies
+) implements CountryMarket.CountryMarketCommand {
 
     public static C_StartMarketDayCycle fromJson(String json) {
         ObjectMapper mapper = new ObjectMapper();

@@ -1,52 +1,71 @@
 package com.saaenmadsen.shardworld.actors.company;
 
+import akka.actor.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
-import akka.actor.typed.ActorSystem;
 import akka.actor.typed.javadsl.Receive;
-
-import java.util.Random;
-
+import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
+import com.saaenmadsen.shardworld.constants.StockKeepUnit;
+import com.saaenmadsen.shardworld.modeltypes.SkuStock;
+import akka.actor.typed.javadsl.Adapter;
 
 public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyCommand> {
-    protected static Random dice = new Random();
-    protected static int maxMillisecondsCookTime = 200;
+    private String companyName;
+    private SkuStock stock;
 
-    public interface ShardCompanyCommand{}
-    public static Behavior<ShardCompanyCommand> create() {
-        return Behaviors.setup(ShardCompany::new);
+    public interface ShardCompanyCommand {
     }
 
-    public ShardCompany(ActorContext<ShardCompanyCommand> context) {
+    public static Behavior<ShardCompanyCommand> create(String companyName) {
+        return Behaviors.setup(context -> new ShardCompany(context, companyName));
+    }
+
+    public ShardCompany(ActorContext<ShardCompanyCommand> context, String companyName) {
         super(context);
+        this.companyName = companyName;
+        this.stock = new SkuStock();
     }
 
-    static final Behavior<ShardCompanyCommand> create(ActorSystem<ShardCompanyCommand> kitchenOutbox) {
-        return Behaviors.setup(ShardCompany::new);
-    }
 
     @Override
     public Receive<ShardCompanyCommand> createReceive() {
         getContext().getLog().info("ShardCompany createReceive");
-        return newReceiveBuilder().onMessage(ShardCompanyCommand.class, this::onReceiveMenuOrder).build();
+        return newReceiveBuilder()
+                .onMessage(C_MarketOpenForSellers.class, this::onReceiveMarketOpenForSellers)
+                .onMessage(C_CompletedBuyOrder.class, this::onReceiveCompletedBuyOrder)
+                .onMessage(C_MarketOpenForBuyers.class, this::onReceiveMarketOpenForBuyers)
+                .build();
     }
 
-    private Behavior<ShardCompanyCommand> onReceiveMenuOrder(ShardCompanyCommand mealCommand) {
-        getContext().getLog().info("Got new meal to prepare {}", mealCommand.toString());
-        takingMyTimeCooking();
+    private Behavior<ShardCompanyCommand> onReceiveMarketOpenForSellers(C_MarketOpenForSellers message) {
+        getContext().getLog().info(companyName + " got message {}", message.toString());
+        ActorRef parent = Adapter.toClassic(getContext()).parent();
+
+        // For now, just setting everything for sale.
+        for (int i=0; i< StockKeepUnit.values().length; ++i) {
+            int amount = stock.getStock(i);
+            if(amount>0) {
+                message.countryMarket().tell(new C_SendSkuToMarketForSale(i, amount));
+            }
+        }
+
         return Behaviors.same();
     }
 
+    private Behavior<ShardCompanyCommand> onReceiveCompletedBuyOrder(C_CompletedBuyOrder message) {
+        getContext().getLog().info(companyName + " got message {}", message.toString());
 
-    public static void takingMyTimeCooking(){
-        try {
-            Thread.sleep(dice.nextLong(maxMillisecondsCookTime));
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        return Behaviors.same();
     }
+
+    private Behavior<ShardCompanyCommand> onReceiveMarketOpenForBuyers(C_MarketOpenForBuyers message) {
+        getContext().getLog().info(companyName + " got message {}", message.toString());
+
+        return Behaviors.same();
+    }
+
 
 }
 

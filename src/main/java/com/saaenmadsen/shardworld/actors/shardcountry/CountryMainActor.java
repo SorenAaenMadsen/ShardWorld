@@ -2,11 +2,16 @@ package com.saaenmadsen.shardworld.actors.shardcountry;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
-import akka.actor.typed.SupervisorStrategy;
 import akka.actor.typed.javadsl.*;
+import com.saaenmadsen.shardworld.actors.countrymarket.C_StartMarketDayCycle;
+import com.saaenmadsen.shardworld.actors.countrymarket.CountryMarket;
+import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.actors.company.C_MarketOpenForSellers;
 import com.saaenmadsen.shardworld.actors.company.ShardCompany;
+import com.saaenmadsen.shardworld.modeltypes.PriceList;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -25,11 +30,14 @@ import com.saaenmadsen.shardworld.actors.company.ShardCompany;
  * For now, I will NOT be using the FSM (Final State Machine) implementation pattern - crawl before walking and all that...
  */
 public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryMainActorCommand> {
+    private static WorldSettings worldSettings;
     private final int poolSize = 4;
     private final CountryStatisticsReceiver statsReceiver;
 
-    private PoolRouter<ShardCompany.ShardCompanyCommand> allCompaniesPool;
-    private ActorRef<ShardCompany.ShardCompanyCommand> randomCompaniesProxy;
+
+
+    private List<ActorRef<ShardCompany.ShardCompanyCommand>> allCompanies = new ArrayList<>();
+    private ActorRef<CountryMarket.CountryMarketCommand> countryMarket;
 
     public interface CountryMainActorCommand{}
 
@@ -45,7 +53,8 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
     ) {
     }
 
-    public static Behavior<CountryMainActorCommand> create(CountryStatisticsReceiver statsReceiver) {
+    public static Behavior<CountryMainActorCommand> create(WorldSettings worldSettings, CountryStatisticsReceiver statsReceiver) {
+        CountryMainActor.worldSettings = worldSettings;
 
         return Behaviors.setup(
                 context -> {
@@ -59,12 +68,12 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
         super(context);
         this.statsReceiver = statsReceiver;
         getContext().getLog().info("ShardCountry Constructor Start");
-        allCompaniesPool =
-                Routers.pool(
-                        poolSize,
-                        // make sure the workers are restarted if they fail
-                        Behaviors.supervise(ShardCompany.create()).onFailure(SupervisorStrategy.restart()));
-        randomCompaniesProxy = context.spawn(allCompaniesPool, "company-pool");
+
+        for(int i=0;i< worldSettings.companiesInCountry(); ++i) {
+            String companyName = "company-" + i;
+            allCompanies.add(context.spawn(ShardCompany.create(companyName), companyName));
+        }
+        countryMarket = context.spawn(CountryMarket.create(), "market");
 
         getContext().getLog().info("ShardCountry Constructor Completed");
     }
@@ -72,12 +81,22 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
     @Override
     public Receive<CountryMainActorCommand> createReceive() {
         getContext().getLog().info("ShardCountry createReceive");
-        return newReceiveBuilder().onMessage(CountryMainActorCommand.class, this::onNewDayStartReceived).build();
+        return newReceiveBuilder()
+                .onMessage(C_CountryDayStart.class, this::onNewDayStartReceived)
+                .onMessage(C_EndMarketDayCycle.class, this::onEndMarketDayCycle)
+                .build();
     }
 
-    private Behavior<CountryMainActorCommand> onNewDayStartReceived(CountryMainActorCommand incomingOrder) {
-        getContext().getLog().info("New order received for {}", incomingOrder);
-        randomCompaniesProxy.tell(new C_MarketOpenForSellers(1));
+    private Behavior<CountryMainActorCommand> onNewDayStartReceived(C_CountryDayStart message) {
+        getContext().getLog().info("onNewDayStartReceived message received: {}", message);
+        countryMarket.tell(new C_StartMarketDayCycle(message.dayId(), allCompanies));
+
+        return Behaviors.same();
+    }
+
+    private Behavior<CountryMainActorCommand> onEndMarketDayCycle(C_EndMarketDayCycle message) {
+        getContext().getLog().info("onEndMarketDayCycle order received: {}", message);
+
         return Behaviors.same();
     }
 

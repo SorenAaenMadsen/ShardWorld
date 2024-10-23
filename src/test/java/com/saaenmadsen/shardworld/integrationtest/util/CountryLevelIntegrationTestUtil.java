@@ -8,6 +8,6 @@ import com.saaenmadsen.shardworld.statistics.CountryStatisticsReceiver;
 public class CountryLevelIntegrationTestUtil {
     private ActorSystem system;
     public CountryLevelIntegrationTestUtil() {
-        system = ActorSystem.create(CountryMainActor.create(new CountryStatisticsReceiver()), "MyCountryActor");
+//        system = ActorSystem.create(CountryMainActor.create(new CountryStatisticsReceiver()), "MyCountryActor");
     }
 }

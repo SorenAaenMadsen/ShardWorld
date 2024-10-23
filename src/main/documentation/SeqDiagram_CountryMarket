@@ -11,6 +11,7 @@ rg -> sw : Start System
 sw -> sc : Start Day
 sc -> cm : Start Market Day Cycle
 cm -> com : Market open for sellers
+com -> com : production
 com -> cm : Send SKU to market for sale
 cm -> pop : Market open for buyers
 cm -> com : Market open for buyers
@@ -20,9 +21,6 @@ cm -> pop : Completed Buy Order
 cm -> com : Completed Buy Order
 cm -> com : Send unsold SKU to company
 cm -> cm : price update
-cm -> pop : new pricelist
-cm -> com : new pricelist
-com -> com : production
 com -> cm : End Market Day
 pop -> cm : End Market Day
 cm -> sc : End Market Day Cycle
