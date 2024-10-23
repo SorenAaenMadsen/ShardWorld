@@ -1,0 +1,7 @@
+
+
+Lets place commands with the class that needs to RECEIVE them.
+
+Prefix all command classes with C_
+
+

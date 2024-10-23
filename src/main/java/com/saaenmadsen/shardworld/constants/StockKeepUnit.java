@@ -1,4 +1,4 @@
-package com.saaenmadsen.shardworld.shardcountry.constants;
+package com.saaenmadsen.shardworld.constants;
 
 public enum StockKeepUnit {
     SKU_SHUE (1, "shue", "clas1", "clas2");

@@ -1,8 +1,8 @@
-package com.saaenmadsen.shardworld.countryLevelIntegrationTests.util;
+package com.saaenmadsen.shardworld.integrationtest.util;
 
 
 import akka.actor.typed.ActorSystem;
-import com.saaenmadsen.shardworld.shardcountry.CountryMainActor;
+import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
 
 public class CountryLevelIntegrationTestUtil {
     private ActorSystem system;

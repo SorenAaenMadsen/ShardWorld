@@ -1,0 +1,38 @@
+
+@startuml
+control     RootGuardian    as rg
+entity      ShardWorld      as sw
+entity      ShardCountry    as sc
+collections Population      as pop
+entity      CountryMarket   as cm
+collections Companies       as com
+
+rg -> sw : Start System
+sw -> sc : Start Day
+sc -> cm : Start Market Day Cycle
+cm -> com : What To Sell
+com -> cm : Sell Order
+cm -> pop : market open
+'activate pop
+cm -> com : market open
+'activate com
+pop -> cm : buy order
+'deactivate pop
+'activate cm
+com -> cm : buy order
+'deactivate com
+cm -> pop : fulfilled orders
+cm -> com : fulfilled orders
+cm -> cm : price update
+'deactivate cm
+com -> com : production
+cm -> pop : new pricelist
+cm -> com : new pricelist
+com -> cm : End Market Day
+pop -> cm : End Market Day
+cm -> sc : End Market Day Cycle
+sc -> sw : End Day
+sw -> rg : Game over
+
+
+@enduml
