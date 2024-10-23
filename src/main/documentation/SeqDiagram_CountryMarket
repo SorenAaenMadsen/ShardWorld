@@ -10,24 +10,19 @@ collections Companies       as com
 rg -> sw : Start System
 sw -> sc : Start Day
 sc -> cm : Start Market Day Cycle
-cm -> com : What To Sell
-com -> cm : Sell Order
-cm -> pop : market open
-'activate pop
-cm -> com : market open
-'activate com
-pop -> cm : buy order
-'deactivate pop
-'activate cm
-com -> cm : buy order
-'deactivate com
-cm -> pop : fulfilled orders
-cm -> com : fulfilled orders
+cm -> com : Market open for sellers
+com -> cm : Send SKU to market for sale
+cm -> pop : Market open for buyers
+cm -> com : Market open for buyers
+pop -> cm : Buy order
+com -> cm : Buy order
+cm -> pop : Completed Buy Order
+cm -> com : Completed Buy Order
+cm -> com : Send unsold SKU to company
 cm -> cm : price update
-'deactivate cm
-com -> com : production
 cm -> pop : new pricelist
 cm -> com : new pricelist
+com -> com : production
 com -> cm : End Market Day
 pop -> cm : End Market Day
 cm -> sc : End Market Day Cycle

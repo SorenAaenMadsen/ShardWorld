@@ -4,43 +4,60 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.SupervisorStrategy;
 import akka.actor.typed.javadsl.*;
+import com.saaenmadsen.shardworld.actors.company.C_MarketOpenForSellers;
 import com.saaenmadsen.shardworld.actors.company.ShardCompany;
-import com.saaenmadsen.shardworld.actors.countrymarket.C_SellOrder;
+
 
 
 /**
- *
  * For both population and companies, there is a turn seqeunce like:
- *
+ * <p>
  * Import is actually just another company?? When importing a SKU for the first time, use the import prize +% as trade price.
- *  Companies send their stock-for-sale to Country-market. This is like driving the truck with goods to market. *
- *  Buy orders - including requests for goods not for sale
- *  Trade completion
- *  Country-market updates prices based on what was sold. If most was sold, more expensive etc.
- *  Pricelist distribution. With pricelist comes the companies offering
- *  Production
- *
+ * Companies send their stock-for-sale to Country-market. This is like driving the truck with goods to market. *
+ * Buy orders - including requests for goods not for sale
+ * Trade completion
+ * Country-market updates prices based on what was sold. If most was sold, more expensive etc.
+ * Pricelist distribution. With pricelist comes the companies offering
+ * Production
+ * <p>
  * Trades are
  *
+ * For now, I will NOT be using the FSM (Final State Machine) implementation pattern - crawl before walking and all that...
  */
-public class CountryMainActor extends AbstractBehavior<CountryDayStartCommand> {
+public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryMainActorCommand> {
     private final int poolSize = 4;
+    private final CountryStatisticsReceiver statsReceiver;
 
-    private PoolRouter<C_SellOrder> allCompaniesPool;
-    private ActorRef<C_SellOrder> randomCompaniesProxy;
+    private PoolRouter<ShardCompany.ShardCompanyCommand> allCompaniesPool;
+    private ActorRef<ShardCompany.ShardCompanyCommand> randomCompaniesProxy;
 
-    public static Behavior<CountryDayStartCommand> create() {
+    public interface CountryMainActorCommand{}
+
+    public interface CountryStatisticsReceiver {
+        void addDay(CountryDayStatistics stats);
+    }
+
+    public record CountryDayStatistics(
+            int daySeqNo,
+            int companyCount,
+            int popCount,
+            int[] pricelist
+    ) {
+    }
+
+    public static Behavior<CountryMainActorCommand> create(CountryStatisticsReceiver statsReceiver) {
 
         return Behaviors.setup(
                 context -> {
-                    CountryMainActor countryActor = new CountryMainActor(context);
+                    CountryMainActor countryActor = new CountryMainActor(context, statsReceiver);
                     return countryActor;
                 });
 
     }
 
-    public CountryMainActor(ActorContext<CountryDayStartCommand> context) {
+    public CountryMainActor(ActorContext<CountryMainActorCommand> context, CountryStatisticsReceiver statsReceiver) {
         super(context);
+        this.statsReceiver = statsReceiver;
         getContext().getLog().info("ShardCountry Constructor Start");
         allCompaniesPool =
                 Routers.pool(
@@ -53,14 +70,14 @@ public class CountryMainActor extends AbstractBehavior<CountryDayStartCommand> {
     }
 
     @Override
-    public Receive<CountryDayStartCommand> createReceive() {
+    public Receive<CountryMainActorCommand> createReceive() {
         getContext().getLog().info("ShardCountry createReceive");
-        return newReceiveBuilder().onMessage(CountryDayStartCommand.class, this::onNewDayStartReceived).build();
+        return newReceiveBuilder().onMessage(CountryMainActorCommand.class, this::onNewDayStartReceived).build();
     }
 
-    private Behavior<CountryDayStartCommand> onNewDayStartReceived(CountryDayStartCommand incomingOrder) {
+    private Behavior<CountryMainActorCommand> onNewDayStartReceived(CountryMainActorCommand incomingOrder) {
         getContext().getLog().info("New order received for {}", incomingOrder);
-        randomCompaniesProxy.tell(new C_SellOrder(1,1));
+        randomCompaniesProxy.tell(new C_MarketOpenForSellers(1));
         return Behaviors.same();
     }
 

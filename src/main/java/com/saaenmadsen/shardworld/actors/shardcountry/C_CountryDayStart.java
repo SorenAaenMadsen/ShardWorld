@@ -1,24 +1,22 @@
-package com.saaenmadsen.shardworld.actors.countrymarket;
+package com.saaenmadsen.shardworld.actors.shardcountry;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public record C_SellOrder  (
-        int skuId,
-        int count
-    ) {
+public record C_CountryDayStart(
+        int dayId
+) implements CountryMainActor.CountryMainActorCommand {
 
-    public static C_SellOrder fromJson(String json){
+    public static C_CountryDayStart fromJson(String json) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(json, C_SellOrder.class);
+            return mapper.readValue(json, C_CountryDayStart.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String toJson(){
-
+    public String toJson() {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(this);

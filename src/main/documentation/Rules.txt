@@ -5,3 +5,4 @@ Lets place commands with the class that needs to RECEIVE them.
 Prefix all command classes with C_
 
 
+For now, I will just anticipate all message sending to be stable and work - I know that is not the truth, but - need to start somewhere! :)

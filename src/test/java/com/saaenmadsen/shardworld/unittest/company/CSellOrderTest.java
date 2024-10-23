@@ -1,6 +1,6 @@
 package com.saaenmadsen.shardworld.unittest.company;
 
-import com.saaenmadsen.shardworld.actors.countrymarket.C_SellOrder;
+import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,14 +10,14 @@ public class CSellOrderTest {
 
     @Test
     public void toAndFromJsonTest(){
-            C_SellOrder originalCommand = new C_SellOrder(12,12);
+            C_SendSkuToMarketForSale originalCommand = new C_SendSkuToMarketForSale(12,12);
         String json = originalCommand.toJson();
-        C_SellOrder parsed = C_SellOrder.fromJson(json);
+        C_SendSkuToMarketForSale parsed = C_SendSkuToMarketForSale.fromJson(json);
 
         assertEquals( originalCommand.count(), parsed.count());
         assertEquals( originalCommand.skuId(), parsed.skuId());
 
-        C_SellOrder differentCommand = new C_SellOrder(12,14);
+        C_SendSkuToMarketForSale differentCommand = new C_SendSkuToMarketForSale(12,14);
         assertNotEquals( originalCommand.count(), differentCommand.count());
         assertEquals( originalCommand.skuId(), differentCommand.skuId());
     }

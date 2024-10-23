@@ -1,15 +1,20 @@
 package com.saaenmadsen.shardworld.integrationtest;
 
 import akka.actor.typed.ActorSystem;
-import com.saaenmadsen.shardworld.actors.shardcountry.CountryDayStartCommand;
+import com.saaenmadsen.shardworld.actors.shardcountry.C_CountryDayStart;
 import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
+import com.saaenmadsen.shardworld.statistics.CountryStatisticsReceiver;
 import org.junit.jupiter.api.Test;
 
 public class CountryMarketCycleTest {
+
     @Test
     public void testSimpleMarketCycle() throws InterruptedException {
-        ActorSystem<CountryDayStartCommand> countryActor = ActorSystem.create(CountryMainActor.create(), "MyCountryActor");
-        countryActor.tell(new CountryDayStartCommand(1));
+
+
+        CountryStatisticsReceiver statsReceiver = new CountryStatisticsReceiver();
+        ActorSystem<CountryMainActor.CountryMainActorCommand> countryActor = ActorSystem.create(CountryMainActor.create(statsReceiver), "MyCountryActor");
+        countryActor.tell(new C_CountryDayStart(1));
 
 //        implicit val timeout = Timeout(FiniteDuration(1, TimeUnit.SECONDS))
 //        countryActor.
