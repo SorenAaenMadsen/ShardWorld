@@ -1,6 +1,7 @@
 package com.saaenmadsen.shardworld.unittest.company;
 
 import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
+import com.saaenmadsen.shardworld.modeltypes.SkuStock;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,17 +10,22 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class CSellOrderTest {
 
     @Test
-    public void toAndFromJsonTest(){
-            C_SendSkuToMarketForSale originalCommand = new C_SendSkuToMarketForSale(12,12);
+    public void toAndFromJsonTest() {
+        SkuStock originalStock = new SkuStock();
+        originalStock.setSkuCount(0, 14);
+        originalStock.setSkuCount(1, 18);
+
+        C_SendSkuToMarketForSale originalCommand = new C_SendSkuToMarketForSale(originalStock, null);
         String json = originalCommand.toJson();
         C_SendSkuToMarketForSale parsed = C_SendSkuToMarketForSale.fromJson(json);
 
-        assertEquals( originalCommand.count(), parsed.count());
-        assertEquals( originalCommand.skuId(), parsed.skuId());
+        assertEquals(originalCommand.forSaleList(), parsed.forSaleList());
 
-        C_SendSkuToMarketForSale differentCommand = new C_SendSkuToMarketForSale(12,14);
-        assertNotEquals( originalCommand.count(), differentCommand.count());
-        assertEquals( originalCommand.skuId(), differentCommand.skuId());
+        SkuStock differentStock = new SkuStock();
+        originalStock.setSkuCount(0, 64);
+        originalStock.setSkuCount(1, 564);
+        C_SendSkuToMarketForSale differentCommand = new C_SendSkuToMarketForSale(differentStock, null);
+        assertNotEquals(originalCommand.forSaleList(), differentCommand.forSaleList());
     }
 
 

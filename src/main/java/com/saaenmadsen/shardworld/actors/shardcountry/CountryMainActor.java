@@ -18,7 +18,7 @@ import java.util.List;
  * For both population and companies, there is a turn seqeunce like:
  * <p>
  * Import is actually just another company?? When importing a SKU for the first time, use the import prize +% as trade price.
- * Companies send their stock-for-sale to Country-market. This is like driving the truck with goods to market. *
+ * Companies send their wishList-for-sale to Country-market. This is like driving the truck with goods to market. *
  * Buy orders - including requests for goods not for sale
  * Trade completion
  * Country-market updates prices based on what was sold. If most was sold, more expensive etc.
@@ -73,7 +73,7 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
             String companyName = "company-" + i;
             allCompanies.add(context.spawn(ShardCompany.create(companyName), companyName));
         }
-        countryMarket = context.spawn(CountryMarket.create(), "market");
+        countryMarket = context.spawn(CountryMarket.create(context.getSelf()), "market");
 
         getContext().getLog().info("ShardCountry Constructor Completed");
     }

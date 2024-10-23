@@ -1,36 +1,46 @@
 package com.saaenmadsen.shardworld.actors.countrymarket;
 
+import akka.actor.typed.ActorRef;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-import com.saaenmadsen.shardworld.actors.company.C_MarketOpenForSellers;
+import com.saaenmadsen.shardworld.actors.company.*;
+import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
+import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
+import com.saaenmadsen.shardworld.modeltypes.SkuStock;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 
 public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketCommand> {
     protected static Random dice = new Random();
     protected static int maxMillisecondsCookTime = 200;
+    private final ActorRef<CountryMainActor.CountryMainActorCommand> country;
 
     private PriceList priceList;
+    List<C_SendSkuToMarketForSale> forSaleLists;
+    List<C_BuyOrder> buyOrderList;
+    int companiesDoneWithMarketDay;
+
+    private List<ActorRef<ShardCompany.ShardCompanyCommand>> allCompanies;
+    private int dayId;
 
     public interface CountryMarketCommand {}
 
-    public static Behavior<CountryMarketCommand> create() {
-        return Behaviors.setup(CountryMarket::new);
+    public static Behavior<CountryMarketCommand> create(ActorRef<CountryMainActor.CountryMainActorCommand> country) {
+        return Behaviors.setup(context -> new CountryMarket(context, country));
     }
 
-    public CountryMarket(ActorContext<CountryMarketCommand> context) {
+    public CountryMarket(ActorContext<CountryMarketCommand> context, ActorRef<CountryMainActor.CountryMainActorCommand> country) {
         super(context);
         priceList = new PriceList();
-    }
-
-    static final Behavior<CountryMarketCommand> create(ActorSystem<CountryMarketCommand> kitchenOutbox) {
-        return Behaviors.setup(CountryMarket::new);
+        this.country = country;
     }
 
     @Override
@@ -46,19 +56,49 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
 
     private Behavior<CountryMarketCommand> onReceiveBuyOrder(C_BuyOrder message) {
         getContext().getLog().info("Market got message {}", message.toString());
+        this.buyOrderList.add(message);
+
+        SkuStock shoppingCart = new SkuStock();
+
+        forSaleLists.forEach(booth->booth.forSaleList().serveCustomer(shoppingCart, message.wishList()));
+        message.buyer().tell(new C_CompletedBuyOrder(shoppingCart));
+
+        if(buyOrderList.size() >= allCompanies.size()) {
+            // This could be a state shift :)
+
+            // Send unsold stuff back to the sellers.
+            forSaleLists.forEach(booth->booth.seller().tell(new C_SendUnsoldSkuBackToSeller(booth.forSaleList(), getContext().getSelf())));
+        }
         return Behaviors.same();
     }
+
     private Behavior<CountryMarketCommand> onReceiveEndMarketDay(C_EndMarketDay message) {
         getContext().getLog().info("Market got message {}", message.toString());
+        companiesDoneWithMarketDay++;
+        if(companiesDoneWithMarketDay == allCompanies.size()) {
+            country.tell(new C_EndMarketDayCycle(dayId));
+        }
         return Behaviors.same();
     }
+
+
     private Behavior<CountryMarketCommand> onReceiveSendSkuToMarketForSale(C_SendSkuToMarketForSale message) {
         getContext().getLog().info("Market got message {}", message.toString());
+        forSaleLists.add(message);
+        if(forSaleLists.size() >= allCompanies.size()) {
+            // This could be a state shift :)
+            allCompanies.forEach(c->c.tell(new C_MarketOpenForBuyers(dayId, priceList, getContext().getSelf())));
+        }
         return Behaviors.same();
     }
     private Behavior<CountryMarketCommand> onReceiveStartMarketDayCycle(C_StartMarketDayCycle message) {
         getContext().getLog().info("Market got message {}", message.toString());
-        message.allCompanies().stream().forEach(c->c.tell(new C_MarketOpenForSellers(message.dayId(), priceList, getContext().getSelf())));
+        forSaleLists = new ArrayList<>();
+        buyOrderList = new ArrayList<>();
+        companiesDoneWithMarketDay = 0;
+        this.allCompanies = message.allCompanies();
+        this.dayId = message.dayId();
+        message.allCompanies().forEach(c->c.tell(new C_MarketOpenForSellers(message.dayId(), priceList, getContext().getSelf())));
         return Behaviors.same();
     }
 

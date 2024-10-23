@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public record C_EndMarketDay(
-        int dayId
+        String companyName
 ) implements CountryMarket.CountryMarketCommand{
 
     public static C_EndMarketDay fromJson(String json) {
