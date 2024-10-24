@@ -9,6 +9,10 @@ import com.saaenmadsen.shardworld.actors.shardworld.C_WorldDayEnd;
 import com.saaenmadsen.shardworld.actors.shardworld.ShardWorldActor;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.actors.company.ShardCompany;
+import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
+import com.saaenmadsen.shardworld.statistics.CountryDayStats;
+import com.saaenmadsen.shardworld.statistics.MarketDayStats;
+import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,42 +36,23 @@ import java.util.List;
 public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryMainActorCommand> {
     private WorldSettings worldSettings;
     private final ActorRef<ShardWorldActor.WorldCommand> worldActorReference;
-    private final int poolSize = 4;
-    private final CountryStatisticsReceiver statsReceiver;
-
-
 
     private List<ActorRef<ShardCompany.ShardCompanyCommand>> allCompanies = new ArrayList<>();
     private ActorRef<CountryMarket.CountryMarketCommand> countryMarket;
 
     public interface CountryMainActorCommand{}
 
-    public interface CountryStatisticsReceiver {
-        void addDay(CountryDayStatistics stats);
-    }
-
-    public record CountryDayStatistics(
-            int daySeqNo,
-            int companyCount,
-            int popCount,
-            int[] pricelist
-    ) {
-    }
-
-    public static Behavior<CountryMainActorCommand> create(WorldSettings worldSettings, CountryStatisticsReceiver statsReceiver, ActorRef<ShardWorldActor.WorldCommand> worldActorReference) {
-
-
+    public static Behavior<CountryMainActorCommand> create(WorldSettings worldSettings, ActorRef<ShardWorldActor.WorldCommand> worldActorReference) {
         return Behaviors.setup(
                 context -> {
-                    CountryMainActor countryActor = new CountryMainActor(context, statsReceiver, worldSettings, worldActorReference);
+                    CountryMainActor countryActor = new CountryMainActor(context, worldSettings, worldActorReference);
                     return countryActor;
                 });
 
     }
 
-    public CountryMainActor(ActorContext<CountryMainActorCommand> context, CountryStatisticsReceiver statsReceiver, WorldSettings worldSettings, ActorRef<ShardWorldActor.WorldCommand> worldActorReference) {
+    public CountryMainActor(ActorContext<CountryMainActorCommand> context, WorldSettings worldSettings, ActorRef<ShardWorldActor.WorldCommand> worldActorReference) {
         super(context);
-        this.statsReceiver = statsReceiver;
         this.worldSettings = worldSettings;
         this.worldActorReference = worldActorReference;
         getContext().getLog().info("ShardCountry Constructor Start");
@@ -99,7 +84,8 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
 
     private Behavior<CountryMainActorCommand> onEndMarketDayCycle(C_EndMarketDayCycle message) {
         getContext().getLog().info("onEndMarketDayCycle order received: {}", message);
-        worldActorReference.tell(new C_WorldDayEnd(message.dayId()));
+        CountryDayStats countryDayStats = new CountryDayStats(message.dayId(), new CompanyDayStats[]{}, new MarketDayStats[]{});
+        worldActorReference.tell(new C_WorldDayEnd(message.dayId(), countryDayStats));
 
         return Behaviors.same();
     }

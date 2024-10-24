@@ -25,6 +25,15 @@ public enum Recipe {
             if(productName.isEmpty()) return Optional.empty();
             return Optional.of(new SkuAndCount(StockKeepUnit.getByProductName(productName), Integer.parseInt(amount)));
         }
+
+        @Override
+        public String toString() {
+            return "SkuAndCount{" +
+                    "skuId=" + sku.getArrayId() +
+                    "productName=" + sku.getProductName() +
+                    ", amount=" + amount +
+                    '}';
+        }
     };
     private final List<SkuAndCount> inputs = new ArrayList<>();
     private final List<SkuAndCount> outputs = new ArrayList<>();
@@ -40,6 +49,18 @@ public enum Recipe {
 //    private final int skillLevel2;
 
 
+    @Override
+    public String toString() {
+        return "Recipe{" +
+                "inputs=" + inputs +
+                ", outputs=" + outputs +
+                ", recipeId=" + recipeId +
+                ", recipeName='" + recipeName + '\'' +
+                ", processDescription='" + processDescription + '\'' +
+                ", calenderWaitTimeFromProductionToAvailable=" + calenderWaitTimeFromProductionToAvailable +
+                ", workTimeTimes10Minutes=" + workTimeTimes10Minutes +
+                '}';
+    }
 
     Recipe(int recipeId, String recipeName, String productProduced, String producedAmount, String processDescription, String input_1, String input_1_amount, String input_2, String input_2_amount, String calenderWaitTimeFromProductionToAvailable, String workTime_times10Minutes, String skillLevel_1, String skillLevel_2) {
         this.recipeId = recipeId;

@@ -1,37 +1,36 @@
 package com.saaenmadsen.shardworld.integrationtest;
 
+import akka.Done;
 import akka.actor.typed.ActorSystem;
+import com.saaenmadsen.shardworld.Main;
 import com.saaenmadsen.shardworld.actors.shardworld.C_ShardWorldSystemStart;
 import com.saaenmadsen.shardworld.actors.shardworld.ShardWorldActor;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
-import com.saaenmadsen.shardworld.actors.shardcountry.C_CountryDayStart;
-import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
-import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
-import com.saaenmadsen.shardworld.statistics.CountryStatisticsReceiver;
+import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import scala.concurrent.Future;
 
 public class CountryMarketCycleTest {
 
-    /*
-    @Test
-    public void testSimpleMarketCycleFromCountry() throws InterruptedException {
-
-
-        CountryStatisticsReceiver statsReceiver = new CountryStatisticsReceiver();
-        WorldSettings worldSettings = new WorldSettings(10, 1);
-        ActorSystem<CountryMainActor.CountryMainActorCommand> countryActor = ActorSystem.create(CountryMainActor.create(worldSettings, statsReceiver, getContext().getSelf()), "MyCountryActor");
-        countryActor.tell(new C_CountryDayStart(1));
-        countryActor.tell(new C_EndMarketDayCycle(1));
-
-
-        Thread.sleep(4000);
-    }*/
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     @Test
-    public void testWorldRuns() {
+    public void testWorldRuns() throws InterruptedException {
         WorldSettings worldSettings = new WorldSettings(10, 1, 10);
-        ActorSystem<ShardWorldActor.WorldCommand> worldActor = ActorSystem.create(ShardWorldActor.create(worldSettings), "MyWorld");
+        WorldStatisticsReceiver worldStatisticsReceiver = new WorldStatisticsReceiver(worldSettings);
+
+        ActorSystem<ShardWorldActor.WorldCommand> worldActor = ActorSystem.create(ShardWorldActor.create(worldSettings, worldStatisticsReceiver), "MyWorld");
         worldActor.tell(new C_ShardWorldSystemStart());
+
+        synchronized (worldActor){
+            worldActor.wait(4000);
+        }
+
+        log.info(worldStatisticsReceiver.toString());
+
+
 
     }
 }

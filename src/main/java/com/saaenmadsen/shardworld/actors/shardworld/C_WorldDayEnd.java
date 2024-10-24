@@ -2,10 +2,11 @@ package com.saaenmadsen.shardworld.actors.shardworld;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.saaenmadsen.shardworld.statistics.CountryDayStats;
 
 public record C_WorldDayEnd(
-        int dayId
-) implements ShardWorldActor.WorldCommand {
+        int dayId,
+        CountryDayStats countryDayStats) implements ShardWorldActor.WorldCommand {
 
     public static C_WorldDayEnd fromJson(String json){
         ObjectMapper mapper = new ObjectMapper();
