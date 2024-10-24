@@ -4,7 +4,7 @@ import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
-import com.saaenmadsen.shardworld.modeltypes.SkuStock;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,9 +22,9 @@ public class RecipeAndProductionForecastTest {
     @Test
     public void ProductionImpactReportTest() {
         Recipe recipe = Recipe.PRIMITIVE_WOODEN_SHUE;
-        SkuStock skuStock = new SkuStock();
-        skuStock.setSkuCount(StockKeepUnit.WOOD_KG.getArrayId(), 100);
-        ProductionImpactReport report = recipe.evaluateRawMaterialImpact(200, skuStock);
+        StockListing stockListing = new StockListing();
+        stockListing.setSkuCount(StockKeepUnit.WOOD_KG.getArrayId(), 100);
+        ProductionImpactReport report = recipe.evaluateRawMaterialImpact(200, stockListing);
         assertEquals(8, report.maxProductionBeforeRunningOutOfTimeOrMaterials());
         assertEquals(8, report.leftOverWorkTime());
         assertEquals(84, report.leftOverStock().getSkuCount(StockKeepUnit.WOOD_KG.getArrayId()));

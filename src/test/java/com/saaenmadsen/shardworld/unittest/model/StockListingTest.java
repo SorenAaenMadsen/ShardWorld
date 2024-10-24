@@ -1,17 +1,17 @@
 package com.saaenmadsen.shardworld.unittest.model;
 
-import com.saaenmadsen.shardworld.modeltypes.SkuStock;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SkuStockTest {
+public class StockListingTest {
     @Test
     public void StockPurchaseSaleTest() {
-        SkuStock seller1 = new SkuStock();
-        SkuStock seller2 = new SkuStock();
-        SkuStock shoppingCart = new SkuStock();
-        SkuStock wishList = new SkuStock();
+        StockListing seller1 = new StockListing();
+        StockListing seller2 = new StockListing();
+        StockListing shoppingCart = new StockListing();
+        StockListing wishList = new StockListing();
 
         seller1.setSkuCount(0, 10);
         seller1.setSkuCount(1, 10);

@@ -12,17 +12,19 @@ import com.saaenmadsen.shardworld.actors.countrymarket.C_BuyOrder;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_EndMarketDay;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
 import com.saaenmadsen.shardworld.constants.Recipe;
-import com.saaenmadsen.shardworld.modeltypes.SkuStock;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import akka.actor.typed.javadsl.Adapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyCommand> {
     private String companyName;
-    private SkuStock stock;
+    private StockListing warehouse;
     private List<Recipe> myRecipes = new ArrayList<>();
     private int workers = 10;
+    private PriceList priceList;
 
     public interface ShardCompanyCommand {
     }
@@ -34,7 +36,9 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     public ShardCompany(ActorContext<ShardCompanyCommand> context, String companyName) {
         super(context);
         this.companyName = companyName;
-        this.stock = new SkuStock();
+        this.warehouse = new StockListing();
+        this.priceList = new PriceList();
+        investInNewProductionRecipies(warehouse, priceList);
     }
 
 
@@ -49,16 +53,12 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
                 .build();
     }
 
-    private Behavior<ShardCompanyCommand> onSendUnsoldSkuBackToSeller(C_SendUnsoldSkuBackToSeller message) {
-        getContext().getLog().info(companyName + " got message {}", message.toString());
-        message.market().tell(new C_EndMarketDay(this.companyName));
-        return Behaviors.same();
-    }
+    // ****************** Acions *************************
 
     private Behavior<ShardCompanyCommand> onReceiveMarketOpenForSellers(C_MarketOpenForSellers message) {
         getContext().getLog().info(companyName + " got message {}", message.toString());
         ActorRef parent = Adapter.toClassic(getContext()).parent();
-
+        this.priceList = message.priceList();
         doProduction(message.priceList());
         sendSkuItemsForSaleToMarket(message);
 
@@ -66,16 +66,25 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     }
 
     private void doProduction(PriceList priceList) {
-        RecipeChoiceReport toWorkRecipe = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(myRecipes, stock, priceList, workers * 8);
+        RecipeChoiceReport toWorkRecipe = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(myRecipes, warehouse, priceList, workers * 8);
         for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : toWorkRecipe.productionChoices()) {
-            productionChoice.recipe().runProduction(productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials(), stock);
+
+            getContext().getLog().info(companyName + " production {}  ", productionChoice.recipe().name() + " a total of " + productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials() + " times.");
+            productionChoice.recipe().runProduction(productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials(), warehouse);
         }
     }
 
     private void sendSkuItemsForSaleToMarket(C_MarketOpenForSellers message) {
         // For now, just setting everything for sale.
-        SkuStock forSaleList = stock.retrieve(stock);
+        StockListing forSaleList = warehouse.retrieve(warehouse);
         message.countryMarket().tell(new C_SendSkuToMarketForSale(forSaleList, getContext().getSelf()));
+    }
+
+    private Behavior<ShardCompanyCommand> onReceiveMarketOpenForBuyers(C_MarketOpenForBuyers message) {
+        getContext().getLog().info(companyName + " got message {}", message.toString());
+        StockListing buyList = new StockListing();
+        message.countryMarket().tell(new C_BuyOrder(buyList, getContext().getSelf()) );
+        return Behaviors.same();
     }
 
     private Behavior<ShardCompanyCommand> onReceiveCompletedBuyOrder(C_CompletedBuyOrder message) {
@@ -84,11 +93,28 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         return Behaviors.same();
     }
 
-    private Behavior<ShardCompanyCommand> onReceiveMarketOpenForBuyers(C_MarketOpenForBuyers message) {
+    private Behavior<ShardCompanyCommand> onSendUnsoldSkuBackToSeller(C_SendUnsoldSkuBackToSeller message) {
         getContext().getLog().info(companyName + " got message {}", message.toString());
-        SkuStock buyList = new SkuStock();
-        message.countryMarket().tell(new C_BuyOrder(buyList, getContext().getSelf()) );
+        warehouse.addStockFromList(message.unsoldGoods());
+        investInNewProductionRecipies(warehouse, priceList);
+
+        message.market().tell(new C_EndMarketDay(this.companyName));
         return Behaviors.same();
+    }
+
+    private void investInNewProductionRecipies(StockListing warehouse, PriceList priceList) {
+        String logMessage = companyName + " recipe adjustment: ";
+        if(myRecipes.size()>5){
+            logMessage += " removed " + myRecipes.getFirst().name();
+            myRecipes.removeFirst();
+        }
+        Random dice = new Random();
+        int newRecipeIndex = dice.nextInt(Recipe.values().length);
+        Recipe newRecipe = Recipe.values()[newRecipeIndex];
+        myRecipes.add(newRecipe);
+        logMessage += " added " + newRecipe.name();
+        getContext().getLog().info(logMessage);
+
     }
 
 

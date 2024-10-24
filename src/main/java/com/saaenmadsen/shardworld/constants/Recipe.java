@@ -1,7 +1,7 @@
 package com.saaenmadsen.shardworld.constants;
 
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
-import com.saaenmadsen.shardworld.modeltypes.SkuStock;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ public enum Recipe {
         return (valueCreated-expenses)/workTimeTimes10Minutes;
     }
 
-    public ProductionImpactReport evaluateRawMaterialImpact(int workTimeAvailable, SkuStock myRawMaterials) {
+    public ProductionImpactReport evaluateRawMaterialImpact(int workTimeAvailable, StockListing myRawMaterials) {
         int productionTimeLimit = workTimeAvailable / this.workTimeTimes10Minutes;
         Stream<Integer> rawMaterialsLimits = inputs.stream().map(inputProduct -> howManyProductionRunsWillThisRawMaterialSupport(myRawMaterials, inputProduct));
         OptionalInt rawMaterialsLimit = rawMaterialsLimits.mapToInt(Integer::intValue).min();
@@ -75,8 +75,8 @@ public enum Recipe {
         int maxRuns = rawMaterialsLimit.isPresent()?Math.min(rawMaterialsLimit.getAsInt(), productionTimeLimit):  productionTimeLimit;
         int leftOverTime = workTimeAvailable - maxRuns*workTimeTimes10Minutes;
 
-        SkuStock copyOfStock = myRawMaterials.createDuplicate();
-        SkuStock consumptionStock = new SkuStock();
+        StockListing copyOfStock = myRawMaterials.createDuplicate();
+        StockListing consumptionStock = new StockListing();
         for (SkuAndCount input : inputs) {
             consumptionStock.setSkuCount(input.sku().getArrayId(), input.amount*maxRuns);
         }
@@ -85,11 +85,11 @@ public enum Recipe {
         return new ProductionImpactReport(maxRuns, leftOverTime, consumptionStock, copyOfStock);
     }
 
-    private static int howManyProductionRunsWillThisRawMaterialSupport(SkuStock myRawMaterials, SkuAndCount inputProduct) {
+    private static int howManyProductionRunsWillThisRawMaterialSupport(StockListing myRawMaterials, SkuAndCount inputProduct) {
         return myRawMaterials.getSkuCount(inputProduct.sku.getArrayId() )/ inputProduct.amount;
     }
 
-    public void runProduction(int numberOfRuns, SkuStock stock){
+    public void runProduction(int numberOfRuns, StockListing stock){
         for (SkuAndCount input : inputs) {
             stock.addStockAmount(input.sku().getArrayId(), -input.amount*numberOfRuns);
         }

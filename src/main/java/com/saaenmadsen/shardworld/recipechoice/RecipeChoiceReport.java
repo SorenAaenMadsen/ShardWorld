@@ -2,7 +2,7 @@ package com.saaenmadsen.shardworld.recipechoice;
 
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
-import com.saaenmadsen.shardworld.modeltypes.SkuStock;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
     public record RecipeChoiceReportElement(Recipe recipe, ProductionImpactReport productionImpactReport, int projectedProfit){}
 
 
-    public static RecipeChoiceReport findRecipeWithHighestProjectedProfit(List<Recipe> availableRecipies, SkuStock myRawMaterials, PriceList priceList, int workTimeAvailable) {
+    public static RecipeChoiceReport findRecipeWithHighestProjectedProfit(List<Recipe> availableRecipies, StockListing myRawMaterials, PriceList priceList, int workTimeAvailable) {
         int projectedProfit = 0;
 
         RecipeChoiceReportElement chosenRecipe = null;
@@ -30,7 +30,11 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
 
         }
         ArrayList<RecipeChoiceReportElement> reportElements = new ArrayList<>();
-        reportElements.add(chosenRecipe);
-        return new RecipeChoiceReport(reportElements);
+        if(chosenRecipe == null){
+            return new RecipeChoiceReport(reportElements);
+        } else {
+            reportElements.add(chosenRecipe);
+            return new RecipeChoiceReport(reportElements);
+        }
     }
 }

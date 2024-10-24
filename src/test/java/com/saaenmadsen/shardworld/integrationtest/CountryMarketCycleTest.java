@@ -20,12 +20,6 @@ public class CountryMarketCycleTest {
         countryActor.tell(new C_CountryDayStart(1));
         countryActor.tell(new C_EndMarketDayCycle(1));
 
-//        implicit val timeout = Timeout(FiniteDuration(1, TimeUnit.SECONDS))
-//        countryActor.
-//        Akka.system.actorSelection("user/" + "somename").resolveOne().onComplete {
-//            case Success(actorRef) => // logic with the actorRef
-//            case Failure(ex) => Logger.warn("user/" + "somename" + " does not exist")
-//        }
 
         Thread.sleep(4000);
     }

@@ -1,7 +1,6 @@
 package com.saaenmadsen.shardworld.actors.countrymarket;
 
 import akka.actor.typed.ActorRef;
-import akka.actor.typed.ActorSystem;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
@@ -11,7 +10,7 @@ import com.saaenmadsen.shardworld.actors.company.*;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
 import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
-import com.saaenmadsen.shardworld.modeltypes.SkuStock;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,7 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
         getContext().getLog().info("Market got message {}", message.toString());
         this.buyOrderList.add(message);
 
-        SkuStock shoppingCart = new SkuStock();
+        StockListing shoppingCart = new StockListing();
 
         forSaleLists.forEach(booth->booth.forSaleList().serveCustomer(shoppingCart, message.wishList()));
         message.buyer().tell(new C_CompletedBuyOrder(shoppingCart));

@@ -3,10 +3,10 @@ package com.saaenmadsen.shardworld.actors.company;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saaenmadsen.shardworld.actors.countrymarket.CountryMarket;
-import com.saaenmadsen.shardworld.modeltypes.SkuStock;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 public record C_SendUnsoldSkuBackToSeller(
-        SkuStock unsoldGoods,
+        StockListing unsoldGoods,
         akka.actor.typed.ActorRef<CountryMarket.CountryMarketCommand> market) implements ShardCompany.ShardCompanyCommand{
 
     public static C_SendUnsoldSkuBackToSeller fromJson(String json){

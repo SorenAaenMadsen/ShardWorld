@@ -5,19 +5,19 @@ import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class SkuStock {
+public class StockListing {
 
 
     private int[] stock;
 
-    public SkuStock() {
+    public StockListing() {
         this.stock = new int[StockKeepUnit.values().length];
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             stock[i] = 0;
         }
     }
 
-    private SkuStock(SkuStock skuStock) {
+    private StockListing(StockListing skuStock) {
         this.stock = new int[skuStock.stock.length];
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             stock[i] = skuStock.stock[i];
@@ -35,8 +35,8 @@ public class SkuStock {
     /**
      * Substracts the amounts in the wishlist from this wishList, and returns the new wishList list.
      */
-    public SkuStock retrieve(SkuStock wishList) {
-        SkuStock retrieved = new SkuStock();
+    public StockListing retrieve(StockListing wishList) {
+        StockListing retrieved = new StockListing();
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             int actualAmount = 0;
             if (wishList.getSkuCount(i) <= stock[i]) {
@@ -53,7 +53,7 @@ public class SkuStock {
     /**
      * The customer comes with his shopping list, and his cart. We fulfill what we can, and he will continue his merry way.
      */
-    public void serveCustomer(SkuStock shoppingCart, SkuStock shoppingList) {
+    public void serveCustomer(StockListing shoppingCart, StockListing shoppingList) {
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
 
             int missingAmountInCart = shoppingList.getSkuCount(i)-shoppingCart.getSkuCount(i);
@@ -80,8 +80,8 @@ public class SkuStock {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SkuStock skuStock)) return false;
-        return Objects.deepEquals(stock, skuStock.stock);
+        if (!(o instanceof StockListing stockListing)) return false;
+        return Objects.deepEquals(stock, stockListing.stock);
     }
 
     @Override
@@ -105,7 +105,13 @@ public class SkuStock {
     }
 
 
-    public SkuStock createDuplicate() {
-        return new SkuStock(this);
+    public StockListing createDuplicate() {
+        return new StockListing(this);
+    }
+
+    public void addStockFromList(StockListing stockListing) {
+        for (int i = 0; i < StockKeepUnit.values().length; ++i) {
+            stock[i] += stockListing.stock[i];
+        }
     }
 }

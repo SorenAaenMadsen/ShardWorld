@@ -2,9 +2,10 @@ package com.saaenmadsen.shardworld.actors.company;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 public record C_CompletedBuyOrder(
-        com.saaenmadsen.shardworld.modeltypes.SkuStock dayId
+        StockListing dayId
 ) implements ShardCompany.ShardCompanyCommand {
 
     public static C_CompletedBuyOrder fromJson(String json) {
