@@ -17,6 +17,13 @@ public class SkuStock {
         }
     }
 
+    private SkuStock(SkuStock skuStock) {
+        this.stock = new int[skuStock.stock.length];
+        for (int i = 0; i < StockKeepUnit.values().length; ++i) {
+            stock[i] = skuStock.stock[i];
+        }
+    }
+
     public int getSkuCount(int skuId) {
         return stock[skuId];
     }
@@ -63,8 +70,11 @@ public class SkuStock {
         }
     }
 
-    private void addStockAmount(int skuId, int addAmount) {
+    public void addStockAmount(int skuId, int addAmount) {
         stock[skuId] += addAmount;
+        if(stock[skuId]<0) {
+            throw new IllegalArgumentException("Stock cannot be negative");
+        }
     }
 
     @Override
@@ -95,4 +105,7 @@ public class SkuStock {
     }
 
 
+    public SkuStock createDuplicate() {
+        return new SkuStock(this);
+    }
 }

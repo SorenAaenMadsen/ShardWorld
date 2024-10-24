@@ -6,15 +6,23 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
+import com.saaenmadsen.shardworld.modeltypes.PriceList;
+import com.saaenmadsen.shardworld.recipechoice.RecipeChoiceReport;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_BuyOrder;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_EndMarketDay;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
+import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.modeltypes.SkuStock;
 import akka.actor.typed.javadsl.Adapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyCommand> {
     private String companyName;
     private SkuStock stock;
+    private List<Recipe> myRecipes = new ArrayList<>();
+    private int workers = 10;
 
     public interface ShardCompanyCommand {
     }
@@ -51,15 +59,17 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         getContext().getLog().info(companyName + " got message {}", message.toString());
         ActorRef parent = Adapter.toClassic(getContext()).parent();
 
-        doProduction();
+        doProduction(message.priceList());
         sendSkuItemsForSaleToMarket(message);
 
         return Behaviors.same();
     }
 
-    private void doProduction() {
-        stock.setSkuCount(0, 31);
-        stock.setSkuCount(1, 12);
+    private void doProduction(PriceList priceList) {
+        RecipeChoiceReport toWorkRecipe = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(myRecipes, stock, priceList, workers * 8);
+        for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : toWorkRecipe.productionChoices()) {
+            productionChoice.recipe().runProduction(productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials(), stock);
+        }
     }
 
     private void sendSkuItemsForSaleToMarket(C_MarketOpenForSellers message) {

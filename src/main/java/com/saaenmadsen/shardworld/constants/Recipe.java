@@ -1,11 +1,13 @@
 package com.saaenmadsen.shardworld.constants;
 
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
+import com.saaenmadsen.shardworld.modeltypes.SkuStock;
+import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.OptionalInt;
 import java.util.stream.Stream;
 
 public enum Recipe {
@@ -15,6 +17,7 @@ public enum Recipe {
     PRIMITIVE_TIMBER_CURING (3, "Primitive Timber Curing", "Timber, cured, kg", "10", "Drying wood in the most primitive way, building a small shelter around it while it dries.", "Timber, raw, kg", "15", "", "", "180", "2", "Forester_3", ""),
     GATHER_CURED_WOOD (4, "Gather Cured Wood", "Wood, kg", "5", "Finding cured blocks of timber amoung deadwood in the forest, and forming into blocks with only what tools can be found in nature", "", "", "", "", "0", "10", "Forester_1", ""),
     GATHER_FIREWOOD (5, "Gather Firewood", "Firewood, kg", "10", "Walking around to gather firewood ", "", "", "", "", "0", "3", "Forester_1", "");
+
 
 
     public record SkuAndCount(StockKeepUnit sku, int amount){
@@ -62,6 +65,37 @@ public enum Recipe {
         Integer expenses = inputs.stream().map(skuAndCount -> priceList.getPrice(skuAndCount.sku.getArrayId()) * skuAndCount.amount).mapToInt(Integer::intValue).sum();
         Integer valueCreated = outputs.stream().map(skuAndCount -> priceList.getPrice(skuAndCount.sku.getArrayId()) * skuAndCount.amount).mapToInt(Integer::intValue).sum();
         return (valueCreated-expenses)/workTimeTimes10Minutes;
+    }
+
+    public ProductionImpactReport evaluateRawMaterialImpact(int workTimeAvailable, SkuStock myRawMaterials) {
+        int productionTimeLimit = workTimeAvailable / this.workTimeTimes10Minutes;
+        Stream<Integer> rawMaterialsLimits = inputs.stream().map(inputProduct -> howManyProductionRunsWillThisRawMaterialSupport(myRawMaterials, inputProduct));
+        OptionalInt rawMaterialsLimit = rawMaterialsLimits.mapToInt(Integer::intValue).min();
+
+        int maxRuns = rawMaterialsLimit.isPresent()?Math.min(rawMaterialsLimit.getAsInt(), productionTimeLimit):  productionTimeLimit;
+        int leftOverTime = workTimeAvailable - maxRuns*workTimeTimes10Minutes;
+
+        SkuStock copyOfStock = myRawMaterials.createDuplicate();
+        SkuStock consumptionStock = new SkuStock();
+        for (SkuAndCount input : inputs) {
+            consumptionStock.setSkuCount(input.sku().getArrayId(), input.amount*maxRuns);
+        }
+        copyOfStock.retrieve(consumptionStock);
+
+        return new ProductionImpactReport(maxRuns, leftOverTime, consumptionStock, copyOfStock);
+    }
+
+    private static int howManyProductionRunsWillThisRawMaterialSupport(SkuStock myRawMaterials, SkuAndCount inputProduct) {
+        return myRawMaterials.getSkuCount(inputProduct.sku.getArrayId() )/ inputProduct.amount;
+    }
+
+    public void runProduction(int numberOfRuns, SkuStock stock){
+        for (SkuAndCount input : inputs) {
+            stock.addStockAmount(input.sku().getArrayId(), -input.amount*numberOfRuns);
+        }
+        for (SkuAndCount output : outputs) {
+            stock.addStockAmount(output.sku().getArrayId(), output.amount*numberOfRuns);
+        }
     }
 
 }
