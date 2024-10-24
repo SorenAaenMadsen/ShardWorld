@@ -5,10 +5,10 @@ import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_StartMarketDayCycle;
 import com.saaenmadsen.shardworld.actors.countrymarket.CountryMarket;
+import com.saaenmadsen.shardworld.actors.shardworld.C_WorldDayEnd;
+import com.saaenmadsen.shardworld.actors.shardworld.ShardWorldActor;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
-import com.saaenmadsen.shardworld.actors.company.C_MarketOpenForSellers;
 import com.saaenmadsen.shardworld.actors.company.ShardCompany;
-import com.saaenmadsen.shardworld.modeltypes.PriceList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,8 @@ import java.util.List;
  * For now, I will NOT be using the FSM (Final State Machine) implementation pattern - crawl before walking and all that...
  */
 public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryMainActorCommand> {
-    private static WorldSettings worldSettings;
+    private WorldSettings worldSettings;
+    private final ActorRef<ShardWorldActor.WorldCommand> worldActorReference;
     private final int poolSize = 4;
     private final CountryStatisticsReceiver statsReceiver;
 
@@ -53,23 +54,25 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
     ) {
     }
 
-    public static Behavior<CountryMainActorCommand> create(WorldSettings worldSettings, CountryStatisticsReceiver statsReceiver) {
-        CountryMainActor.worldSettings = worldSettings;
+    public static Behavior<CountryMainActorCommand> create(WorldSettings worldSettings, CountryStatisticsReceiver statsReceiver, ActorRef<ShardWorldActor.WorldCommand> worldActorReference) {
+
 
         return Behaviors.setup(
                 context -> {
-                    CountryMainActor countryActor = new CountryMainActor(context, statsReceiver);
+                    CountryMainActor countryActor = new CountryMainActor(context, statsReceiver, worldSettings, worldActorReference);
                     return countryActor;
                 });
 
     }
 
-    public CountryMainActor(ActorContext<CountryMainActorCommand> context, CountryStatisticsReceiver statsReceiver) {
+    public CountryMainActor(ActorContext<CountryMainActorCommand> context, CountryStatisticsReceiver statsReceiver, WorldSettings worldSettings, ActorRef<ShardWorldActor.WorldCommand> worldActorReference) {
         super(context);
         this.statsReceiver = statsReceiver;
+        this.worldSettings = worldSettings;
+        this.worldActorReference = worldActorReference;
         getContext().getLog().info("ShardCountry Constructor Start");
 
-        for(int i=0;i< worldSettings.companiesInCountry(); ++i) {
+        for(int i = 0; i< this.worldSettings.companyCount(); ++i) {
             String companyName = "company-" + i;
             allCompanies.add(context.spawn(ShardCompany.create(companyName), companyName));
         }
@@ -96,6 +99,7 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
 
     private Behavior<CountryMainActorCommand> onEndMarketDayCycle(C_EndMarketDayCycle message) {
         getContext().getLog().info("onEndMarketDayCycle order received: {}", message);
+        worldActorReference.tell(new C_WorldDayEnd(message.dayId()));
 
         return Behaviors.same();
     }

@@ -57,7 +57,7 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
         getContext().getLog().info("Market got message {}", message.toString());
         this.buyOrderList.add(message);
 
-        StockListing shoppingCart = new StockListing();
+        StockListing shoppingCart = StockListing.createEmptyStockListing();
 
         forSaleLists.forEach(booth->booth.forSaleList().serveCustomer(shoppingCart, message.wishList()));
         message.buyer().tell(new C_CompletedBuyOrder(shoppingCart));

@@ -10,10 +10,10 @@ public class StockListing {
 
     private int[] stock;
 
-    public StockListing() {
+    private StockListing(int initialVal) {
         this.stock = new int[StockKeepUnit.values().length];
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
-            stock[i] = 0;
+            stock[i] = initialVal;
         }
     }
 
@@ -22,6 +22,18 @@ public class StockListing {
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             stock[i] = skuStock.stock[i];
         }
+    }
+
+    public static StockListing createEmptyStockListing() {
+        return new StockListing(new StockListing(0));
+    }
+
+    public static StockListing createMaxedOutStockListing() {
+        return new StockListing(Integer.MAX_VALUE);
+    }
+
+    public StockListing createDuplicate() {
+        return new StockListing(this);
     }
 
     public int getSkuCount(int skuId) {
@@ -36,7 +48,7 @@ public class StockListing {
      * Substracts the amounts in the wishlist from this wishList, and returns the new wishList list.
      */
     public StockListing retrieve(StockListing wishList) {
-        StockListing retrieved = new StockListing();
+        StockListing retrieved = StockListing.createEmptyStockListing();
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             int actualAmount = 0;
             if (wishList.getSkuCount(i) <= stock[i]) {
@@ -105,9 +117,7 @@ public class StockListing {
     }
 
 
-    public StockListing createDuplicate() {
-        return new StockListing(this);
-    }
+
 
     public void addStockFromList(StockListing stockListing) {
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {

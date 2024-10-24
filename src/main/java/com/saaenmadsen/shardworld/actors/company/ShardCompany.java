@@ -7,6 +7,7 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
+import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.recipechoice.RecipeChoiceReport;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_BuyOrder;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_EndMarketDay;
@@ -17,12 +18,13 @@ import akka.actor.typed.javadsl.Adapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyCommand> {
     private String companyName;
     private StockListing warehouse;
-    private List<Recipe> myRecipes = new ArrayList<>();
+    private List<KnownRecipe> myRecipes = new ArrayList<>();
     private int workers = 10;
     private PriceList priceList;
 
@@ -36,7 +38,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     public ShardCompany(ActorContext<ShardCompanyCommand> context, String companyName) {
         super(context);
         this.companyName = companyName;
-        this.warehouse = new StockListing();
+        this.warehouse = StockListing.createEmptyStockListing();
         this.priceList = new PriceList();
         investInNewProductionRecipies(warehouse, priceList);
     }
@@ -66,12 +68,16 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     }
 
     private void doProduction(PriceList priceList) {
-        RecipeChoiceReport toWorkRecipe = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(myRecipes, warehouse, priceList, workers * 8);
+        RecipeChoiceReport toWorkRecipe = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(myRecipes, warehouse, priceList, getWorkTimeAvailable());
         for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : toWorkRecipe.productionChoices()) {
 
             getContext().getLog().info(companyName + " production {}  ", productionChoice.recipe().name() + " a total of " + productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials() + " times.");
             productionChoice.recipe().runProduction(productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials(), warehouse);
         }
+    }
+
+    private int getWorkTimeAvailable() {
+        return workers * 8;
     }
 
     private void sendSkuItemsForSaleToMarket(C_MarketOpenForSellers message) {
@@ -82,9 +88,54 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
 
     private Behavior<ShardCompanyCommand> onReceiveMarketOpenForBuyers(C_MarketOpenForBuyers message) {
         getContext().getLog().info(companyName + " got message {}", message.toString());
-        StockListing buyList = new StockListing();
+        this.priceList = message.priceList();
+        ArrayList<KnownRecipe> prepareToProduceRecipies = getListOfTwoMostProfitableRecipes(message);
+        StockListing buyList = buildBuyList(prepareToProduceRecipies, getWorkTimeAvailable());
+
         message.countryMarket().tell(new C_BuyOrder(buyList, getContext().getSelf()) );
         return Behaviors.same();
+    }
+
+    public static StockListing buildBuyList(ArrayList<KnownRecipe> prepareToProduceRecipies, int workTimeAvailable) {
+        StockListing buyList = StockListing.createEmptyStockListing();
+
+        for (KnownRecipe knownRecipe : prepareToProduceRecipies) {
+            ProductionImpactReport evaluation = knownRecipe.getRecipe().evaluateRawMaterialImpact(workTimeAvailable, StockListing.createMaxedOutStockListing());
+            buyList.addStockFromList(evaluation.usedRawMaterial());
+        }
+        return buyList;
+    }
+
+    private ArrayList<KnownRecipe> getListOfTwoMostProfitableRecipes(C_MarketOpenForBuyers message) {
+        Optional<KnownRecipe> prepare1 = Optional.empty();
+        Optional<KnownRecipe> prepare2 = Optional.empty();
+
+        for (KnownRecipe myRecipe : myRecipes) {
+            myRecipe.setProfitability(myRecipe.recipe().calculateProfitPrWorkTenMin(message.priceList()));
+            if (prepare1.isEmpty()) {
+                prepare1 = Optional.of(myRecipe);
+            } else {
+                if (prepare2.isEmpty()) {
+                    prepare2 = Optional.of(myRecipe);
+                } else {
+                    if (prepare1.get().getProfitability() < myRecipe.getProfitability()) {
+                        prepare1 = Optional.of(myRecipe);
+                    } else {
+                        if (prepare2.get().getProfitability() < myRecipe.getProfitability()) {
+                            prepare2 = Optional.of(myRecipe);
+                        }
+                    }
+                }
+            }
+        }
+        ArrayList<KnownRecipe> result = new ArrayList<>();
+        if (prepare1.isPresent()) {
+            result.add(prepare1.get());
+        }
+        if (prepare2.isPresent()) {
+            result.add(prepare2.get());
+        }
+        return result;
     }
 
     private Behavior<ShardCompanyCommand> onReceiveCompletedBuyOrder(C_CompletedBuyOrder message) {
@@ -105,13 +156,13 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     private void investInNewProductionRecipies(StockListing warehouse, PriceList priceList) {
         String logMessage = companyName + " recipe adjustment: ";
         if(myRecipes.size()>5){
-            logMessage += " removed " + myRecipes.getFirst().name();
+            logMessage += " removed " + myRecipes.getFirst().recipe().name();
             myRecipes.removeFirst();
         }
         Random dice = new Random();
         int newRecipeIndex = dice.nextInt(Recipe.values().length);
         Recipe newRecipe = Recipe.values()[newRecipeIndex];
-        myRecipes.add(newRecipe);
+        myRecipes.add(new KnownRecipe(newRecipe));
         logMessage += " added " + newRecipe.name();
         getContext().getLog().info(logMessage);
 

@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class StockListingTest {
     @Test
     public void StockPurchaseSaleTest() {
-        StockListing seller1 = new StockListing();
-        StockListing seller2 = new StockListing();
-        StockListing shoppingCart = new StockListing();
-        StockListing wishList = new StockListing();
+        StockListing seller1 = StockListing.createEmptyStockListing();
+        StockListing seller2 = StockListing.createEmptyStockListing();
+        StockListing shoppingCart = StockListing.createEmptyStockListing();
+        StockListing wishList = StockListing.createEmptyStockListing();
 
         seller1.setSkuCount(0, 10);
         seller1.setSkuCount(1, 10);
