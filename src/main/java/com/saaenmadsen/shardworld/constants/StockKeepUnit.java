@@ -40,18 +40,6 @@ public enum StockKeepUnit {
         throw new IllegalArgumentException("Unknown product name: " + productName);
     }
 
-    @Override
-    public String toString() {
-        return "StockKeepUnit{" +
-                "arrayId=" + arrayId +
-                ", usageCategory='" + usageCategory + '\'' +
-                ", unit='" + unit + '\'' +
-                ", description='" + description + '\'' +
-                ", initialPrice=" + initialPrice +
-                ", productName='" + productName + '\'' +
-                '}';
-    }
-
     public int getArrayId() {
         return arrayId;
     }

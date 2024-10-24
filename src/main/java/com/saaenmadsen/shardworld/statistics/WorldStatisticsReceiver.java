@@ -1,5 +1,10 @@
 package com.saaenmadsen.shardworld.statistics;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.saaenmadsen.shardworld.actors.shardcountry.C_CountryDayStart;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
 
@@ -25,13 +30,13 @@ public class WorldStatisticsReceiver {
         dayStatistics.add(worldDayStats);
     }
 
-    @Override
     public String toString() {
-        return "WorldStatisticsReceiver{" +
-                "worldSettings=" + worldSettings +
-                ", recipies='" + recipies + '\'' +
-                ", stockKeepUnits='" + stockKeepUnits + '\'' +
-                ", dayStatistics=" + dayStatistics +
-                '}';
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

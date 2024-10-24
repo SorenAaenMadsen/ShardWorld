@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class PriceList {
+public class PriceList implements Cloneable {
     private int[] prices;
 
     public PriceList() {
@@ -28,5 +28,11 @@ public class PriceList {
 
     public int[] getArray() {
         return prices;
+    }
+
+    public PriceList duplicate(){
+        PriceList copy = new PriceList();
+        copy.prices = this.prices.clone();
+        return copy;
     }
 }

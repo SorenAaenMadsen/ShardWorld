@@ -6,6 +6,8 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
+import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
+import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.recipechoice.RecipeChoiceReport;
@@ -15,6 +17,7 @@ import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import akka.actor.typed.javadsl.Adapter;
+import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,21 +26,25 @@ import java.util.Random;
 
 public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyCommand> {
     private String companyName;
+    private final akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor;
     private StockListing warehouse;
     private List<KnownRecipe> myRecipes = new ArrayList<>();
     private int workers = 10;
     private PriceList priceList;
 
+    private StockListing reportUnsoldGoods;
+
     public interface ShardCompanyCommand {
     }
 
-    public static Behavior<ShardCompanyCommand> create(String companyName) {
-        return Behaviors.setup(context -> new ShardCompany(context, companyName));
+    public static Behavior<ShardCompanyCommand> create(String companyName, akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor) {
+        return Behaviors.setup(context -> new ShardCompany(context, companyName, countryActor));
     }
 
-    public ShardCompany(ActorContext<ShardCompanyCommand> context, String companyName) {
+    public ShardCompany(ActorContext<ShardCompanyCommand> context, String companyName, akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor) {
         super(context);
         this.companyName = companyName;
+        this.countryActor = countryActor;
         this.warehouse = StockListing.createEmptyStockListing();
         this.priceList = new PriceList();
         investInNewProductionRecipies(warehouse, priceList);
@@ -70,9 +77,10 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     private void doProduction(PriceList priceList) {
         RecipeChoiceReport toWorkRecipe = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(myRecipes, warehouse, priceList, getWorkTimeAvailable());
         for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : toWorkRecipe.productionChoices()) {
-
-            getContext().getLog().info(companyName + " production {}  ", productionChoice.recipe().name() + " a total of " + productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials() + " times.");
+            String message = companyName + " production " + productionChoice.recipe().name() + " a total of " + productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials() + " times.";
+            getContext().getLog().info(message);
             productionChoice.recipe().runProduction(productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials(), warehouse);
+            appendToDailyReport(message);
         }
     }
 
@@ -138,6 +146,8 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         return result;
     }
 
+    StringBuilder dailyReport = new StringBuilder();
+
     private Behavior<ShardCompanyCommand> onReceiveCompletedBuyOrder(C_CompletedBuyOrder message) {
         getContext().getLog().info(companyName + " got message {}", message.toString());
 
@@ -146,10 +156,13 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
 
     private Behavior<ShardCompanyCommand> onSendUnsoldSkuBackToSeller(C_SendUnsoldSkuBackToSeller message) {
         getContext().getLog().info(companyName + " got message {}", message.toString());
+        this.reportUnsoldGoods = message.unsoldGoods().createDuplicate();
         warehouse.addStockFromList(message.unsoldGoods());
+
         investInNewProductionRecipies(warehouse, priceList);
 
         message.market().tell(new C_EndMarketDay(this.companyName));
+        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport.toString(), myRecipes, reportUnsoldGoods)));
         return Behaviors.same();
     }
 
@@ -164,8 +177,13 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         Recipe newRecipe = Recipe.values()[newRecipeIndex];
         myRecipes.add(new KnownRecipe(newRecipe));
         logMessage += " added " + newRecipe.name();
+        appendToDailyReport(logMessage);
         getContext().getLog().info(logMessage);
 
+    }
+
+    private void appendToDailyReport(String section){
+        dailyReport.append(" | "+section);
     }
 
 

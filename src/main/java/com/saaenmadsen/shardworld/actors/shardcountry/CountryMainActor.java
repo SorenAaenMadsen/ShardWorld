@@ -2,20 +2,22 @@ package com.saaenmadsen.shardworld.actors.shardcountry;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.*;
+import akka.actor.typed.javadsl.AbstractBehavior;
+import akka.actor.typed.javadsl.ActorContext;
+import akka.actor.typed.javadsl.Behaviors;
+import akka.actor.typed.javadsl.Receive;
+import com.saaenmadsen.shardworld.actors.company.ShardCompany;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_StartMarketDayCycle;
 import com.saaenmadsen.shardworld.actors.countrymarket.CountryMarket;
 import com.saaenmadsen.shardworld.actors.shardworld.C_WorldDayEnd;
 import com.saaenmadsen.shardworld.actors.shardworld.ShardWorldActor;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
-import com.saaenmadsen.shardworld.actors.company.ShardCompany;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
 import com.saaenmadsen.shardworld.statistics.CountryDayStats;
-import com.saaenmadsen.shardworld.statistics.MarketDayStats;
-import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -30,7 +32,7 @@ import java.util.List;
  * Production
  * <p>
  * Trades are
- *
+ * <p>
  * For now, I will NOT be using the FSM (Final State Machine) implementation pattern - crawl before walking and all that...
  */
 public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryMainActorCommand> {
@@ -40,7 +42,12 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
     private List<ActorRef<ShardCompany.ShardCompanyCommand>> allCompanies = new ArrayList<>();
     private ActorRef<CountryMarket.CountryMarketCommand> countryMarket;
 
-    public interface CountryMainActorCommand{}
+    List<C_CompanyDayEnd> companyDayEnds = new ArrayList<>();
+    Optional<C_EndMarketDayCycle> endMarketDayCycle = Optional.empty();
+
+
+    public interface CountryMainActorCommand {
+    }
 
     public static Behavior<CountryMainActorCommand> create(WorldSettings worldSettings, ActorRef<ShardWorldActor.WorldCommand> worldActorReference) {
         return Behaviors.setup(
@@ -57,9 +64,9 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
         this.worldActorReference = worldActorReference;
         getContext().getLog().info("ShardCountry Constructor Start");
 
-        for(int i = 0; i< this.worldSettings.companyCount(); ++i) {
+        for (int i = 0; i < this.worldSettings.companyCount(); ++i) {
             String companyName = "company-" + i;
-            allCompanies.add(context.spawn(ShardCompany.create(companyName), companyName));
+            allCompanies.add(context.spawn(ShardCompany.create(companyName, context.getSelf()), companyName));
         }
         countryMarket = context.spawn(CountryMarket.create(context.getSelf()), "market");
 
@@ -72,22 +79,39 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
         return newReceiveBuilder()
                 .onMessage(C_CountryDayStart.class, this::onNewDayStartReceived)
                 .onMessage(C_EndMarketDayCycle.class, this::onEndMarketDayCycle)
+                .onMessage(C_CompanyDayEnd.class, this::onCompanyDayEnd)
                 .build();
     }
 
     private Behavior<CountryMainActorCommand> onNewDayStartReceived(C_CountryDayStart message) {
         getContext().getLog().info("onNewDayStartReceived message received: {}", message);
+        companyDayEnds = new ArrayList<>();
+        endMarketDayCycle = Optional.empty();
         countryMarket.tell(new C_StartMarketDayCycle(message.dayId(), allCompanies));
+        return Behaviors.same();
+    }
 
+
+    private Behavior<CountryMainActorCommand> onCompanyDayEnd(C_CompanyDayEnd message) {
+        getContext().getLog().info("onCompanyDayEnd message received: {}", message);
+        companyDayEnds.add(message);
+        checkEndCountryDay();
         return Behaviors.same();
     }
 
     private Behavior<CountryMainActorCommand> onEndMarketDayCycle(C_EndMarketDayCycle message) {
         getContext().getLog().info("onEndMarketDayCycle order received: {}", message);
-        CountryDayStats countryDayStats = new CountryDayStats(message.dayId(), new CompanyDayStats[]{}, new MarketDayStats[]{});
-        worldActorReference.tell(new C_WorldDayEnd(message.dayId(), countryDayStats));
-
+        endMarketDayCycle = Optional.of(message);
+        checkEndCountryDay();
         return Behaviors.same();
+    }
+
+    private void checkEndCountryDay() {
+        if (endMarketDayCycle.isPresent() && companyDayEnds.size() == allCompanies.size()) {
+            CompanyDayStats[] companyDayStatsArray = companyDayEnds.stream().map(message -> message.companyDayStats()).toArray(CompanyDayStats[]::new);
+            CountryDayStats countryDayStats = new CountryDayStats(endMarketDayCycle.get().dayId(), companyDayStatsArray, endMarketDayCycle.get().marketDayStats());
+            worldActorReference.tell(new C_WorldDayEnd(endMarketDayCycle.get().dayId(), countryDayStats));
+        }
     }
 
 }

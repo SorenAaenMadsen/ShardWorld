@@ -11,6 +11,7 @@ import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
 import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
+import com.saaenmadsen.shardworld.statistics.MarketDayStats;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,9 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
     protected static int maxMillisecondsCookTime = 200;
     private final ActorRef<CountryMainActor.CountryMainActorCommand> country;
 
-    private PriceList priceList;
+    private PriceList newestPriceList;
+    private PriceList priceListDayStart;
+
     List<C_SendSkuToMarketForSale> forSaleLists;
     List<C_BuyOrder> buyOrderList;
     int companiesDoneWithMarketDay;
@@ -38,7 +41,7 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
 
     public CountryMarket(ActorContext<CountryMarketCommand> context, ActorRef<CountryMainActor.CountryMainActorCommand> country) {
         super(context);
-        priceList = new PriceList();
+        newestPriceList = new PriceList();
         this.country = country;
     }
 
@@ -75,7 +78,7 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
         getContext().getLog().info("Market got message {}", message.toString());
         companiesDoneWithMarketDay++;
         if(companiesDoneWithMarketDay == allCompanies.size()) {
-            country.tell(new C_EndMarketDayCycle(dayId));
+            country.tell(new C_EndMarketDayCycle(dayId, new MarketDayStats(priceListDayStart.duplicate(), newestPriceList.duplicate())));
         }
         return Behaviors.same();
     }
@@ -86,7 +89,7 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
         forSaleLists.add(message);
         if(forSaleLists.size() >= allCompanies.size()) {
             // This could be a state shift :)
-            allCompanies.forEach(c->c.tell(new C_MarketOpenForBuyers(dayId, priceList, getContext().getSelf())));
+            allCompanies.forEach(c->c.tell(new C_MarketOpenForBuyers(dayId, newestPriceList, getContext().getSelf())));
         }
         return Behaviors.same();
     }
@@ -95,9 +98,10 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
         forSaleLists = new ArrayList<>();
         buyOrderList = new ArrayList<>();
         companiesDoneWithMarketDay = 0;
+        this.priceListDayStart = newestPriceList;
         this.allCompanies = message.allCompanies();
         this.dayId = message.dayId();
-        message.allCompanies().forEach(c->c.tell(new C_MarketOpenForSellers(message.dayId(), priceList, getContext().getSelf())));
+        message.allCompanies().forEach(c->c.tell(new C_MarketOpenForSellers(message.dayId(), newestPriceList, getContext().getSelf())));
         return Behaviors.same();
     }
 
