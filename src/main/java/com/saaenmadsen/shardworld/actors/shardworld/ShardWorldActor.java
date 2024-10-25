@@ -79,6 +79,9 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
                 }
                 return Behaviors.same();
             } else {
+                synchronized (worldStatisticsReceiver) {
+                    worldStatisticsReceiver.notifyAll();
+                }
                 return Behaviors.stopped();
             }
         } else {

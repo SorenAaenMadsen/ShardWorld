@@ -1,10 +1,8 @@
 package com.saaenmadsen.shardworld.integrationtest;
 
-import akka.actor.typed.ActorSystem;
 import com.saaenmadsen.shardworld.Main;
-import com.saaenmadsen.shardworld.actors.shardworld.C_ShardWorldSystemStart;
-import com.saaenmadsen.shardworld.actors.shardworld.ShardWorldActor;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.integrationtest.util.IntegrationTestUtil;
 import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -14,19 +12,15 @@ public class CountryMarketCycleTest {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
+
     @Test
-    public void testWorldRuns() throws InterruptedException {
+    public void runWorldWithTestUtil() throws InterruptedException {
         WorldSettings worldSettings = new WorldSettings(10, 1, 10);
-        WorldStatisticsReceiver worldStatisticsReceiver = new WorldStatisticsReceiver(worldSettings);
 
-        ActorSystem<ShardWorldActor.WorldCommand> worldActor = ActorSystem.create(ShardWorldActor.create(worldSettings, worldStatisticsReceiver), "MyWorld");
-        worldActor.tell(new C_ShardWorldSystemStart());
+        IntegrationTestUtil countryLevelIntegrationTestUtil = new IntegrationTestUtil(worldSettings);
 
-        synchronized (worldActor) {
-            worldActor.wait(20000);
-        }
-
-        log.info(worldStatisticsReceiver.toString());
+        WorldStatisticsReceiver report = countryLevelIntegrationTestUtil.runWorld();
+//        log.info(report.toString());
 
 
     }
