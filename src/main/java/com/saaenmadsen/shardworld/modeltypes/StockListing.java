@@ -101,13 +101,6 @@ public class StockListing {
         return Arrays.hashCode(stock);
     }
 
-    @Override
-    public String toString() {
-        return "SkuStock{" +
-                "wishList=" + Arrays.toString(stock) +
-                '}';
-    }
-
     public int[] getStock() {
         return stock;
     }
@@ -123,5 +116,9 @@ public class StockListing {
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             stock[i] += stockListing.stock[i];
         }
+    }
+
+    public int getStockAmount(StockKeepUnit stockKeepUnit) {
+        return this.stock[stockKeepUnit.getArrayId()];
     }
 }

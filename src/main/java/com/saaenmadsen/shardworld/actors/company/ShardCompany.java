@@ -162,7 +162,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         investInNewProductionRecipies(warehouse, priceList);
 
         message.market().tell(new C_EndMarketDay(this.companyName));
-        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport.toString(), myRecipes, reportUnsoldGoods)));
+        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport.toString(), myRecipes, reportUnsoldGoods, warehouse.createDuplicate())));
         return Behaviors.same();
     }
 

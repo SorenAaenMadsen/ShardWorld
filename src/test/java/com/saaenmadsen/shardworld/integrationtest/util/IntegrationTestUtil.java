@@ -5,6 +5,7 @@ import akka.actor.typed.ActorSystem;
 import com.saaenmadsen.shardworld.actors.shardworld.C_ShardWorldSystemStart;
 import com.saaenmadsen.shardworld.actors.shardworld.ShardWorldActor;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.statistics.WorldEndStatsWorld;
 import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
 
 public class IntegrationTestUtil {
@@ -18,7 +19,7 @@ public class IntegrationTestUtil {
 
     }
 
-    public WorldStatisticsReceiver runWorld(){
+    public WorldEndStatsWorld runWorld(){
         worldActor.tell(new C_ShardWorldSystemStart());
 
         synchronized (worldStatisticsReceiver) {
@@ -28,6 +29,7 @@ public class IntegrationTestUtil {
                 throw new RuntimeException(e);
             }
         }
-        return worldStatisticsReceiver;
+        worldStatisticsReceiver.writeToFile();
+        return worldStatisticsReceiver.summarize();
     }
 }
