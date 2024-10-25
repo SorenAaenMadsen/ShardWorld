@@ -66,16 +66,15 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
 
         for (int i = 0; i < this.worldSettings.companyCount(); ++i) {
             String companyName = "company-" + i;
-            allCompanies.add(context.spawn(ShardCompany.create(companyName, context.getSelf()), companyName));
+            allCompanies.add(context.spawn(ShardCompany.create(companyName, context.getSelf(), worldSettings), companyName));
         }
-        countryMarket = context.spawn(CountryMarket.create(context.getSelf()), "market");
+        countryMarket = context.spawn(CountryMarket.create(context.getSelf(), worldSettings), "market");
 
         getContext().getLog().info("ShardCountry Constructor Completed");
     }
 
     @Override
     public Receive<CountryMainActorCommand> createReceive() {
-        getContext().getLog().info("ShardCountry createReceive");
         return newReceiveBuilder()
                 .onMessage(C_CountryDayStart.class, this::onNewDayStartReceived)
                 .onMessage(C_EndMarketDayCycle.class, this::onEndMarketDayCycle)
@@ -84,7 +83,9 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
     }
 
     private Behavior<CountryMainActorCommand> onNewDayStartReceived(C_CountryDayStart message) {
-        getContext().getLog().info("onNewDayStartReceived message received: {}", message);
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("onNewDayStartReceived message received: {}", message);
+        }
         companyDayEnds = new ArrayList<>();
         endMarketDayCycle = Optional.empty();
         countryMarket.tell(new C_StartMarketDayCycle(message.dayId(), allCompanies));
@@ -93,14 +94,18 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
 
 
     private Behavior<CountryMainActorCommand> onCompanyDayEnd(C_CompanyDayEnd message) {
-        getContext().getLog().info("onCompanyDayEnd message received: {}", message);
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("onCompanyDayEnd message received: {}", message);
+        }
         companyDayEnds.add(message);
         checkEndCountryDay();
         return Behaviors.same();
     }
 
     private Behavior<CountryMainActorCommand> onEndMarketDayCycle(C_EndMarketDayCycle message) {
-        getContext().getLog().info("onEndMarketDayCycle order received: {}", message);
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("onEndMarketDayCycle order received: {}", message);
+        }
         endMarketDayCycle = Optional.of(message);
         checkEndCountryDay();
         return Behaviors.same();

@@ -13,23 +13,22 @@ public class IntegrationTestUtil {
     private WorldStatisticsReceiver worldStatisticsReceiver;
 
     public IntegrationTestUtil(WorldSettings worldSettings) {
-        worldStatisticsReceiver = new WorldStatisticsReceiver(worldSettings);
+        worldStatisticsReceiver = new WorldStatisticsReceiver(worldSettings, 10);
 
         worldActor = ActorSystem.create(ShardWorldActor.create(worldSettings, worldStatisticsReceiver), "MyWorld");
 
     }
 
-    public WorldEndStatsWorld runWorld(){
+    public WorldEndStatsWorld runWorld(int timetoutMillis){
         worldActor.tell(new C_ShardWorldSystemStart());
 
         synchronized (worldStatisticsReceiver) {
             try {
-                worldStatisticsReceiver.wait(10000);
+                worldStatisticsReceiver.wait(timetoutMillis);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-        worldStatisticsReceiver.writeToFile();
         return worldStatisticsReceiver.summarize();
     }
 }

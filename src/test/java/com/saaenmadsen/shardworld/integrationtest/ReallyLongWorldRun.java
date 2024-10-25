@@ -12,21 +12,21 @@ import org.slf4j.LoggerFactory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
-public class CountryMarketCycleTest {
+public class ReallyLongWorldRun {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
 
     @Test
-    public void runWorldWithTestUtil() throws InterruptedException {
-        WorldSettings worldSettings = new WorldSettings(10, 1, 10, true);
+    public void run100Companies500daysTest() throws InterruptedException {
+        WorldSettings worldSettings = new WorldSettings(100, 1, 500, false);
 
         IntegrationTestUtil countryLevelIntegrationTestUtil = new IntegrationTestUtil(worldSettings);
 
-        WorldEndStatsWorld report = countryLevelIntegrationTestUtil.runWorld(3000);
+        WorldEndStatsWorld report = countryLevelIntegrationTestUtil.runWorld(60000);
 
-        assertThat("FIREWOOD_KG should have been created in 10 days", report.finalWorldTotalStock().getStockAmount(StockKeepUnit.FIREWOOD_KG), greaterThan(0));
-        assertThat("WOOD_KG should have been created in 10 days", report.finalWorldTotalStock().getStockAmount(StockKeepUnit.WOOD_KG), greaterThan(0));
+        assertThat( report.finalWorldTotalStock().getStockAmount(StockKeepUnit.FIREWOOD_KG), greaterThan(0));
+        assertThat( report.finalWorldTotalStock().getStockAmount(StockKeepUnit.WOOD_KG), greaterThan(0));
     }
 
 

@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class WorldStatisticsReceiver {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private final WorldSettings worldSettings;
+    private final int maxDayReportsToKeep;
     private final String recipies;
     private final String stockKeepUnits;
     private WorldEndStatsWorld worldEndStatus;
@@ -31,16 +32,18 @@ public class WorldStatisticsReceiver {
 
     List<WorldDayStats> dayStatistics = new ArrayList<>();
 
-
-
-    public WorldStatisticsReceiver(WorldSettings worldSettings) {
+    public WorldStatisticsReceiver(WorldSettings worldSettings, int maxDayReportsToKeep) {
         this.worldSettings = worldSettings;
+        this.maxDayReportsToKeep = maxDayReportsToKeep;
         this.recipies = Arrays.stream(Recipe.values()).map(Recipe::toString).collect(Collectors.joining(","));
         this.stockKeepUnits = Arrays.stream(Recipe.values()).map(Recipe::toString).collect(Collectors.joining(","));
     }
 
     public void addDay(WorldDayStats worldDayStats) {
         dayStatistics.add(worldDayStats);
+        if(dayStatistics.size()>maxDayReportsToKeep){
+            dayStatistics.removeFirst();
+        }
     }
 
     public WorldEndStatsWorld summarize(){
@@ -55,7 +58,9 @@ public class WorldStatisticsReceiver {
             worldEndStatsCountries.add(new WorldEndStatsCountry(finalTotalCountryStock));
             finalTotalWorldStock.addStockFromList(finalTotalCountryStock);
         }
-        return new WorldEndStatsWorld(finalTotalWorldStock, worldEndStatsCountries);
+        this.worldEndStatus = new WorldEndStatsWorld(finalTotalWorldStock, worldEndStatsCountries);
+        writeToFile();
+        return worldEndStatus;
     }
 
     public String toString() {

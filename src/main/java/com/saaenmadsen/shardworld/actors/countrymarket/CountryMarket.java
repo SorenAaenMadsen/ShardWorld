@@ -9,6 +9,7 @@ import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.actors.company.*;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
 import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
+import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.statistics.MarketDayStats;
@@ -22,6 +23,7 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
     protected static Random dice = new Random();
     protected static int maxMillisecondsCookTime = 200;
     private final ActorRef<CountryMainActor.CountryMainActorCommand> country;
+    private final WorldSettings worldSettings;
 
     private PriceList newestPriceList;
     private PriceList priceListDayStart;
@@ -35,19 +37,19 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
 
     public interface CountryMarketCommand {}
 
-    public static Behavior<CountryMarketCommand> create(ActorRef<CountryMainActor.CountryMainActorCommand> country) {
-        return Behaviors.setup(context -> new CountryMarket(context, country));
+    public static Behavior<CountryMarketCommand> create(ActorRef<CountryMainActor.CountryMainActorCommand> country, WorldSettings worldSettings) {
+        return Behaviors.setup(context -> new CountryMarket(context, country, worldSettings));
     }
 
-    public CountryMarket(ActorContext<CountryMarketCommand> context, ActorRef<CountryMainActor.CountryMainActorCommand> country) {
+    public CountryMarket(ActorContext<CountryMarketCommand> context, ActorRef<CountryMainActor.CountryMainActorCommand> country, WorldSettings worldSettings) {
         super(context);
+        this.worldSettings = worldSettings;
         newestPriceList = new PriceList();
         this.country = country;
     }
 
     @Override
     public Receive<CountryMarketCommand> createReceive() {
-        getContext().getLog().info("CountryMarket createReceive");
         return newReceiveBuilder()
                 .onMessage(C_BuyOrder.class, this::onReceiveBuyOrder)
                 .onMessage(C_EndMarketDay.class, this::onReceiveEndMarketDay)
@@ -57,7 +59,9 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
     }
 
     private Behavior<CountryMarketCommand> onReceiveBuyOrder(C_BuyOrder message) {
-        getContext().getLog().info("Market got message {}", message.toString());
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("Market got message {}", message.toString());
+        }
         this.buyOrderList.add(message);
 
         StockListing shoppingCart = StockListing.createEmptyStockListing();
@@ -75,7 +79,9 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
     }
 
     private Behavior<CountryMarketCommand> onReceiveEndMarketDay(C_EndMarketDay message) {
-        getContext().getLog().info("Market got message {}", message.toString());
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("Market got message {}", message.toString());
+        }
         companiesDoneWithMarketDay++;
         if(companiesDoneWithMarketDay == allCompanies.size()) {
             country.tell(new C_EndMarketDayCycle(dayId, new MarketDayStats(priceListDayStart.duplicate(), newestPriceList.duplicate())));
@@ -85,7 +91,9 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
 
 
     private Behavior<CountryMarketCommand> onReceiveSendSkuToMarketForSale(C_SendSkuToMarketForSale message) {
-        getContext().getLog().info("Market got message {}", message.toString());
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("Market got message {}", message.toString());
+        }
         forSaleLists.add(message);
         if(forSaleLists.size() >= allCompanies.size()) {
             // This could be a state shift :)
@@ -94,7 +102,9 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
         return Behaviors.same();
     }
     private Behavior<CountryMarketCommand> onReceiveStartMarketDayCycle(C_StartMarketDayCycle message) {
-        getContext().getLog().info("Market got message {}", message.toString());
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("Market got message {}", message.toString());
+        }
         forSaleLists = new ArrayList<>();
         buyOrderList = new ArrayList<>();
         companiesDoneWithMarketDay = 0;

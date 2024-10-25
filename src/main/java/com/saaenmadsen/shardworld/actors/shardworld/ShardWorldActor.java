@@ -15,7 +15,6 @@ import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldCommand> {
     private int worldDay;
@@ -41,7 +40,6 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
     public ShardWorldActor(ActorContext<WorldCommand> context, WorldSettings worldSettings, WorldStatisticsReceiver worldStatisticsReceiver) {
         super(context);
         this.worldStatisticsReceiver = worldStatisticsReceiver;
-        getContext().getLog().info("ShardWorld Constructor Start");
         this.worldSettings = worldSettings;
         this.worldDay = 1;
 
@@ -53,7 +51,6 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
 
     @Override
     public Receive<ShardWorldActor.WorldCommand> createReceive() {
-        getContext().getLog().info("ShardCountry createReceive");
         return newReceiveBuilder()
                 .onMessage(C_ShardWorldSystemStart.class, this::onShardWorldSystemStart)
                 .onMessage(C_WorldDayEnd.class, this::onWorldDayEnd)
@@ -61,7 +58,9 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
     }
 
     private Behavior<WorldCommand> onShardWorldSystemStart(C_ShardWorldSystemStart message) {
-        getContext().getLog().info("onNewDayStartReceived message received: {}", message);
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("onNewDayStartReceived message received: {}", message);
+        }
         for (ActorRef<CountryMainActor.CountryMainActorCommand> country : allCountries) {
             country.tell(new C_CountryDayStart(worldDay));
         }
@@ -69,7 +68,9 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
     }
 
     private Behavior<WorldCommand> onWorldDayEnd(C_WorldDayEnd message) {
-        getContext().getLog().info("onEndMarketDayCycle order received: {}", message);
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("onEndMarketDayCycle order received: {}", message);
+        }
         worldStatisticsReceiver.addDay(new WorldDayStats(message.dayId(), new CountryDayStats[]{message.countryDayStats()}));
         if (message.dayId() == this.worldDay) {
             if (this.worldDay < worldSettings.maxDaysToRun()) {
