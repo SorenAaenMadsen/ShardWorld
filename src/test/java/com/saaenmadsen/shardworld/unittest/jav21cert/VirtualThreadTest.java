@@ -35,7 +35,7 @@ public class VirtualThreadTest {
     @Test
     public void testThreadPoolExecuterAsyncstuff() {
 
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 1; ++i) {
             System.out.println("virtual threads     : " + timeRollingALotOfDiceOnExecutor(Executors.newVirtualThreadPerTaskExecutor()));
             System.out.println("1 platform threads  : " + timeRollingALotOfDiceOnExecutor(new ThreadPoolExecutor(1, 1, 1000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>())));
             System.out.println("2 platform threads  : " + timeRollingALotOfDiceOnExecutor(new ThreadPoolExecutor(2, 2, 1000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>())));
