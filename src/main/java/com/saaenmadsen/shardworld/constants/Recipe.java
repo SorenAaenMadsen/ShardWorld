@@ -49,6 +49,14 @@ public enum Recipe {
 //    private final int skillLevel2;
 
 
+    public String getRecipeName() {
+        return recipeName;
+    }
+
+    public String getProcessDescription() {
+        return processDescription;
+    }
+
     @Override
     public String toString() {
         return "Recipe{" +

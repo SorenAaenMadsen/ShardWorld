@@ -19,6 +19,7 @@ import dev.langchain4j.model.ollama.OllamaChatModel;
 
 public class OllamaAiConnectTest {
     private static final String LOCALHOST = "http://localhost:11434";
+    private static final String modelName = "gemma2:2b";
 
     @Test
     public void simpleTestFromDocsLangChain(){
