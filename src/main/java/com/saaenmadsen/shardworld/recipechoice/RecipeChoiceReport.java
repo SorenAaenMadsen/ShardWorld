@@ -12,7 +12,7 @@ import java.util.List;
 public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoices) {
 
     public static RecipeChoiceReport findRecipeWithHighestProjectedProfit(CompanyInformation companyInformation, PriceList priceList) {
-        return findRecipeWithHighestProjectedProfit(companyInformation.getMyRecipes(), companyInformation.getWarehouse(), priceList, companyInformation.calculateWorkTimeAvailable());
+        return findRecipeWithHighestProjectedProfit(companyInformation.getKnownRecipes(), companyInformation.getWarehouse(), priceList, companyInformation.calculateWorkTimeAvailable());
     }
 
     public record RecipeChoiceReportElement(Recipe recipe, ProductionImpactReport productionImpactReport, int projectedProfit){}

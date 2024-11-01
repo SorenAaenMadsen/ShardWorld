@@ -62,7 +62,7 @@ public class CompanyInformation {
         this.warehouse = warehouse;
     }
 
-    public List<KnownRecipe> getMyRecipes() {
+    public List<KnownRecipe> getKnownRecipes() {
         return myRecipes;
     }
 

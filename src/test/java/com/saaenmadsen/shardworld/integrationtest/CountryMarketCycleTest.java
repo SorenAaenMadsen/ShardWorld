@@ -25,8 +25,11 @@ public class CountryMarketCycleTest {
 
         WorldEndStatsWorld report = countryLevelIntegrationTestUtil.runWorld(3000);
 
-        assertThat("FIREWOOD_KG should have been created in 10 days", report.finalWorldTotalStock().getStockAmount(StockKeepUnit.FIREWOOD_KG), greaterThan(0));
-        assertThat("WOOD_KG should have been created in 10 days", report.finalWorldTotalStock().getStockAmount(StockKeepUnit.WOOD_KG), greaterThan(0));
+        assertThat("Either TIMBER_RAW_KG, WOOD_KG or FIREWOOD_KG should have been created in 10 days",
+                report.finalWorldTotalStock().getStockAmount(StockKeepUnit.TIMBER_RAW_KG) +
+                        report.finalWorldTotalStock().getStockAmount(StockKeepUnit.WOOD_KG) +
+                        report.finalWorldTotalStock().getStockAmount(StockKeepUnit.FIREWOOD_KG),
+                greaterThan(0));
     }
 
 

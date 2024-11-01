@@ -2,44 +2,31 @@ package com.saaenmadsen.shardworld.actors.company;
 
 import akka.actor.ActorRef;
 import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.AbstractBehavior;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.actor.typed.javadsl.Receive;
-import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
+import akka.actor.typed.javadsl.*;
 import com.saaenmadsen.shardworld.actors.company.direction.DailyDirectionMeeting;
 import com.saaenmadsen.shardworld.actors.company.direction.ProductionPlanning;
 import com.saaenmadsen.shardworld.actors.company.direction.StrategicBoardMeeting;
 import com.saaenmadsen.shardworld.actors.company.direction.TacticalBoardMeeting;
-import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
+import com.saaenmadsen.shardworld.actors.countrymarket.C_BuyOrder;
+import com.saaenmadsen.shardworld.actors.countrymarket.C_EndMarketDay;
+import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
 import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.recipechoice.RecipeChoiceReport;
-import com.saaenmadsen.shardworld.actors.countrymarket.C_BuyOrder;
-import com.saaenmadsen.shardworld.actors.countrymarket.C_EndMarketDay;
-import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
-import com.saaenmadsen.shardworld.constants.Recipe;
-import com.saaenmadsen.shardworld.modeltypes.StockListing;
-import akka.actor.typed.javadsl.Adapter;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyCommand> {
     private String companyId;
     private final akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor;
     private final WorldSettings worldSettings;
     DailyReport dailyReport = new DailyReport();
-
-
-
-    private StockListing reportUnsoldGoods;
 
     private CompanyInformation companyInformation;
 
@@ -83,7 +70,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         dailyReport = new DailyReport();
         ActorRef parent = Adapter.toClassic(getContext()).parent();
         companyInformation.setPriceList(message.priceList());
-        ProductionPlanning.accept(companyInformation);
+        new ProductionPlanning(companyInformation, dailyReport);
         doProduction(message.priceList());
         sendSkuItemsForSaleToMarket(message);
 
@@ -101,10 +88,10 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     }
 
 
-
     private void sendSkuItemsForSaleToMarket(C_MarketOpenForSellers message) {
         // For now, just setting everything for sale.
         StockListing forSaleList = companyInformation.getWarehouse().retrieve(companyInformation.getWarehouse());
+        this.dailyReport.setForSaleList(forSaleList);
         message.countryMarket().tell(new C_SendSkuToMarketForSale(forSaleList, getContext().getSelf()));
     }
 
@@ -116,7 +103,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         ArrayList<KnownRecipe> prepareToProduceRecipies = getListOfTwoMostProfitableRecipes(message);
         StockListing buyList = buildBuyList(prepareToProduceRecipies, companyInformation.calculateWorkTimeAvailable());
 
-        message.countryMarket().tell(new C_BuyOrder(buyList, getContext().getSelf()) );
+        message.countryMarket().tell(new C_BuyOrder(buyList, getContext().getSelf()));
         return Behaviors.same();
     }
 
@@ -134,7 +121,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         Optional<KnownRecipe> prepare1 = Optional.empty();
         Optional<KnownRecipe> prepare2 = Optional.empty();
 
-        for (KnownRecipe myRecipe : companyInformation.getMyRecipes()) {
+        for (KnownRecipe myRecipe : companyInformation.getKnownRecipes()) {
             myRecipe.setProfitability(myRecipe.recipe().calculateProfitPrWorkTenMin(message.priceList()));
             if (prepare1.isEmpty()) {
                 prepare1 = Optional.of(myRecipe);
@@ -175,28 +162,20 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
-        this.reportUnsoldGoods = message.unsoldGoods().createDuplicate();
+        dailyReport.setUnsoldGoods(message.unsoldGoods());
         companyInformation.getWarehouse().addStockFromList(message.unsoldGoods());
 
+        new DailyDirectionMeeting(companyInformation, dailyReport);
 
-        DailyDirectionMeeting.accept(companyInformation, dailyReport);
-
-        if(companyInformation.timeForTacticalBoardMeeting()){
-            TacticalBoardMeeting.accept(companyInformation);
+        if (companyInformation.timeForTacticalBoardMeeting()) {
+            new TacticalBoardMeeting(companyInformation, dailyReport);
         }
-        if(companyInformation.timeForStrategicBoardMeeting()){
-            StrategicBoardMeeting.accept(companyInformation);
+        if (companyInformation.timeForStrategicBoardMeeting()) {
+            new StrategicBoardMeeting(companyInformation, dailyReport);
         }
-
-
         message.market().tell(new C_EndMarketDay(this.companyId));
-        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport.toString(), companyInformation.getMyRecipes(), reportUnsoldGoods, companyInformation.getWarehouse().createDuplicate())));
+        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport.toString(), companyInformation.getKnownRecipes(), dailyReport.getUnsoldGoods(), companyInformation.getWarehouse().createDuplicate())));
         return Behaviors.same();
     }
-
-
-
-
-
 }
 

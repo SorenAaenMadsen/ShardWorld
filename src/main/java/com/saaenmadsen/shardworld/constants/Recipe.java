@@ -127,4 +127,11 @@ public enum Recipe {
         }
     }
 
+    public List<SkuAndCount> getInputs() {
+        return inputs;
+    }
+
+    public List<SkuAndCount> getOutputs() {
+        return outputs;
+    }
 }

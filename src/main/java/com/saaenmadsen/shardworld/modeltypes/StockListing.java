@@ -109,9 +109,6 @@ public class StockListing {
         this.stock = stockOverride;
     }
 
-
-
-
     public void addStockFromList(StockListing stockListing) {
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             stock[i] += stockListing.stock[i];
