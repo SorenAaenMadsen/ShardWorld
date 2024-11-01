@@ -17,14 +17,14 @@ public class CompanyFlawor {
     private Recipe[] knownRecipes;
 
 
-
     public CompanyFlawor(Recipe... knownRecipes) {
         this.knownRecipes = knownRecipes;
         culture = new CompanyCulture();
-        generateAiCompanyDescription();
+//        generateAiCompanyDescription();
     }
 
-    private void generateAiCompanyDescription(){
+    private void generateAiCompanyDescription() {
+
         ChatLanguageModel chatLanguageModel = AiTextGenerator.connectModel();
 
         String productionProcesses = Arrays.stream(knownRecipes).map(knownRecipes -> knownRecipes.getProcessDescription()).collect(Collectors.joining(", "));
@@ -33,8 +33,8 @@ public class CompanyFlawor {
 
 
         this.companyName = chatLanguageModel.generate("Choose a random good enough company name for " + companyDescription + " and make it a short answer with just one name.").trim();
-        this.companyMarketingMotto = chatLanguageModel.generate("Make a company marketing slogan for "+ companyDescription +", using max 120 characters. Return just that marketing motto as a plain string and nothing else.").trim();
-        this.leadershipStyle = chatLanguageModel.generate("Describe the leadership style of "+ companyDescription +" in 200 characters, with the added knowledge that it is " + culture.getInnovativenessLevel().getDescription() + ". Return just the leadership style description as a string.").trim();
+        this.companyMarketingMotto = chatLanguageModel.generate("Make a company marketing slogan for " + companyDescription + ", using max 120 characters. Return just that marketing motto as a plain string and nothing else.").trim();
+        this.leadershipStyle = chatLanguageModel.generate("Describe the leadership style of " + companyDescription + " in 200 characters, with the added knowledge that it is " + culture.getInnovativenessLevel().getDescription() + ". Return just the leadership style description as a string.").trim();
 
     }
 

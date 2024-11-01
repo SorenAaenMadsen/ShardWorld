@@ -7,6 +7,10 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
+import com.saaenmadsen.shardworld.actors.company.direction.DailyDirectionMeeting;
+import com.saaenmadsen.shardworld.actors.company.direction.ProductionPlanning;
+import com.saaenmadsen.shardworld.actors.company.direction.StrategicBoardMeeting;
+import com.saaenmadsen.shardworld.actors.company.direction.TacticalBoardMeeting;
 import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
 import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
@@ -31,8 +35,9 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     private String companyId;
     private final akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor;
     private final WorldSettings worldSettings;
+    DailyReport dailyReport = new DailyReport();
 
-    private PriceList priceList;
+
 
     private StockListing reportUnsoldGoods;
 
@@ -43,17 +48,18 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     }
 
     public static Behavior<ShardCompanyCommand> create(String companyName, akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
+
         return Behaviors.setup(context -> new ShardCompany(context, companyName, countryActor, worldSettings));
     }
 
-    public ShardCompany(ActorContext<ShardCompanyCommand> context, String companyName, akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
+    public ShardCompany(ActorContext<ShardCompanyCommand> context, String companyId, akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
         super(context);
-        this.companyId = companyName;
+        getContext().getLog().info(companyId + "Constructor start");
+        this.companyId = companyId;
         this.countryActor = countryActor;
         this.worldSettings = worldSettings;
-        this.companyInformation = new CompanyInformation();
-        this.priceList = new PriceList();
-        dailyCompanyDirectionEvaluation();
+        this.companyInformation = new CompanyInformation(companyId);
+        getContext().getLog().info(companyId + "Constructor done");
     }
 
 
@@ -74,8 +80,10 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
+        dailyReport = new DailyReport();
         ActorRef parent = Adapter.toClassic(getContext()).parent();
-        this.priceList = message.priceList();
+        companyInformation.setPriceList(message.priceList());
+        ProductionPlanning.accept(companyInformation);
         doProduction(message.priceList());
         sendSkuItemsForSaleToMarket(message);
 
@@ -88,7 +96,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
             String message = companyId + " production " + productionChoice.recipe().name() + " a total of " + productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials() + " times.";
             getContext().getLog().info(message);
             productionChoice.recipe().runProduction(productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials(), companyInformation.getWarehouse());
-            appendToDailyReport(message);
+            dailyReport.appendToDailyReport(message);
         }
     }
 
@@ -104,7 +112,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
-        this.priceList = message.priceList();
+        companyInformation.setPriceList(message.priceList());
         ArrayList<KnownRecipe> prepareToProduceRecipies = getListOfTwoMostProfitableRecipes(message);
         StockListing buyList = buildBuyList(prepareToProduceRecipies, companyInformation.calculateWorkTimeAvailable());
 
@@ -154,7 +162,6 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         return result;
     }
 
-    StringBuilder dailyReport = new StringBuilder();
 
     private Behavior<ShardCompanyCommand> onReceiveCompletedBuyOrder(C_CompletedBuyOrder message) {
         if (worldSettings.logAkkaMessages()) {
@@ -172,44 +179,23 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         companyInformation.getWarehouse().addStockFromList(message.unsoldGoods());
 
 
-        dailyCompanyDirectionEvaluation();
+        DailyDirectionMeeting.accept(companyInformation, dailyReport);
+
+        if(companyInformation.timeForTacticalBoardMeeting()){
+            TacticalBoardMeeting.accept(companyInformation);
+        }
+        if(companyInformation.timeForStrategicBoardMeeting()){
+            StrategicBoardMeeting.accept(companyInformation);
+        }
+
 
         message.market().tell(new C_EndMarketDay(this.companyId));
         countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport.toString(), companyInformation.getMyRecipes(), reportUnsoldGoods, companyInformation.getWarehouse().createDuplicate())));
         return Behaviors.same();
     }
 
-    private void dailyCompanyDirectionEvaluation() {
-        investInNewProductionRecipies(companyInformation.getWarehouse(), priceList);
-        boolean holdBoardMeeting = true;
-        if(holdBoardMeeting){
-            longTermCompanyDirectionEvaluation();
-        }
-    }
 
-    private void longTermCompanyDirectionEvaluation() {
 
-    }
-
-    private void investInNewProductionRecipies(StockListing warehouse, PriceList priceList) {
-        String logMessage = companyId + " recipe adjustment: ";
-        if(companyInformation.getMyRecipes().size()>5){
-            logMessage += " removed " + companyInformation.getMyRecipes().getFirst().recipe().name();
-            companyInformation.getMyRecipes().removeFirst();
-        }
-        Random dice = new Random();
-        int newRecipeIndex = dice.nextInt(Recipe.values().length);
-        Recipe newRecipe = Recipe.values()[newRecipeIndex];
-        companyInformation.getMyRecipes().add(new KnownRecipe(newRecipe));
-        logMessage += " added " + newRecipe.name();
-        appendToDailyReport(logMessage);
-        getContext().getLog().info(logMessage);
-
-    }
-
-    private void appendToDailyReport(String section){
-        dailyReport.append(" | "+section);
-    }
 
 
 }

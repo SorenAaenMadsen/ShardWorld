@@ -51,6 +51,7 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
 
     @Override
     public Receive<ShardWorldActor.WorldCommand> createReceive() {
+        getContext().getLog().info("World createReceive");
         return newReceiveBuilder()
                 .onMessage(C_ShardWorldSystemStart.class, this::onShardWorldSystemStart)
                 .onMessage(C_WorldDayEnd.class, this::onWorldDayEnd)
@@ -59,7 +60,7 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
 
     private Behavior<WorldCommand> onShardWorldSystemStart(C_ShardWorldSystemStart message) {
         if (worldSettings.logAkkaMessages()) {
-            getContext().getLog().info("onNewDayStartReceived message received: {}", message);
+            getContext().getLog().info("World onNewDayStartReceived message received: {}", message);
         }
         for (ActorRef<CountryMainActor.CountryMainActorCommand> country : allCountries) {
             country.tell(new C_CountryDayStart(worldDay));
@@ -69,7 +70,7 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
 
     private Behavior<WorldCommand> onWorldDayEnd(C_WorldDayEnd message) {
         if (worldSettings.logAkkaMessages()) {
-            getContext().getLog().info("onEndMarketDayCycle order received: {}", message);
+            getContext().getLog().info("World onEndMarketDayCycle order received: {}", message);
         }
         worldStatisticsReceiver.addDay(new WorldDayStats(message.dayId(), new CountryDayStats[]{message.countryDayStats()}));
         if (message.dayId() == this.worldDay) {

@@ -75,6 +75,7 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
 
     @Override
     public Receive<CountryMainActorCommand> createReceive() {
+        getContext().getLog().info("Country createReceive");
         return newReceiveBuilder()
                 .onMessage(C_CountryDayStart.class, this::onNewDayStartReceived)
                 .onMessage(C_EndMarketDayCycle.class, this::onEndMarketDayCycle)
@@ -84,7 +85,7 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
 
     private Behavior<CountryMainActorCommand> onNewDayStartReceived(C_CountryDayStart message) {
         if (worldSettings.logAkkaMessages()) {
-            getContext().getLog().info("onNewDayStartReceived message received: {}", message);
+            getContext().getLog().info("Country onNewDayStartReceived message received: {}", message);
         }
         companyDayEnds = new ArrayList<>();
         endMarketDayCycle = Optional.empty();
@@ -95,7 +96,7 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
 
     private Behavior<CountryMainActorCommand> onCompanyDayEnd(C_CompanyDayEnd message) {
         if (worldSettings.logAkkaMessages()) {
-            getContext().getLog().info("onCompanyDayEnd message received: {}", message);
+            getContext().getLog().info("Country onCompanyDayEnd message received: {}", message);
         }
         companyDayEnds.add(message);
         checkEndCountryDay();
@@ -104,7 +105,7 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
 
     private Behavior<CountryMainActorCommand> onEndMarketDayCycle(C_EndMarketDayCycle message) {
         if (worldSettings.logAkkaMessages()) {
-            getContext().getLog().info("onEndMarketDayCycle order received: {}", message);
+            getContext().getLog().info("Country onEndMarketDayCycle order received: {}", message);
         }
         endMarketDayCycle = Optional.of(message);
         checkEndCountryDay();

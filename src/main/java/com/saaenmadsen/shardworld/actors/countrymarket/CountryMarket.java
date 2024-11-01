@@ -50,6 +50,7 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
 
     @Override
     public Receive<CountryMarketCommand> createReceive() {
+        getContext().getLog().info("Market createReceive");
         return newReceiveBuilder()
                 .onMessage(C_BuyOrder.class, this::onReceiveBuyOrder)
                 .onMessage(C_EndMarketDay.class, this::onReceiveEndMarketDay)

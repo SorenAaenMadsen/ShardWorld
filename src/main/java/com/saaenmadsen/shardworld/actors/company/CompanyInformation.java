@@ -2,38 +2,41 @@ package com.saaenmadsen.shardworld.actors.company;
 
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
 import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
+import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class CompanyInformation {
+    private final String companyId;
     private CompanyCulture culture;
     private CompanyFlawor companyFlawor;
     private StockListing warehouse;
-    private List<KnownRecipe> myRecipes = new ArrayList<>();
+    private List<KnownRecipe> myRecipes;
     private int workers = 10;
+    private Random dice;
+    private PriceList priceList;
 
-    public CompanyInformation() {
+    public CompanyInformation(String companyId) {
+        this.companyId = companyId;
+        this.culture = new CompanyCulture();
         this.warehouse = StockListing.createEmptyStockListing();
+        this.dice = new Random();
+        this.myRecipes = new ArrayList<>();
+        this.priceList = new PriceList();
+        this.companyFlawor = new CompanyFlawor();
+
     }
 
     public int calculateWorkTimeAvailable() {
         return workers * 8;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    public Random getDice() {
+        return dice;
+    }
 
     public CompanyCulture getCulture() {
         return culture;
@@ -73,5 +76,25 @@ public class CompanyInformation {
 
     public void setWorkers(int workers) {
         this.workers = workers;
+    }
+
+    public boolean timeForTacticalBoardMeeting() {
+        return (dice.nextInt(20)<2);
+    }
+
+    public boolean timeForStrategicBoardMeeting() {
+        return (dice.nextInt(180)<2);
+    }
+
+    public PriceList getPriceList() {
+        return priceList;
+    }
+
+    public void setPriceList(PriceList priceList) {
+        this.priceList = priceList;
+    }
+
+    public String getCompanyId() {
+        return companyId;
     }
 }
