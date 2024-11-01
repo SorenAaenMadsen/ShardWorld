@@ -6,6 +6,8 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
+import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
 import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
@@ -26,15 +28,16 @@ import java.util.Optional;
 import java.util.Random;
 
 public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyCommand> {
-    private String companyName;
+    private String companyId;
     private final akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor;
     private final WorldSettings worldSettings;
-    private StockListing warehouse;
-    private List<KnownRecipe> myRecipes = new ArrayList<>();
-    private int workers = 10;
+
     private PriceList priceList;
 
     private StockListing reportUnsoldGoods;
+
+    private CompanyInformation companyInformation;
+
 
     public interface ShardCompanyCommand {
     }
@@ -45,12 +48,12 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
 
     public ShardCompany(ActorContext<ShardCompanyCommand> context, String companyName, akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
         super(context);
-        this.companyName = companyName;
+        this.companyId = companyName;
         this.countryActor = countryActor;
         this.worldSettings = worldSettings;
-        this.warehouse = StockListing.createEmptyStockListing();
+        this.companyInformation = new CompanyInformation();
         this.priceList = new PriceList();
-        investInNewProductionRecipies(warehouse, priceList);
+        dailyCompanyDirectionEvaluation();
     }
 
 
@@ -69,7 +72,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
 
     private Behavior<ShardCompanyCommand> onReceiveMarketOpenForSellers(C_MarketOpenForSellers message) {
         if (worldSettings.logAkkaMessages()) {
-            getContext().getLog().info(companyName + " got message {}", message.toString());
+            getContext().getLog().info(companyId + " got message {}", message.toString());
         }
         ActorRef parent = Adapter.toClassic(getContext()).parent();
         this.priceList = message.priceList();
@@ -80,32 +83,30 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     }
 
     private void doProduction(PriceList priceList) {
-        RecipeChoiceReport toWorkRecipe = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(myRecipes, warehouse, priceList, getWorkTimeAvailable());
+        RecipeChoiceReport toWorkRecipe = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(companyInformation, priceList);
         for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : toWorkRecipe.productionChoices()) {
-            String message = companyName + " production " + productionChoice.recipe().name() + " a total of " + productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials() + " times.";
+            String message = companyId + " production " + productionChoice.recipe().name() + " a total of " + productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials() + " times.";
             getContext().getLog().info(message);
-            productionChoice.recipe().runProduction(productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials(), warehouse);
+            productionChoice.recipe().runProduction(productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials(), companyInformation.getWarehouse());
             appendToDailyReport(message);
         }
     }
 
-    private int getWorkTimeAvailable() {
-        return workers * 8;
-    }
+
 
     private void sendSkuItemsForSaleToMarket(C_MarketOpenForSellers message) {
         // For now, just setting everything for sale.
-        StockListing forSaleList = warehouse.retrieve(warehouse);
+        StockListing forSaleList = companyInformation.getWarehouse().retrieve(companyInformation.getWarehouse());
         message.countryMarket().tell(new C_SendSkuToMarketForSale(forSaleList, getContext().getSelf()));
     }
 
     private Behavior<ShardCompanyCommand> onReceiveMarketOpenForBuyers(C_MarketOpenForBuyers message) {
         if (worldSettings.logAkkaMessages()) {
-            getContext().getLog().info(companyName + " got message {}", message.toString());
+            getContext().getLog().info(companyId + " got message {}", message.toString());
         }
         this.priceList = message.priceList();
         ArrayList<KnownRecipe> prepareToProduceRecipies = getListOfTwoMostProfitableRecipes(message);
-        StockListing buyList = buildBuyList(prepareToProduceRecipies, getWorkTimeAvailable());
+        StockListing buyList = buildBuyList(prepareToProduceRecipies, companyInformation.calculateWorkTimeAvailable());
 
         message.countryMarket().tell(new C_BuyOrder(buyList, getContext().getSelf()) );
         return Behaviors.same();
@@ -125,7 +126,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         Optional<KnownRecipe> prepare1 = Optional.empty();
         Optional<KnownRecipe> prepare2 = Optional.empty();
 
-        for (KnownRecipe myRecipe : myRecipes) {
+        for (KnownRecipe myRecipe : companyInformation.getMyRecipes()) {
             myRecipe.setProfitability(myRecipe.recipe().calculateProfitPrWorkTenMin(message.priceList()));
             if (prepare1.isEmpty()) {
                 prepare1 = Optional.of(myRecipe);
@@ -157,7 +158,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
 
     private Behavior<ShardCompanyCommand> onReceiveCompletedBuyOrder(C_CompletedBuyOrder message) {
         if (worldSettings.logAkkaMessages()) {
-            getContext().getLog().info(companyName + " got message {}", message.toString());
+            getContext().getLog().info(companyId + " got message {}", message.toString());
         }
 
         return Behaviors.same();
@@ -165,28 +166,41 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
 
     private Behavior<ShardCompanyCommand> onSendUnsoldSkuBackToSeller(C_SendUnsoldSkuBackToSeller message) {
         if (worldSettings.logAkkaMessages()) {
-            getContext().getLog().info(companyName + " got message {}", message.toString());
+            getContext().getLog().info(companyId + " got message {}", message.toString());
         }
         this.reportUnsoldGoods = message.unsoldGoods().createDuplicate();
-        warehouse.addStockFromList(message.unsoldGoods());
+        companyInformation.getWarehouse().addStockFromList(message.unsoldGoods());
 
-        investInNewProductionRecipies(warehouse, priceList);
 
-        message.market().tell(new C_EndMarketDay(this.companyName));
-        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport.toString(), myRecipes, reportUnsoldGoods, warehouse.createDuplicate())));
+        dailyCompanyDirectionEvaluation();
+
+        message.market().tell(new C_EndMarketDay(this.companyId));
+        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport.toString(), companyInformation.getMyRecipes(), reportUnsoldGoods, companyInformation.getWarehouse().createDuplicate())));
         return Behaviors.same();
     }
 
+    private void dailyCompanyDirectionEvaluation() {
+        investInNewProductionRecipies(companyInformation.getWarehouse(), priceList);
+        boolean holdBoardMeeting = true;
+        if(holdBoardMeeting){
+            longTermCompanyDirectionEvaluation();
+        }
+    }
+
+    private void longTermCompanyDirectionEvaluation() {
+
+    }
+
     private void investInNewProductionRecipies(StockListing warehouse, PriceList priceList) {
-        String logMessage = companyName + " recipe adjustment: ";
-        if(myRecipes.size()>5){
-            logMessage += " removed " + myRecipes.getFirst().recipe().name();
-            myRecipes.removeFirst();
+        String logMessage = companyId + " recipe adjustment: ";
+        if(companyInformation.getMyRecipes().size()>5){
+            logMessage += " removed " + companyInformation.getMyRecipes().getFirst().recipe().name();
+            companyInformation.getMyRecipes().removeFirst();
         }
         Random dice = new Random();
         int newRecipeIndex = dice.nextInt(Recipe.values().length);
         Recipe newRecipe = Recipe.values()[newRecipeIndex];
-        myRecipes.add(new KnownRecipe(newRecipe));
+        companyInformation.getMyRecipes().add(new KnownRecipe(newRecipe));
         logMessage += " added " + newRecipe.name();
         appendToDailyReport(logMessage);
         getContext().getLog().info(logMessage);

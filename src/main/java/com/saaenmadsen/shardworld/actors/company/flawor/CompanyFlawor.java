@@ -1,14 +1,14 @@
-package com.saaenmadsen.shardworld.constants.companies;
+package com.saaenmadsen.shardworld.actors.company.flawor;
 
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
 import com.saaenmadsen.shardworld.aitools.AiTextGenerator;
 import com.saaenmadsen.shardworld.constants.Recipe;
-import com.saaenmadsen.shardworld.constants.companies.culture.CompanyCulture;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class Company {
+public class CompanyFlawor {
     private String companyName;
     private String companyMarketingMotto;
     private String leadershipStyle;
@@ -18,7 +18,7 @@ public class Company {
 
 
 
-    public Company(Recipe... knownRecipes) {
+    public CompanyFlawor(Recipe... knownRecipes) {
         this.knownRecipes = knownRecipes;
         culture = new CompanyCulture();
         generateAiCompanyDescription();

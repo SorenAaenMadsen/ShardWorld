@@ -1,5 +1,6 @@
 package com.saaenmadsen.shardworld.recipechoice;
 
+import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
@@ -10,10 +11,14 @@ import java.util.List;
 
 public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoices) {
 
+    public static RecipeChoiceReport findRecipeWithHighestProjectedProfit(CompanyInformation companyInformation, PriceList priceList) {
+        return findRecipeWithHighestProjectedProfit(companyInformation.getMyRecipes(), companyInformation.getWarehouse(), priceList, companyInformation.calculateWorkTimeAvailable());
+    }
+
     public record RecipeChoiceReportElement(Recipe recipe, ProductionImpactReport productionImpactReport, int projectedProfit){}
 
 
-    public static RecipeChoiceReport findRecipeWithHighestProjectedProfit(List<KnownRecipe> availableRecipies, StockListing myRawMaterials, PriceList priceList, int workTimeAvailable) {
+    private static RecipeChoiceReport findRecipeWithHighestProjectedProfit(List<KnownRecipe> availableRecipies, StockListing myRawMaterials, PriceList priceList, int workTimeAvailable) {
         int projectedProfit = 0;
 
         RecipeChoiceReportElement chosenRecipe = null;

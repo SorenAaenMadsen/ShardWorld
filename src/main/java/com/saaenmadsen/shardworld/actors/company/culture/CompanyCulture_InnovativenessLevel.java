@@ -1,4 +1,4 @@
-package com.saaenmadsen.shardworld.constants.companies.culture;
+package com.saaenmadsen.shardworld.actors.company.culture;
 
 import java.util.Random;
 
