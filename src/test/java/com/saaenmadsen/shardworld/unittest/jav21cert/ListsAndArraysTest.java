@@ -22,7 +22,7 @@ public class ListsAndArraysTest {
     private record TestResult(String testId, int testSize, Duration duration) {}
 
     @Test
-    public void test() {
+    public void testWhatStructuresToUseForEfficiency() {
         int testSize = 10000000;
 
         List<TestResult> results = new ArrayList<>();
