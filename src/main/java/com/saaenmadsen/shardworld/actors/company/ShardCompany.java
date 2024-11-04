@@ -41,18 +41,18 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
 
     public ShardCompany(ActorContext<ShardCompanyCommand> context, String companyId, akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
         super(context);
-        getContext().getLog().info(companyId + "Constructor start");
+        getContext().getLog().debug(companyId + "Constructor start");
         this.companyId = companyId;
         this.countryActor = countryActor;
         this.worldSettings = worldSettings;
         this.companyInformation = new CompanyInformation(companyId);
-        getContext().getLog().info(companyId + "Constructor done");
+        getContext().getLog().debug(companyId + "Constructor done");
     }
 
 
     @Override
     public Receive<ShardCompanyCommand> createReceive() {
-        getContext().getLog().info("ShardCompany createReceive");
+        getContext().getLog().debug("ShardCompany createReceive");
         return newReceiveBuilder()
                 .onMessage(C_MarketOpenForSellers.class, this::onReceiveMarketOpenForSellers)
                 .onMessage(C_CompletedBuyOrder.class, this::onReceiveCompletedBuyOrder)
@@ -81,7 +81,7 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         RecipeChoiceReport toWorkRecipe = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(companyInformation, priceList);
         for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : toWorkRecipe.productionChoices()) {
             String message = companyId + " production " + productionChoice.recipe().name() + " a total of " + productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials() + " times.";
-            getContext().getLog().info(message);
+            getContext().getLog().debug(message);
             productionChoice.recipe().runProduction(productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials(), companyInformation.getWarehouse());
             dailyReport.appendToDailyReport(message);
         }

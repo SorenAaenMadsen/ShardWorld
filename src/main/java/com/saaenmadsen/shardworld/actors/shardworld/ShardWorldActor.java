@@ -77,7 +77,9 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
             if (this.worldDay < worldSettings.maxDaysToRun()) {
                 this.worldDay++;
                 for (ActorRef<CountryMainActor.CountryMainActorCommand> country : allCountries) {
-                    country.tell(new C_CountryDayStart(message.dayId() + 1));
+                    int nextDay = message.dayId() + 1;
+                    getContext().getLog().info("World next day start for day: {}", nextDay);
+                    country.tell(new C_CountryDayStart(nextDay));
                 }
                 return Behaviors.same();
             } else {

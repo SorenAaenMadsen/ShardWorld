@@ -19,16 +19,6 @@ public class Main {
         ActorSystem system = ActorSystem.create("shardworld");
 
 
-//        ActorRef readingActorRef = system.actorOf(ReadingActor.props("Lorum ipsum\nHan Solo"), "readingActor");
-//        readingActorRef.tell(new ReadingActor.ReadLines(), ActorRef.noSender());
-
-//        ActorRef persistentActor = system.actorOf(MyPersistentBehavior);
-//        Behavior<MyPersistentBehavior.Command> persistentActor = MyPersistentBehavior.create(new PersistenceId("1234"));
-//        persistentActor.
-
-
-//        CompletableFuture<Object> future = ask(wordCounterActorRef,
-//                new WordCounterActor.CountWords(line), 1000).toCompletableFuture();
 
 
         log.info("Done with Main");
