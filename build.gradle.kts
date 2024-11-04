@@ -81,3 +81,11 @@ dependencyManagement {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+tasks.test {
+    jvmArgs = listOf(
+        "-Xms1g",  // Initial heap size
+        "-Xmx4g",    // Maximum heap size
+        "-XX:+UseG1GC" // Example: Use G1 garbage collector
+    )
+}
