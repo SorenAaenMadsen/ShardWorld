@@ -6,11 +6,16 @@ import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.constants.Recipe;
 
 /**
- * At the daily direction meeting, decisions are taken regarding
- * - tomorrows production.
  */
 public class DailyDirectionMeeting {
+
     public DailyDirectionMeeting(CompanyInformation companyInformation, DailyReport dailyReport) {
+        updateExpectedDailySalesForRecipies(companyInformation, dailyReport);
+    }
+
+
+
+    private static void updateExpectedDailySalesForRecipies(CompanyInformation companyInformation, DailyReport dailyReport) {
         for (KnownRecipe myRecipe : companyInformation.getKnownRecipes()) {
             int totalDailySaleValueForRecipeOutputs = 0;
             for (Recipe.SkuAndCount output : myRecipe.getRecipe().getOutputs()) {
