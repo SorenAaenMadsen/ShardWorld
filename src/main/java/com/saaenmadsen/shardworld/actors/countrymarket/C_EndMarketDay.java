@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public record C_EndMarketDay(
         String companyName
-) implements CountryMarket.CountryMarketCommand{
+) implements A_CountryMarket.CountryMarketCommand{
 
     public static C_EndMarketDay fromJson(String json) {
         ObjectMapper mapper = new ObjectMapper();

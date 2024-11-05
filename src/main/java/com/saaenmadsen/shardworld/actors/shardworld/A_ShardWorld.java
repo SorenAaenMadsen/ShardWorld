@@ -7,7 +7,7 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_CountryDayStart;
-import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
+import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.statistics.CountryDayStats;
 import com.saaenmadsen.shardworld.statistics.WorldDayStats;
@@ -16,13 +16,13 @@ import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldCommand> {
+public class A_ShardWorld extends AbstractBehavior<A_ShardWorld.WorldCommand> {
     private int worldDay;
     private WorldSettings worldSettings;
 
     private WorldStatisticsReceiver worldStatisticsReceiver;
 
-    private List<ActorRef<CountryMainActor.CountryMainActorCommand>> allCountries = new ArrayList<>();
+    private List<ActorRef<A_ShardCountry.CountryMainActorCommand>> allCountries = new ArrayList<>();
 
 
     public interface WorldCommand {
@@ -31,13 +31,13 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
     public static Behavior<WorldCommand> create(WorldSettings worldSettings, WorldStatisticsReceiver worldStatisticsReceiver) {
         return Behaviors.setup(
                 context -> {
-                    ShardWorldActor worldActor = new ShardWorldActor(context, worldSettings, worldStatisticsReceiver);
+                    A_ShardWorld worldActor = new A_ShardWorld(context, worldSettings, worldStatisticsReceiver);
                     return worldActor;
                 });
 
     }
 
-    public ShardWorldActor(ActorContext<WorldCommand> context, WorldSettings worldSettings, WorldStatisticsReceiver worldStatisticsReceiver) {
+    public A_ShardWorld(ActorContext<WorldCommand> context, WorldSettings worldSettings, WorldStatisticsReceiver worldStatisticsReceiver) {
         super(context);
         this.worldStatisticsReceiver = worldStatisticsReceiver;
         this.worldSettings = worldSettings;
@@ -45,12 +45,12 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
 
         for (int i = 0; i < worldSettings.countryCount(); ++i) {
             String companyName = "country-" + i;
-            allCountries.add(context.spawn(CountryMainActor.create(worldSettings, getContext().getSelf()), companyName));
+            allCountries.add(context.spawn(A_ShardCountry.create(worldSettings, getContext().getSelf()), companyName));
         }
     }
 
     @Override
-    public Receive<ShardWorldActor.WorldCommand> createReceive() {
+    public Receive<A_ShardWorld.WorldCommand> createReceive() {
         getContext().getLog().info("World createReceive");
         return newReceiveBuilder()
                 .onMessage(C_ShardWorldSystemStart.class, this::onShardWorldSystemStart)
@@ -62,7 +62,7 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info("World onNewDayStartReceived message received: {}", message);
         }
-        for (ActorRef<CountryMainActor.CountryMainActorCommand> country : allCountries) {
+        for (ActorRef<A_ShardCountry.CountryMainActorCommand> country : allCountries) {
             country.tell(new C_CountryDayStart(worldDay));
         }
         return Behaviors.same();
@@ -76,7 +76,7 @@ public class ShardWorldActor extends AbstractBehavior<ShardWorldActor.WorldComma
         if (message.dayId() == this.worldDay) {
             if (this.worldDay < worldSettings.maxDaysToRun()) {
                 this.worldDay++;
-                for (ActorRef<CountryMainActor.CountryMainActorCommand> country : allCountries) {
+                for (ActorRef<A_ShardCountry.CountryMainActorCommand> country : allCountries) {
                     int nextDay = message.dayId() + 1;
                     getContext().getLog().info("World next day start for day: {}", nextDay);
                     country.tell(new C_CountryDayStart(nextDay));

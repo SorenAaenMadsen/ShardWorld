@@ -3,7 +3,7 @@ package com.saaenmadsen.shardworld.unittest.company;
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.company.DailyReport;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
-import com.saaenmadsen.shardworld.actors.company.ShardCompany;
+import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
 import com.saaenmadsen.shardworld.actors.company.direction.DailyDirectionMeeting;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.constants.Recipe;
@@ -46,7 +46,7 @@ public class RecipeAndProductionForecastTest {
     public void PrepareBuyListForCompanyTest(){
         ArrayList<KnownRecipe> knownRecipes = new ArrayList<>();
         knownRecipes.add(new KnownRecipe(Recipe.PRIMITIVE_WOODEN_SHUE, 0));
-        StockListing buylist = ShardCompany.buildBuyList(knownRecipes, 100);
+        StockListing buylist = A_ShardCompany.buildBuyList(knownRecipes, 100);
         assertEquals(8, buylist.getSkuCount(StockKeepUnit.WOOD_KG.getArrayId()));
 
     }

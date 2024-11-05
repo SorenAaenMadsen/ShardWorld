@@ -6,7 +6,7 @@ import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 public record C_CompletedBuyOrder(
         StockListing dayId
-) implements ShardCompany.ShardCompanyCommand {
+) implements A_ShardCompany.ShardCompanyCommand {
 
     public static C_CompletedBuyOrder fromJson(String json) {
         ObjectMapper mapper = new ObjectMapper();

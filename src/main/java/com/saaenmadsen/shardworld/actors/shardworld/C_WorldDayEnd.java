@@ -6,7 +6,7 @@ import com.saaenmadsen.shardworld.statistics.CountryDayStats;
 
 public record C_WorldDayEnd(
         int dayId,
-        CountryDayStats countryDayStats) implements ShardWorldActor.WorldCommand {
+        CountryDayStats countryDayStats) implements A_ShardWorld.WorldCommand {
 
     public static C_WorldDayEnd fromJson(String json){
         ObjectMapper mapper = new ObjectMapper();

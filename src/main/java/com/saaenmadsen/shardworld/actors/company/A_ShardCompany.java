@@ -1,30 +1,24 @@
 package com.saaenmadsen.shardworld.actors.company;
 
-import akka.actor.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
-import com.saaenmadsen.shardworld.actors.company.direction.DailyDirectionMeeting;
-import com.saaenmadsen.shardworld.actors.company.direction.ProductionPlanning;
-import com.saaenmadsen.shardworld.actors.company.direction.StrategicBoardMeeting;
-import com.saaenmadsen.shardworld.actors.company.direction.TacticalBoardMeeting;
+import com.saaenmadsen.shardworld.actors.company.direction.*;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_BuyOrder;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_EndMarketDay;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
-import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
+import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
-import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
-import com.saaenmadsen.shardworld.recipechoice.RecipeChoiceReport;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyCommand> {
+public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompanyCommand> {
     private String companyId;
-    private final akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor;
+    private final akka.actor.typed.ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor;
     private final WorldSettings worldSettings;
     DailyReport dailyReport = new DailyReport();
 
@@ -34,12 +28,12 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
     public interface ShardCompanyCommand {
     }
 
-    public static Behavior<ShardCompanyCommand> create(String companyName, akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
+    public static Behavior<ShardCompanyCommand> create(String companyName, akka.actor.typed.ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
 
-        return Behaviors.setup(context -> new ShardCompany(context, companyName, countryActor, worldSettings));
+        return Behaviors.setup(context -> new A_ShardCompany(context, companyName, countryActor, worldSettings));
     }
 
-    public ShardCompany(ActorContext<ShardCompanyCommand> context, String companyId, akka.actor.typed.ActorRef<CountryMainActor.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
+    public A_ShardCompany(ActorContext<ShardCompanyCommand> context, String companyId, akka.actor.typed.ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
         super(context);
         getContext().getLog().debug(companyId + "Constructor start");
         this.companyId = companyId;
@@ -67,32 +61,16 @@ public class ShardCompany extends AbstractBehavior<ShardCompany.ShardCompanyComm
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
+
         dailyReport = new DailyReport();
-        ActorRef parent = Adapter.toClassic(getContext()).parent();
         companyInformation.setPriceList(message.priceList());
-        new ProductionPlanning(companyInformation, dailyReport);
-        doProduction(message.priceList());
-        sendSkuItemsForSaleToMarket(message);
+
+        new ProductionPlanningAndExecution(companyInformation, dailyReport);
+
+        StockListing forSaleList = new DesiceWhatToSellAtMarket(companyInformation, dailyReport).getForSaleList();
+        message.countryMarket().tell(new C_SendSkuToMarketForSale(forSaleList, getContext().getSelf()));
 
         return Behaviors.same();
-    }
-
-    private void doProduction(PriceList priceList) {
-        RecipeChoiceReport toWorkRecipe = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(companyInformation, priceList);
-        for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : toWorkRecipe.productionChoices()) {
-            String message = companyId + " production " + productionChoice.recipe().name() + " a total of " + productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials() + " times.";
-            getContext().getLog().debug(message);
-            productionChoice.recipe().runProduction(productionChoice.productionImpactReport().maxProductionBeforeRunningOutOfTimeOrMaterials(), companyInformation.getWarehouse());
-            dailyReport.appendToDailyReport(message);
-        }
-    }
-
-
-    private void sendSkuItemsForSaleToMarket(C_MarketOpenForSellers message) {
-        // For now, just setting everything for sale.
-        StockListing forSaleList = companyInformation.getWarehouse().retrieve(companyInformation.getWarehouse());
-        this.dailyReport.setForSaleList(forSaleList);
-        message.countryMarket().tell(new C_SendSkuToMarketForSale(forSaleList, getContext().getSelf()));
     }
 
     private Behavior<ShardCompanyCommand> onReceiveMarketOpenForBuyers(C_MarketOpenForBuyers message) {

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public record C_ShardWorldSystemStart(
 
-) implements ShardWorldActor.WorldCommand {
+) implements A_ShardWorld.WorldCommand {
 
     public static C_ShardWorldSystemStart fromJson(String json) {
         ObjectMapper mapper = new ObjectMapper();

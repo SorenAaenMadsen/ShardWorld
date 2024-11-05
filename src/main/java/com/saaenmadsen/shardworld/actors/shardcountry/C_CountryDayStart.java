@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public record C_CountryDayStart(
         int dayId
-) implements CountryMainActor.CountryMainActorCommand {
+) implements A_ShardCountry.CountryMainActorCommand {
 
     public static C_CountryDayStart fromJson(String json) {
         ObjectMapper mapper = new ObjectMapper();

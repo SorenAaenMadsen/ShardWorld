@@ -2,11 +2,12 @@ package com.saaenmadsen.shardworld.actors.countrymarket;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 public record C_BuyOrder(
         StockListing wishList,
-        akka.actor.typed.ActorRef<com.saaenmadsen.shardworld.actors.company.ShardCompany.ShardCompanyCommand> buyer) implements CountryMarket.CountryMarketCommand {
+        akka.actor.typed.ActorRef<A_ShardCompany.ShardCompanyCommand> buyer) implements A_CountryMarket.CountryMarketCommand {
 
     public static C_BuyOrder fromJson(String json){
         ObjectMapper mapper = new ObjectMapper();

@@ -8,7 +8,7 @@ import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.actors.company.*;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
-import com.saaenmadsen.shardworld.actors.shardcountry.CountryMainActor;
+import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Random;
 
 
-public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketCommand> {
+public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMarketCommand> {
     protected static Random dice = new Random();
     protected static int maxMillisecondsCookTime = 200;
-    private final ActorRef<CountryMainActor.CountryMainActorCommand> country;
+    private final ActorRef<A_ShardCountry.CountryMainActorCommand> country;
     private final WorldSettings worldSettings;
 
     private PriceList newestPriceList;
@@ -32,16 +32,16 @@ public class CountryMarket extends AbstractBehavior<CountryMarket.CountryMarketC
     List<C_BuyOrder> buyOrderList;
     int companiesDoneWithMarketDay;
 
-    private List<ActorRef<ShardCompany.ShardCompanyCommand>> allCompanies;
+    private List<ActorRef<A_ShardCompany.ShardCompanyCommand>> allCompanies;
     private int dayId;
 
     public interface CountryMarketCommand {}
 
-    public static Behavior<CountryMarketCommand> create(ActorRef<CountryMainActor.CountryMainActorCommand> country, WorldSettings worldSettings) {
-        return Behaviors.setup(context -> new CountryMarket(context, country, worldSettings));
+    public static Behavior<CountryMarketCommand> create(ActorRef<A_ShardCountry.CountryMainActorCommand> country, WorldSettings worldSettings) {
+        return Behaviors.setup(context -> new A_CountryMarket(context, country, worldSettings));
     }
 
-    public CountryMarket(ActorContext<CountryMarketCommand> context, ActorRef<CountryMainActor.CountryMainActorCommand> country, WorldSettings worldSettings) {
+    public A_CountryMarket(ActorContext<CountryMarketCommand> context, ActorRef<A_ShardCountry.CountryMainActorCommand> country, WorldSettings worldSettings) {
         super(context);
         this.worldSettings = worldSettings;
         newestPriceList = new PriceList();

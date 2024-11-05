@@ -3,16 +3,16 @@ package com.saaenmadsen.shardworld.actors.company;
 import akka.actor.typed.ActorRef;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saaenmadsen.shardworld.actors.countrymarket.CountryMarket;
+import com.saaenmadsen.shardworld.actors.countrymarket.A_CountryMarket;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 
 public record C_MarketOpenForBuyers(
         int dayId,
         PriceList priceList,
 
-        ActorRef<CountryMarket.CountryMarketCommand> countryMarket
+        ActorRef<A_CountryMarket.CountryMarketCommand> countryMarket
 
-    ) implements ShardCompany.ShardCompanyCommand{
+    ) implements A_ShardCompany.ShardCompanyCommand{
 
     public static C_MarketOpenForBuyers fromJson(String json){
         ObjectMapper mapper = new ObjectMapper();

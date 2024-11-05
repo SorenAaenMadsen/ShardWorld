@@ -6,11 +6,11 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-import com.saaenmadsen.shardworld.actors.company.ShardCompany;
+import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_StartMarketDayCycle;
-import com.saaenmadsen.shardworld.actors.countrymarket.CountryMarket;
+import com.saaenmadsen.shardworld.actors.countrymarket.A_CountryMarket;
 import com.saaenmadsen.shardworld.actors.shardworld.C_WorldDayEnd;
-import com.saaenmadsen.shardworld.actors.shardworld.ShardWorldActor;
+import com.saaenmadsen.shardworld.actors.shardworld.A_ShardWorld;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
 import com.saaenmadsen.shardworld.statistics.CountryDayStats;
@@ -35,12 +35,12 @@ import java.util.Optional;
  * <p>
  * For now, I will NOT be using the FSM (Final State Machine) implementation pattern - crawl before walking and all that...
  */
-public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryMainActorCommand> {
+public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainActorCommand> {
     private WorldSettings worldSettings;
-    private final ActorRef<ShardWorldActor.WorldCommand> worldActorReference;
+    private final ActorRef<A_ShardWorld.WorldCommand> worldActorReference;
 
-    private List<ActorRef<ShardCompany.ShardCompanyCommand>> allCompanies = new ArrayList<>();
-    private ActorRef<CountryMarket.CountryMarketCommand> countryMarket;
+    private List<ActorRef<A_ShardCompany.ShardCompanyCommand>> allCompanies = new ArrayList<>();
+    private ActorRef<A_CountryMarket.CountryMarketCommand> countryMarket;
 
     List<C_CompanyDayEnd> companyDayEnds = new ArrayList<>();
     Optional<C_EndMarketDayCycle> endMarketDayCycle = Optional.empty();
@@ -49,16 +49,16 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
     public interface CountryMainActorCommand {
     }
 
-    public static Behavior<CountryMainActorCommand> create(WorldSettings worldSettings, ActorRef<ShardWorldActor.WorldCommand> worldActorReference) {
+    public static Behavior<CountryMainActorCommand> create(WorldSettings worldSettings, ActorRef<A_ShardWorld.WorldCommand> worldActorReference) {
         return Behaviors.setup(
                 context -> {
-                    CountryMainActor countryActor = new CountryMainActor(context, worldSettings, worldActorReference);
+                    A_ShardCountry countryActor = new A_ShardCountry(context, worldSettings, worldActorReference);
                     return countryActor;
                 });
 
     }
 
-    public CountryMainActor(ActorContext<CountryMainActorCommand> context, WorldSettings worldSettings, ActorRef<ShardWorldActor.WorldCommand> worldActorReference) {
+    public A_ShardCountry(ActorContext<CountryMainActorCommand> context, WorldSettings worldSettings, ActorRef<A_ShardWorld.WorldCommand> worldActorReference) {
         super(context);
         this.worldSettings = worldSettings;
         this.worldActorReference = worldActorReference;
@@ -66,9 +66,9 @@ public class CountryMainActor extends AbstractBehavior<CountryMainActor.CountryM
 
         for (int i = 0; i < this.worldSettings.companyCount(); ++i) {
             String companyName = "company-" + i;
-            allCompanies.add(context.spawn(ShardCompany.create(companyName, context.getSelf(), worldSettings), companyName));
+            allCompanies.add(context.spawn(A_ShardCompany.create(companyName, context.getSelf(), worldSettings), companyName));
         }
-        countryMarket = context.spawn(CountryMarket.create(context.getSelf(), worldSettings), "market");
+        countryMarket = context.spawn(A_CountryMarket.create(context.getSelf(), worldSettings), "market");
 
         getContext().getLog().info("ShardCountry Constructor Completed");
     }

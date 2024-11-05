@@ -7,7 +7,7 @@ import com.saaenmadsen.shardworld.statistics.MarketDayStats;
 public record C_EndMarketDayCycle (
         int dayId,
         MarketDayStats marketDayStats
-) implements CountryMainActor.CountryMainActorCommand {
+) implements A_ShardCountry.CountryMainActorCommand {
 
     public static C_EndMarketDayCycle fromJson(String json){
         ObjectMapper mapper = new ObjectMapper();
