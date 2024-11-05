@@ -143,7 +143,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         dailyReport.setUnsoldGoods(message.unsoldGoods());
         companyInformation.getWarehouse().addStockFromList(message.unsoldGoods());
 
-        new DailyDirectionMeeting(companyInformation, dailyReport);
+        new DayEndEvaluationDirectionMeeting(companyInformation, dailyReport);
 
         if (companyInformation.timeForTacticalBoardMeeting()) {
             new TacticalBoardMeeting(companyInformation, dailyReport);

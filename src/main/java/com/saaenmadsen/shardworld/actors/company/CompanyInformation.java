@@ -2,6 +2,7 @@ package com.saaenmadsen.shardworld.actors.company;
 
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
 import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
+import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
@@ -18,6 +19,8 @@ public class CompanyInformation {
     private int workers = 10;
     private Random dice;
     private PriceList priceList;
+    private MoneyBox moneyBox;
+
 
     public CompanyInformation(String companyId) {
         this.companyId = companyId;
@@ -27,7 +30,7 @@ public class CompanyInformation {
         this.myRecipes = new ArrayList<>();
         this.priceList = new PriceList();
         this.companyFlawor = new CompanyFlawor();
-
+        this.moneyBox = new MoneyBox();
     }
 
     public int calculateWorkTimeAvailable() {
@@ -96,5 +99,9 @@ public class CompanyInformation {
 
     public String getCompanyId() {
         return companyId;
+    }
+
+    public MoneyBox getMoneyBox() {
+        return this.moneyBox;
     }
 }

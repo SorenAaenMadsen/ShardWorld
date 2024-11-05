@@ -1,11 +1,13 @@
 package com.saaenmadsen.shardworld.actors.company;
 
+import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 public class DailyReport {
     StringBuilder dailyReport;
     private StockListing unsoldGoods;
     private StockListing forSaleList;
+    private Long dayEndLiquidity;
 
 
     public DailyReport() {
@@ -33,4 +35,12 @@ public class DailyReport {
     }
 
     public String getDailyReport() {return this.dailyReport.toString();}
+
+    public void setLiquidityDayEnd(long money) {
+        this.dayEndLiquidity = money;
+    }
+
+    public Long getDayEndLiquidity() {
+        return this.dayEndLiquidity;
+    }
 }

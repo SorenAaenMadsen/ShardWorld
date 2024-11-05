@@ -7,10 +7,11 @@ import com.saaenmadsen.shardworld.constants.Recipe;
 
 /**
  */
-public class DailyDirectionMeeting {
+public class DayEndEvaluationDirectionMeeting {
 
-    public DailyDirectionMeeting(CompanyInformation companyInformation, DailyReport dailyReport) {
+    public DayEndEvaluationDirectionMeeting(CompanyInformation companyInformation, DailyReport dailyReport) {
         updateExpectedDailySalesForRecipies(companyInformation, dailyReport);
+        dailyReport.setLiquidityDayEnd(companyInformation.getMoneyBox().getMoney());
     }
 
 

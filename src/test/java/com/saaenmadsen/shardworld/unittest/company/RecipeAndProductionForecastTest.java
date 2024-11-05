@@ -4,7 +4,7 @@ import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.company.DailyReport;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
-import com.saaenmadsen.shardworld.actors.company.direction.DailyDirectionMeeting;
+import com.saaenmadsen.shardworld.actors.company.direction.DayEndEvaluationDirectionMeeting;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
@@ -66,7 +66,7 @@ public class RecipeAndProductionForecastTest {
         dailyReport.setUnsoldGoods(unsoldList);
 
 
-        DailyDirectionMeeting meeting = new DailyDirectionMeeting(companyInformation,dailyReport);
+        DayEndEvaluationDirectionMeeting meeting = new DayEndEvaluationDirectionMeeting(companyInformation,dailyReport);
 
         KnownRecipe updatedKnownRecipe = companyInformation.getKnownRecipes().getFirst();
         assertThat("Expecting the daily sale value to change",
