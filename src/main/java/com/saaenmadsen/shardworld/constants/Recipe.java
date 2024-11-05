@@ -33,14 +33,37 @@ public enum Recipe {
     SHAFT_FURNACE_CRUCIBLE_MILD_STEEL_SMELTING(19, "Shaft Furnace Crucible Mild Steel Smelting", "Mild Steel", "150", "Using a Shaft Furnace, the temperature of the iron can be brought to 1,300–1,500°C, high enough to produce molten iron, especially with effective bellows. With this, it is much faster to produce steel in a crucible. ", "Wrought Iron", "160", "Charcoal", "240", "Null", "0", "", "3200", "", "", "", "Iron tools", "30", "Stone tools", "70", "Null", "0"),
     SHAFT_FURNACE_WROUGHT_IRON_SMELTING(20, "Shaft Furnace Wrought Iron Smelting", "Wrought Iron", "150", "Using a Shaft Furnace, the temperature of the iron can be brought to 1,300–1,500°C, high enough to produce molten iron, especially with effective bellows.  With this high temperature, the efficiency of the melting process increases, and requires fewer passes through the heating process to reduce impurities.", "Iron Ore", "1500", "Charcoal", "350", "Null", "0", "", "3200", "", "", "", "Iron tools", "20", "Stone tools", "70", "Null", "0"),
     SHAFT_FURNACE_IRON_CASTING_AND_SMITHING_OF_IRON_TOOLS(21, "Shaft Furnace Iron Casting and Smithing of Iron Tools", "Iron tools", "150", "Using a Shaft Furnace, the temperature of the iron can be brought to 1,300–1,500°C, high enough to produce molten iron, especially with effective bellows.  This allow production of cast iron, by pouring molten iron into molds for larger-scale production.", "Wrought Iron", "160", "Charcoal", "240", "Null", "0", "", "3200", "", "", "", "Iron tools", "40", "Stone tools", "80", "Null", "0"),
-    SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING(22, "Shaft Furnace Crucible Hard Steel Smelting", "Hard Steel", "150", "Using a Shaft Furnace, the temperature of the iron can be brought to 1,300–1,500°C, high enough to produce molten iron, especially with effective bellows. TODO: More description here", "Wrought Iron", "160", "Charcoal", "240", "Null", "0", "", "3200", "", "", "", "Iron tools", "30", "Stone tools", "70", "Null", "0");
+    SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING(22, "Shaft Furnace Crucible Hard Steel Smelting", "Hard Steel", "150", "Using a Shaft Furnace, the temperature of the iron can be brought to 1,300–1,500°C, high enough to produce molten iron, especially with effective bellows. TODO: More description here", "Wrought Iron", "160", "Charcoal", "240", "Null", "0", "", "3200", "", "", "", "Iron tools", "30", "Stone tools", "70", "Null", "0"),
+    PRIMITIVE_CHARCOAL_BURNING(23, "Primitive Charcoal burning", StockKeepUnit.CHARCOAL, 50, "Description", StockKeepUnit.FIREWOOD_KG, 180, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0,48, new SkillLevel(Skill.WOODWORKER,3), null, null, null,0, null,0, null,0),
+    PRIMITIVE_STONE_TOOLS(24, "Primitive Stone Tools", StockKeepUnit.STONE_TOOLS, 1, "Making stone tools with only the tools and ingredients which can be found in nature.", StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0,80, new SkillLevel(Skill.STONEWORKER,1), null, null, null,0, null,0, null,0),
+    PRIMITIVE_WOOD_TOOLS(25, "Primitive Wood Tools", StockKeepUnit.WOOD_TOOLS, 1, "Making wooden tools with only the tools which can be found in nature.", StockKeepUnit.WOOD_KG, 2, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0,30, new SkillLevel(Skill.WOODWORKER,1), null, null, null,0, null,0, null,0)
+    ;
 
+
+
+    /**
+
+     Furnace Type	Period	Temperature Range	Output Type
+     Bloomery Furnace	c. 1200 BCE onward	1,200–1,300°C	Wrought Iron
+     Early Shaft Furnace	Iron Age (c. 5th century BCE)	1,300–1,500°C	Wrought and Cast Iron
+     Chinese Blast Furnace	Han Dynasty (c. 200 BCE)	1,500–1,600°C	Cast Iron
+     Medieval European Blast Furnace	12th–15th Century CE	1,600°C	Cast Iron
+     Puddling Furnace	18th Century	1,350–1,450°C	Wrought Iron
+     Bessemer Converter	1856	1,600–1,700°C	Low-Carbon Steel
+     Electric Arc Furnace	20th Century	1,800°C+	Steel and Alloys
+
+     */
 
     public record SkuAndCount(StockKeepUnit sku, int amount) {
         public static Optional<SkuAndCount> fromStrings(String productName, String amount) {
             if (productName.isEmpty()) return Optional.empty();
             if (productName.equals("Null")) return Optional.empty();
             return Optional.of(new SkuAndCount(StockKeepUnit.getByProductName(productName), Integer.parseInt(amount)));
+        }
+        public static Optional<SkuAndCount> from(StockKeepUnit sku, int amount) {
+            if (null == sku) return Optional.empty();
+            if (sku.equals(StockKeepUnit.NULL)) return Optional.empty();
+            return Optional.of(new SkuAndCount(sku, amount));
         }
 
         @Override
@@ -143,9 +166,61 @@ public enum Recipe {
         toolRequirement2.ifPresent(inputs::add);
         Optional<SkuAndCount> toolRequirement3 = SkuAndCount.fromStrings(Tool_Requirement_3, Tool_Requirement_3_amount);
         toolRequirement3.ifPresent(inputs::add);
+    }
 
 
 
+    Recipe(
+            int recipeId,
+            String recipeName,
+            StockKeepUnit productProduced,
+            int producedAmount,
+            String processDescription,
+            StockKeepUnit input_1,
+            int input_1_amount,
+            StockKeepUnit input_2,
+            int input_2_amount,
+            StockKeepUnit input_3,
+            int input_3_amount,
+            int calenderWaitTimeFromProductionToAvailable,
+            int workTime_times10Minutes,
+            SkillLevel skillLevel_1,
+            SkillLevel skillLevel_2,
+            SkillLevel skillLevel_3,
+            StockKeepUnit Tool_Requirement_1,
+            int Tool_Requirement_1_amount,
+            StockKeepUnit Tool_Requirement_2,
+            int Tool_Requirement_2_amount,
+            StockKeepUnit Tool_Requirement_3,
+            int Tool_Requirement_3_amount
+    ) {
+        this.recipeId = recipeId;
+        this.recipeName = recipeName;
+
+
+        Optional<SkuAndCount> output1 = SkuAndCount.from(productProduced, producedAmount);
+        output1.ifPresent(outputs::add);
+
+        this.processDescription = processDescription;
+        Optional<SkuAndCount> input1 = SkuAndCount.from(input_1, input_1_amount);
+        input1.ifPresent(inputs::add);
+        Optional<SkuAndCount> input2 = SkuAndCount.from(input_2, input_2_amount);
+        input2.ifPresent(inputs::add);
+        Optional<SkuAndCount> input3 = SkuAndCount.from(input_3, input_3_amount);
+        input3.ifPresent(inputs::add);
+
+        this.calenderWaitTimeFromProductionToAvailable = calenderWaitTimeFromProductionToAvailable;
+        workTimeTimes10Minutes = workTime_times10Minutes;
+
+//        skillLevel1 = Integer.parseInt(skillLevel_1);
+//        skillLevel2 = Integer.parseInt(skillLevel_2);
+
+        Optional<SkuAndCount> toolRequirement1 = SkuAndCount.from(Tool_Requirement_1, Tool_Requirement_1_amount);
+        toolRequirement1.ifPresent(inputs::add);
+        Optional<SkuAndCount> toolRequirement2 = SkuAndCount.from(Tool_Requirement_2, Tool_Requirement_2_amount);
+        toolRequirement2.ifPresent(inputs::add);
+        Optional<SkuAndCount> toolRequirement3 = SkuAndCount.from(Tool_Requirement_3, Tool_Requirement_3_amount);
+        toolRequirement3.ifPresent(inputs::add);
     }
 
     public int calculateProfitPrWorkTenMin(PriceList priceList) {
