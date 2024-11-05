@@ -31,4 +31,6 @@ public class DailyReport {
     public StockListing getForSaleList() {
         return forSaleList;
     }
+
+    public String getDailyReport() {return this.dailyReport.toString();}
 }

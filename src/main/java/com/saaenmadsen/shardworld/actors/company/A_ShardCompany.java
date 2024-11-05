@@ -152,7 +152,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
             new StrategicBoardMeeting(companyInformation, dailyReport);
         }
         message.market().tell(new C_EndMarketDay(this.companyId));
-        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport.toString(), companyInformation.getKnownRecipes(), dailyReport.getUnsoldGoods(), companyInformation.getWarehouse().createDuplicate())));
+        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport, companyInformation.getKnownRecipes(), dailyReport.getUnsoldGoods(), companyInformation.getWarehouse().createDuplicate())));
         return Behaviors.same();
     }
 }
