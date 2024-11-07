@@ -63,6 +63,12 @@ dependencies {
     implementation("dev.langchain4j:langchain4j-ollama:${ollamaVersion}")
 
 
+    // Core Mockito library
+    testImplementation("org.mockito:mockito-core:5.5.0")
+
+    // Mockito-Kotlin library for Kotlin extensions and support
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+
     //Not used:
     //    implementation ("org.slf4j.slf4j-log4j12")
     //    testImplementation(platform("org.junit:junit-bom:5.10.0"))

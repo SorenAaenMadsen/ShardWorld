@@ -3,6 +3,7 @@ package com.saaenmadsen.shardworld.integrationtest;
 import com.saaenmadsen.shardworld.Main;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.constants.WorldSettingsBuilder;
 import com.saaenmadsen.shardworld.integrationtest.util.IntegrationTestUtil;
 import com.saaenmadsen.shardworld.statistics.WorldEndStatsWorld;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,8 @@ public class ReallyLongWorldRun {
 
     @Test
     public void run100Companies500daysTest() throws InterruptedException {
-        WorldSettings worldSettings = new WorldSettings(100, 1, 500, false);
+//        WorldSettings worldSettings = new WorldSettings(100, 1, 500, false, 1000);
+        WorldSettings worldSettings = WorldSettingsBuilder.ofDefault().build();
 
         IntegrationTestUtil countryLevelIntegrationTestUtil = new IntegrationTestUtil(worldSettings);
 

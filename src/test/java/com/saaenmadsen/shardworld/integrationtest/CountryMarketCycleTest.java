@@ -3,6 +3,7 @@ package com.saaenmadsen.shardworld.integrationtest;
 import com.saaenmadsen.shardworld.Main;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.constants.WorldSettingsBuilder;
 import com.saaenmadsen.shardworld.integrationtest.util.IntegrationTestUtil;
 import com.saaenmadsen.shardworld.statistics.WorldEndStatsWorld;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,8 @@ public class CountryMarketCycleTest {
 
 
     @Test
-    public void runWorldWithTestUtil() throws InterruptedException {
-        WorldSettings worldSettings = new WorldSettings(10, 1, 10, true);
+    public void runWorldWithTestUtil() {
+        WorldSettings worldSettings = WorldSettingsBuilder.ofDefault().withAkkaMessageLogging().build();
 
         IntegrationTestUtil countryLevelIntegrationTestUtil = new IntegrationTestUtil(worldSettings);
 
@@ -30,6 +31,13 @@ public class CountryMarketCycleTest {
                         report.finalWorldTotalStock().getStockAmount(StockKeepUnit.WOOD_KG) +
                         report.finalWorldTotalStock().getStockAmount(StockKeepUnit.FIREWOOD_KG),
                 greaterThan(0));
+    }
+
+    @Test
+    public void runWorldWith2CompaniesTrading() {
+        WorldSettings worldSettings = WorldSettingsBuilder.ofDefault().build();
+
+
     }
 
 

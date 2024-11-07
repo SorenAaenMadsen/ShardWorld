@@ -62,24 +62,9 @@ public class StockListing {
         return retrieved;
     }
 
-    /**
-     * The customer comes with his shopping list, and his cart. We fulfill what we can, and he will continue his merry way.
-     */
-    public void serveCustomer(StockListing shoppingCart, StockListing shoppingList) {
-        for (int i = 0; i < StockKeepUnit.values().length; ++i) {
 
-            int missingAmountInCart = shoppingList.getSkuCount(i)-shoppingCart.getSkuCount(i);
-            if (missingAmountInCart>0) {
-                int soldAmount = 0;
-                if (missingAmountInCart <= stock[i]) {
-                    soldAmount = missingAmountInCart;
-                } else {
-                    soldAmount = stock[i];
-                }
-                this.addStockAmount(i, -soldAmount);
-                shoppingCart.addStockAmount(i, soldAmount);
-            }
-        }
+    public void removeStockAmount(int skuId, int addAmount) {
+        this.addStockAmount(skuId, -addAmount);
     }
 
     public void addStockAmount(int skuId, int addAmount) {

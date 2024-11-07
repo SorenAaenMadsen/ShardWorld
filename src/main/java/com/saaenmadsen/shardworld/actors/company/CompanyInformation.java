@@ -2,6 +2,7 @@ package com.saaenmadsen.shardworld.actors.company;
 
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
 import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
+import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
@@ -22,7 +23,7 @@ public class CompanyInformation {
     private MoneyBox moneyBox;
 
 
-    public CompanyInformation(String companyId) {
+    public CompanyInformation(String companyId, WorldSettings worldSettings) {
         this.companyId = companyId;
         this.culture = new CompanyCulture();
         this.warehouse = StockListing.createEmptyStockListing();
@@ -31,6 +32,7 @@ public class CompanyInformation {
         this.priceList = new PriceList();
         this.companyFlawor = new CompanyFlawor();
         this.moneyBox = new MoneyBox();
+        moneyBox.addMoney(worldSettings.companyInitialMoney());
     }
 
     public int calculateWorkTimeAvailable() {

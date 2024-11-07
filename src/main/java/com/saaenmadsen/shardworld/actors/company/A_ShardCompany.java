@@ -9,6 +9,7 @@ import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
@@ -21,6 +22,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
     private final akka.actor.typed.ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor;
     private final WorldSettings worldSettings;
     DailyReport dailyReport = new DailyReport();
+
 
     private CompanyInformation companyInformation;
 
@@ -39,7 +41,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         this.companyId = companyId;
         this.countryActor = countryActor;
         this.worldSettings = worldSettings;
-        this.companyInformation = new CompanyInformation(companyId);
+        this.companyInformation = new CompanyInformation(companyId, worldSettings);
         getContext().getLog().debug(companyId + "Constructor done");
     }
 
@@ -81,7 +83,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         ArrayList<KnownRecipe> prepareToProduceRecipies = getListOfTwoMostProfitableRecipes(message);
         StockListing buyList = buildBuyList(prepareToProduceRecipies, companyInformation.calculateWorkTimeAvailable());
 
-        message.countryMarket().tell(new C_BuyOrder(buyList, getContext().getSelf()));
+        message.countryMarket().tell(new C_BuyOrder(buyList, companyInformation.getMoneyBox().newBoxWithAllTheMoeny(), getContext().getSelf())); // TODO MoneyBox
         return Behaviors.same();
     }
 
@@ -133,6 +135,9 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
 
+        this.companyInformation.getMoneyBox().addMoney(message.unspentMoney().getMoney());
+        this.companyInformation.getWarehouse().addStockFromList(message.purchasedGoods());
+
         return Behaviors.same();
     }
 
@@ -141,6 +146,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
         dailyReport.setUnsoldGoods(message.unsoldGoods());
+        dailyReport.setLiquidityDayEnd(this.companyInformation.getMoneyBox().getMoney());
         companyInformation.getWarehouse().addStockFromList(message.unsoldGoods());
 
         new DayEndEvaluationDirectionMeeting(companyInformation, dailyReport);

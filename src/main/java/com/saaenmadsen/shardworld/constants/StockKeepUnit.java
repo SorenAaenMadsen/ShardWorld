@@ -1,5 +1,8 @@
 package com.saaenmadsen.shardworld.constants;
 
+/**
+ * This should be JSON files, which can then be loaded into the world settings.
+ */
 public enum StockKeepUnit {
     TIMBER_RAW_KG (0, "Timber, raw, kg", "Raw material", "kg", "Raw timber, newly felled and fresh. Sold pr. Kg", 5),
     FIREWOOD_KG (1, "Firewood, kg", "Fuel", "kg", "Firewood", 8),
@@ -59,7 +62,7 @@ public enum StockKeepUnit {
     TIN (55, "Tin", "Raw material", "", "", 33),
     TIN_ORE (56, "Tin Ore", "Ore", "", "", 33),
     TOPAZ (57, "Topaz", "Precious Stone", "", "", 33),
-    WOOD_TOOLS (58, "Wood tools", "Tools", "kg", "", 33)
+    WOOD_TOOLS (58, "Wood tools", "Tools", "kg", "", 33),
     ;
 
 

@@ -11,7 +11,9 @@ public class PrintableStockListing {
 
     public PrintableStockListing(StockListing stockListing) {
         for (StockKeepUnit sku : StockKeepUnit.values()) {
-            printableStockListing.put(sku.getProductName(), stockListing.getStockAmount(sku));
+            if(stockListing.getStockAmount(sku)>0) {
+                printableStockListing.put(sku.getProductName(), stockListing.getStockAmount(sku));
+            }
         }
     }
 }

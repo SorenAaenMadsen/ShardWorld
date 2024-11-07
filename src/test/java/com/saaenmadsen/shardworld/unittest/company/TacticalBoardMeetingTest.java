@@ -5,6 +5,8 @@ import com.saaenmadsen.shardworld.actors.company.DailyReport;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.actors.company.direction.TacticalBoardMeeting;
 import com.saaenmadsen.shardworld.constants.Recipe;
+import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.constants.WorldSettingsBuilder;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -13,7 +15,7 @@ import static org.hamcrest.Matchers.equalTo;
 public class TacticalBoardMeetingTest {
     @Test
     public void testReduceNumberOfKnownRecipiesToMax5() {
-        CompanyInformation companyInformation = new CompanyInformation("Testcompany");
+        CompanyInformation companyInformation = new CompanyInformation("Testcompany", WorldSettingsBuilder.ofDefault().build());
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.PRIMITIVE_WOODEN_SHUE, 100));
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.GATHER_FIREWOOD, 100));
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.GATHER_CURED_WOOD, 90));

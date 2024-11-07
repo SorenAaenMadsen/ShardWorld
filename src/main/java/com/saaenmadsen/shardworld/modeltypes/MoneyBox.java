@@ -1,7 +1,7 @@
 package com.saaenmadsen.shardworld.modeltypes;
 
 public class MoneyBox {
-    long money;
+    private long money;
 
     public long getMoney() {
         return money;
@@ -23,5 +23,16 @@ public class MoneyBox {
         MoneyBox copy = new MoneyBox();
         copy.addMoney(money);
         return copy;
+    }
+
+    public MoneyBox newBoxWithAllTheMoeny() {
+        MoneyBox copy = new MoneyBox();
+        this.money = 0;
+        return copy;
+    }
+
+    public void payAmount(MoneyBox receiver, long amount) {
+        receiver.addMoney(amount);
+        this.subMoney(amount);
     }
 }

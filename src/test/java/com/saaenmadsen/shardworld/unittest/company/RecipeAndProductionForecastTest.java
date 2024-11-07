@@ -5,6 +5,8 @@ import com.saaenmadsen.shardworld.actors.company.DailyReport;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
 import com.saaenmadsen.shardworld.actors.company.direction.DayEndEvaluationDirectionMeeting;
+import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.constants.WorldSettingsBuilder;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
@@ -53,7 +55,7 @@ public class RecipeAndProductionForecastTest {
 
     @Test
     public void DailyDirectionMeeting_CompanySoldAllTenWoodenShues_Test(){
-        CompanyInformation companyInformation = new CompanyInformation("testcompany");
+        CompanyInformation companyInformation = new CompanyInformation("testcompany", WorldSettingsBuilder.ofDefault().build());
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.PRIMITIVE_WOODEN_SHUE, 0));
         DailyReport dailyReport = new DailyReport();
 
