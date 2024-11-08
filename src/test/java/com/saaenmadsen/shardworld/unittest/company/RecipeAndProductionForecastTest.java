@@ -1,11 +1,7 @@
 package com.saaenmadsen.shardworld.unittest.company;
 
-import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
-import com.saaenmadsen.shardworld.actors.company.DailyReport;
-import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
-import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
+import com.saaenmadsen.shardworld.actors.company.*;
 import com.saaenmadsen.shardworld.actors.company.direction.DayEndEvaluationDirectionMeeting;
-import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.constants.WorldSettingsBuilder;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.constants.Recipe;
@@ -55,9 +51,9 @@ public class RecipeAndProductionForecastTest {
 
     @Test
     public void DailyDirectionMeeting_CompanySoldAllTenWoodenShues_Test(){
-        CompanyInformation companyInformation = new CompanyInformation("testcompany", WorldSettingsBuilder.ofDefault().build());
+        CompanyInformation companyInformation = CompanyInformationBuilder.ofWorldDefault("testcompany", WorldSettingsBuilder.ofDefault().build()).build();
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.PRIMITIVE_WOODEN_SHUE, 0));
-        DailyReport dailyReport = new DailyReport();
+        DailyReport dailyReport = new DailyReport("testcompany");
 
         StockListing forSaleList = StockListing.createEmptyStockListing();
         forSaleList.addStockAmount(StockKeepUnit.PAIR_OF_SHUES_WOODEN.getArrayId(), 10);

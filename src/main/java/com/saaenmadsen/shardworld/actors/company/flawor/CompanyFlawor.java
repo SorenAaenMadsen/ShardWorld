@@ -1,6 +1,7 @@
 package com.saaenmadsen.shardworld.actors.company.flawor;
 
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyCultureBuilder;
 import com.saaenmadsen.shardworld.aitools.AiTextGenerator;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -19,7 +20,7 @@ public class CompanyFlawor {
 
     public CompanyFlawor(Recipe... knownRecipes) {
         this.knownRecipes = knownRecipes;
-        culture = new CompanyCulture();
+        culture = CompanyCultureBuilder.ofRandom().build();
 //        generateAiCompanyDescription();
     }
 

@@ -4,13 +4,15 @@ import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 public class DailyReport {
+    private final String companyId;
     StringBuilder dailyReport;
     private StockListing unsoldGoods;
     private StockListing forSaleList;
     private Long dayEndLiquidity;
 
 
-    public DailyReport() {
+    public DailyReport(String companyId) {
+        this.companyId = companyId;
         dailyReport = new StringBuilder();
     }
 
@@ -42,5 +44,9 @@ public class DailyReport {
 
     public Long getDayEndLiquidity() {
         return this.dayEndLiquidity;
+    }
+
+    public String getCompanyId() {
+        return companyId;
     }
 }

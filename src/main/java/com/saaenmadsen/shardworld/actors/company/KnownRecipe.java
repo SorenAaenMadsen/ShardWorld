@@ -20,7 +20,6 @@ public class KnownRecipe {
         this.expectedDailySaleValue_daily5percentChange = forecastedDailySalesValue;
         this.expectedDailySaleValue_daily10percentChange = forecastedDailySalesValue;
         this.expectedDailySaleValue_daily20percentChange = forecastedDailySalesValue;
-
     }
 
 

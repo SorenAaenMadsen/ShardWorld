@@ -3,7 +3,7 @@ package com.saaenmadsen.shardworld.actors.company.culture;
 import java.util.Random;
 
 public enum CompanyCulture_InnovativenessLevel {
-    NOT_INNOVATIVE(1, "Not Innovative"),
+    NO_INNOVATION(1, "No Innovation, Calcified"),
     LOW_INNOVATIVE(2, "Low Innovative"),
     MODERATELY_INNOVATIVE(3, "Moderately Innovative"),
     SOMEWHAT_INNOVATIVE(4, "Somewhat Innovative"),

@@ -7,10 +7,11 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
-import com.saaenmadsen.shardworld.actors.countrymarket.C_StartMarketDayCycle;
+import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.countrymarket.A_CountryMarket;
-import com.saaenmadsen.shardworld.actors.shardworld.C_WorldDayEnd;
+import com.saaenmadsen.shardworld.actors.countrymarket.C_StartMarketDayCycle;
 import com.saaenmadsen.shardworld.actors.shardworld.A_ShardWorld;
+import com.saaenmadsen.shardworld.actors.shardworld.C_WorldDayEnd;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
 import com.saaenmadsen.shardworld.statistics.CountryDayStats;
@@ -64,9 +65,22 @@ public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainA
         this.worldActorReference = worldActorReference;
         getContext().getLog().info("ShardCountry Constructor Start");
 
-        for (int i = 0; i < this.worldSettings.companyCount(); ++i) {
+        for (CompanyInformation companyInformation : worldSettings.startCompanies()) {
+            allCompanies.add(
+                    context.spawn(
+                            A_ShardCompany.create(companyInformation, context.getSelf(), worldSettings),
+                            companyInformation.getCompanyId()
+                    )
+            );
+        }
+
+        for (int i = allCompanies.size(); i < this.worldSettings.companyCount(); ++i) {
             String companyName = "company-" + i;
-            allCompanies.add(context.spawn(A_ShardCompany.create(companyName, context.getSelf(), worldSettings), companyName));
+            allCompanies.add(
+                    context.spawn(
+                            A_ShardCompany.create(companyName, context.getSelf(), worldSettings)
+                            , companyName)
+            );
         }
         countryMarket = context.spawn(A_CountryMarket.create(context.getSelf(), worldSettings), "market");
 

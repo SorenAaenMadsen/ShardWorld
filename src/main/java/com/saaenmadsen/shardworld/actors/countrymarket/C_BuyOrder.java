@@ -9,9 +9,11 @@ import com.saaenmadsen.shardworld.modeltypes.StockListing;
 public record C_BuyOrder(
         StockListing wishList,
         MoneyBox moneyBox,
-        akka.actor.typed.ActorRef<A_ShardCompany.ShardCompanyCommand> buyer) implements A_CountryMarket.CountryMarketCommand {
+        akka.actor.typed.ActorRef<A_ShardCompany.ShardCompanyCommand> buyer,
+        String buyerCompanyId
+) implements A_CountryMarket.CountryMarketCommand {
 
-    public static C_BuyOrder fromJson(String json){
+    public static C_BuyOrder fromJson(String json) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(json, C_BuyOrder.class);
@@ -20,7 +22,7 @@ public record C_BuyOrder(
         }
     }
 
-    public String toJson(){
+    public String toJson() {
 
         ObjectMapper mapper = new ObjectMapper();
         try {

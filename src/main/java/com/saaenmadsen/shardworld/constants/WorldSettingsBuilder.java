@@ -1,6 +1,7 @@
 package com.saaenmadsen.shardworld.constants;
 
 import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
+import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +13,10 @@ public class WorldSettingsBuilder {
     private int maxDaysToRun;
     private boolean logAkkaMessages;
     private int companyInitialMoney;
-    private List<A_ShardCompany> startCompanies;
+    private List<CompanyInformation> startCompanies;
 
 
-    public WorldSettingsBuilder(int companyCount, int countryCount, int maxDaysToRun, boolean logAkkaMessages, int companyInitialMoney, List<A_ShardCompany> startCompanies) {
+    public WorldSettingsBuilder(int companyCount, int countryCount, int maxDaysToRun, boolean logAkkaMessages, int companyInitialMoney, List<CompanyInformation> startCompanies) {
         this.companyCount = companyCount;
         this.countryCount = countryCount;
         this.maxDaysToRun = maxDaysToRun;
@@ -35,13 +36,18 @@ public class WorldSettingsBuilder {
         );
     }
 
-    public WorldSettingsBuilder withStartCompany(A_ShardCompany company) {
+    public WorldSettingsBuilder withStartCompany(CompanyInformation company) {
         this.startCompanies.add(company);
         return this;
     }
 
     public WorldSettingsBuilder withDaysToRun(int daysToRun) {
         this.maxDaysToRun = daysToRun;
+        return this;
+    }
+
+    public WorldSettingsBuilder withOnlyTheManuallyAddedCompanies() {
+        this.companyCount = this.startCompanies.size();
         return this;
     }
 

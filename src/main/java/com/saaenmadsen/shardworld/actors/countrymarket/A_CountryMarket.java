@@ -82,6 +82,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         }
         marketDay.buyOrderList.add(message);
         MoneyBox buyersMoney = message.moneyBox();
+        getContext().getLog().info("Market buyer {} money is {}", message.buyerCompanyId(), message.moneyBox().getMoney() );
 
         message.buyer().tell(
                 new C_CompletedBuyOrder(

@@ -8,6 +8,7 @@ import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import java.util.List;
 
 public record CompanyDayStats(@JsonIgnore DailyReport dailyReport,
+                              String companyId,
                               java.util.List<KnownRecipe> companyRecipes,
                               @JsonIgnore StockListing unsoldGoods,
                               @JsonIgnore StockListing companyWarehouse,
@@ -19,6 +20,7 @@ public record CompanyDayStats(@JsonIgnore DailyReport dailyReport,
     public CompanyDayStats(DailyReport dailyReport, List<KnownRecipe> companyRecipes, StockListing unsoldGoods, StockListing companyWarehouse) {
         this(
                 dailyReport,
+                dailyReport.getCompanyId(),
                 companyRecipes,
                 unsoldGoods,
                 companyWarehouse,

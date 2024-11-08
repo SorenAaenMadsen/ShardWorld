@@ -7,11 +7,9 @@ public class CompanyCulture {
     private final CompanyCulture_StockManagementLevel stockManagementLevel;
 
 
-    public CompanyCulture() {
-        super();
-        Random dice = new Random();
-        this.innovativenessLevel = CompanyCulture_InnovativenessLevel.getRandom(dice);
-        this.stockManagementLevel = CompanyCulture_StockManagementLevel.getRandom(dice);
+    public CompanyCulture(CompanyCulture_InnovativenessLevel innovativenessLevel, CompanyCulture_StockManagementLevel stockManagementLevel) {
+        this.innovativenessLevel = innovativenessLevel;
+        this.stockManagementLevel = stockManagementLevel;
     }
 
     public CompanyCulture_InnovativenessLevel getInnovativenessLevel() {

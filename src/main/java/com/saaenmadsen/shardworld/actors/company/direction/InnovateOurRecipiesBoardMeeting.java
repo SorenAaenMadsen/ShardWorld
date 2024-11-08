@@ -7,11 +7,15 @@ import com.saaenmadsen.shardworld.constants.Recipe;
 
 import java.util.Random;
 
-public class TacticalBoardMeeting {
+public class InnovateOurRecipiesBoardMeeting {
 
-    public TacticalBoardMeeting(CompanyInformation companyInformation, DailyReport dailyReport) {
-        reduceNumberOfKnownRecipiesToMax5(companyInformation, dailyReport);
-        investInNewCompletelyRandomProductionRecipe(companyInformation, dailyReport);
+    public InnovateOurRecipiesBoardMeeting(CompanyInformation companyInformation, DailyReport dailyReport) {
+        if(companyInformation.getCulture().getInnovativenessLevel().getLevel()==1){
+            return;
+        } else {
+            reduceNumberOfKnownRecipiesToMax5(companyInformation, dailyReport);
+            investInNewCompletelyRandomProductionRecipe(companyInformation, dailyReport);
+        }
     }
 
     public static void investInNewCompletelyRandomProductionRecipe(CompanyInformation companyInformation, DailyReport dailyReport) {
