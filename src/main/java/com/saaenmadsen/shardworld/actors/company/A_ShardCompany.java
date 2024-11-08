@@ -171,9 +171,14 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
+
         dailyReport.setUnsoldGoods(message.unsoldGoods());
-        dailyReport.setLiquidityDayEnd(this.companyInformation.getMoneyBox().getMoney());
+        dailyReport.setMarketDayRevenue(message.boothRevenue().getMoney());
+
         companyInformation.getWarehouse().addStockFromList(message.unsoldGoods());
+        companyInformation.getMoneyBox().addMoney(message.boothRevenue().getMoney());
+
+        dailyReport.setLiquidityDayEnd(this.companyInformation.getMoneyBox().getMoney());
 
         new DayEndEvaluationDirectionMeeting(companyInformation, dailyReport);
 

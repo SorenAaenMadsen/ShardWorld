@@ -9,6 +9,7 @@ public class DailyReport {
     private StockListing unsoldGoods;
     private StockListing forSaleList;
     private Long dayEndLiquidity;
+    private Long marketDayRevenue;
 
 
     public DailyReport(String companyId) {
@@ -48,5 +49,9 @@ public class DailyReport {
 
     public String getCompanyId() {
         return companyId;
+    }
+
+    public void setMarketDayRevenue(long marketDayRevenue) {
+        this.marketDayRevenue = marketDayRevenue;
     }
 }

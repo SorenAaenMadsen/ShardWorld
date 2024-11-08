@@ -7,8 +7,8 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.actors.company.*;
-import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
+import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.statistics.MarketDayStats;
@@ -25,11 +25,11 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
     private MarketDay marketDay;
 
 
-
     private List<ActorRef<A_ShardCompany.ShardCompanyCommand>> allCompanies;
     private int dayId;
 
-    public interface CountryMarketCommand {}
+    public interface CountryMarketCommand {
+    }
 
     public static Behavior<CountryMarketCommand> create(ActorRef<A_ShardCountry.CountryMainActorCommand> country, WorldSettings worldSettings) {
         return Behaviors.setup(context -> new A_CountryMarket(context, country, worldSettings));
@@ -51,6 +51,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
                 .onMessage(C_EndMarketDay.class, this::onReceiveEndMarketDay)
                 .build();
     }
+
     private Behavior<CountryMarketCommand> onReceiveStartMarketDayCycle(C_StartMarketDayCycle message) {
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info("Market got message {}", message.toString());
@@ -59,7 +60,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
 
         this.allCompanies = message.allCompanies();
         this.dayId = message.dayId();
-        message.allCompanies().forEach(c->c.tell(new C_MarketOpenForSellers(message.dayId(), marketDay.getNewestPriceList(), getContext().getSelf())));
+        message.allCompanies().forEach(c -> c.tell(new C_MarketOpenForSellers(message.dayId(), marketDay.getNewestPriceList(), getContext().getSelf())));
         return Behaviors.same();
     }
 
@@ -69,9 +70,9 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         }
         MarketBooth sellersBooth = new MarketBooth(message.forSaleList(), message.seller());
         marketDay.addBooth(sellersBooth);
-        if(marketDay.marketBooths.size() >= allCompanies.size()) {
+        if (marketDay.marketBooths.size() >= allCompanies.size()) {
             // This could be a state shift :)
-            allCompanies.forEach(c->c.tell(new C_MarketOpenForBuyers(dayId, marketDay.getNewestPriceList(), getContext().getSelf())));
+            allCompanies.forEach(c -> c.tell(new C_MarketOpenForBuyers(dayId, marketDay.getNewestPriceList(), getContext().getSelf())));
         }
         return Behaviors.same();
     }
@@ -82,7 +83,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         }
         marketDay.buyOrderList.add(message);
         MoneyBox buyersMoney = message.moneyBox();
-        getContext().getLog().info("Market buyer {} money is {}", message.buyerCompanyId(), message.moneyBox().getMoney() );
+        getContext().getLog().info("Market buyer {} money is {}", message.buyerCompanyId(), message.moneyBox().getMoney());
 
         message.buyer().tell(
                 new C_CompletedBuyOrder(
@@ -91,11 +92,17 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
                 )
         );
 
-        if(marketDay.buyOrderList.size() >= allCompanies.size()) {
+        if (marketDay.buyOrderList.size() >= allCompanies.size()) {
             // This could be a state shift :)
 
             // Send unsold stuff back to the sellers.
-            marketDay.marketBooths.forEach(booth->booth.getSeller().tell(new C_SendUnsoldSkuBackToSeller(booth.closeBoothAndGetRemainingForSaleList(), getContext().getSelf())));
+            marketDay.marketBooths.forEach(booth -> booth.getSeller().tell(
+                            new C_SendUnsoldSkuBackToSeller(
+                                    booth.closeBoothAndGetRemainingForSaleList(),
+                                    booth.getBoothRevenue(),
+                                    getContext().getSelf())
+                    )
+            );
         }
         return Behaviors.same();
     }
@@ -105,7 +112,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
             getContext().getLog().info("Market got message {}", message.toString());
         }
         marketDay.companiesDoneWithMarketDay++;
-        if(marketDay.companiesDoneWithMarketDay == allCompanies.size()) {
+        if (marketDay.companiesDoneWithMarketDay == allCompanies.size()) {
             country.tell(new C_EndMarketDayCycle(dayId, new MarketDayStats(marketDay.getPriceListDayStart().duplicate(), marketDay.getNewestPriceList().duplicate())));
         }
         return Behaviors.same();

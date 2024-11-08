@@ -37,7 +37,7 @@ public class MarketDay {
     public StockListing doShoppingAndReturnShoppingCart(StockListing wishList, MoneyBox buyersMoney){
         StockListing shoppingCart = StockListing.createEmptyStockListing();
 
-        marketBooths.forEach(booth->booth.performTradeAccordingToShoppingList(shoppingCart, wishList, newestPriceList, buyersMoney)); // TODO Money!
+        marketBooths.forEach(booth->booth.performTradeAccordingToShoppingList(shoppingCart, wishList, newestPriceList, buyersMoney));
         return shoppingCart;
     }
 
