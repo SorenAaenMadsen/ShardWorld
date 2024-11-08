@@ -3,7 +3,6 @@ package com.saaenmadsen.shardworld.actors.company;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCultureBuilder;
 import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
-import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
@@ -58,8 +57,8 @@ public class CompanyInformationBuilder {
     }
 
     public static CompanyInformationBuilder ofWorldDefault(String companyId, WorldSettings worldSettings) {
-        if (companyId == null || !companyId.matches("[a-zA-Z0-9]+")) {
-            throw new IllegalArgumentException("companyId must contain only letters and numbers, with no spaces or special characters.");
+        if (companyId == null || !companyId.matches("[-a-zA-Z0-9]+")) {
+            throw new IllegalArgumentException("companyId must contain only letters and numbers, with no spaces or special characters. Was " + companyId);
         }
         return new CompanyInformationBuilder(companyId, worldSettings);
     }

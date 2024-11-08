@@ -27,6 +27,7 @@ public class MoneyBox {
 
     public MoneyBox newBoxWithAllTheMoeny() {
         MoneyBox copy = new MoneyBox();
+        copy.addMoney(money);
         this.money = 0;
         return copy;
     }

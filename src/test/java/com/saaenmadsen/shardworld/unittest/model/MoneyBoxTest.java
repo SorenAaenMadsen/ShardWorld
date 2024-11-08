@@ -26,4 +26,21 @@ public class MoneyBoxTest {
                 equalTo(0L));
 
     }
+
+    @Test
+    public void testNewMoneyBoxWithAllMoney() {
+        MoneyBox moneyBox = new MoneyBox();
+        moneyBox.addMoney(100);
+        assertThat("Inserted 100",
+                moneyBox.getMoney(),
+                equalTo(100L));
+
+        MoneyBox newBox = moneyBox.newBoxWithAllTheMoeny();
+        assertThat("All transferred to new box",
+                moneyBox.getMoney(),
+                equalTo(0L));
+        assertThat("All transferred to new box",
+                newBox.getMoney(),
+                equalTo(100L));
+    }
 }
