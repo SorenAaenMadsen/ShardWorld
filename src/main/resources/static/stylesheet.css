@@ -1,0 +1,7 @@
+
+#myChart {
+    width: 50%;  /* Adjust to 50% of the container's width */
+    max-width: 500px; /* Optional: maximum width for the chart */
+    height: 300px; /* Fixed height */
+}
+
