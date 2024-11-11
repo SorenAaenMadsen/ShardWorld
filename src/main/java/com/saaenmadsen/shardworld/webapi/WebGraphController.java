@@ -22,10 +22,9 @@ public class WebGraphController {
 
 
 
-    @GetMapping("/data/graph")
+    @GetMapping("/data/totalworldresourses")
     public ResponseEntity<List<ShardWorld.DataPoint>> getGraphData() {
         log.info("WebGraphController GET getGraphData");
-        // Fetch or generate your data here
         WorldEndStatsWorld latestSummary = ShardWorld.instance.getLatestSummary();
         List<ShardWorld.DataPoint> data = latestSummary.finalWorldTotalStockMap().getAsDataPointsForWebGraph();
         return new ResponseEntity<>(data, HttpStatus.OK);

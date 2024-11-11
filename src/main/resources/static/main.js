@@ -34,7 +34,7 @@ window.onload = () => loadTabContent('world-control.html', 'World Control');
 
 // Function to fetch data and create the chart
 function fetchChartDataAndCreateChart() {
-    fetch('http://localhost:8080/api/data/graph')
+    fetch('http://localhost:8080/api/data/totalworldresourses')
         .then(response => response.json())
         .then(data => {
             console.log('Data received:', data); // Debugging line
