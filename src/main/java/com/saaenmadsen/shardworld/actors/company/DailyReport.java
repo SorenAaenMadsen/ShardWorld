@@ -5,6 +5,7 @@ import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 public class DailyReport {
     private final String companyId;
+    private final int dayId;
     StringBuilder dailyReport;
     private StockListing unsoldGoods;
     private StockListing forSaleList;
@@ -12,13 +13,17 @@ public class DailyReport {
     private Long marketDayRevenue;
 
 
-    public DailyReport(String companyId) {
+    public DailyReport(String companyId, int dayId) {
         this.companyId = companyId;
+        this.dayId = dayId;
         dailyReport = new StringBuilder();
+        dailyReport.append("Company " + companyId + " on day "+dayId +":");
     }
 
+
+
     public void appendToDailyReport(String section){
-        dailyReport.append(" | "+section);
+        dailyReport.append("<br>"+section);
     }
 
     public void setUnsoldGoods(StockListing stockListing) {

@@ -21,7 +21,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
     private String companyId;
     private final akka.actor.typed.ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor;
     private final WorldSettings worldSettings;
-    DailyReport dailyReport = new DailyReport(companyId);
+    DailyReport dailyReport = new DailyReport(companyId, 1);
 
 
     private CompanyInformation companyInformation;
@@ -82,7 +82,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         }
         getContext().getLog().info("onReceiveMarketOpenForSellers: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
 
-        dailyReport = new DailyReport(companyId);
+        dailyReport = new DailyReport(companyId, message.dayId());
         companyInformation.setPriceList(message.priceList());
 
         new ProductionPlanningAndExecution(companyInformation, dailyReport);

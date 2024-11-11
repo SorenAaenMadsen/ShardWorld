@@ -19,13 +19,11 @@ public class InnovateOurRecipiesBoardMeeting {
     }
 
     public static void investInNewCompletelyRandomProductionRecipe(CompanyInformation companyInformation, DailyReport dailyReport) {
-        String logMessage = companyInformation.getCompanyId() + " recipe adjustment: ";
         Random dice = new Random();
         int newRecipeIndex = dice.nextInt(Recipe.values().length);
         Recipe newRecipe = Recipe.values()[newRecipeIndex];
         companyInformation.getKnownRecipes().add(new KnownRecipe(newRecipe, 0));
-        logMessage += " added " + newRecipe.name();
-        dailyReport.appendToDailyReport(logMessage);
+        dailyReport.appendToDailyReport("We have invested in " +  newRecipe.name());
     }
 
     public static void reduceNumberOfKnownRecipiesToMax5(CompanyInformation companyInformation, DailyReport dailyReport) {
@@ -33,7 +31,7 @@ public class InnovateOurRecipiesBoardMeeting {
             KnownRecipe worstRecipe = companyInformation.getKnownRecipes().stream().reduce(
                     (a, b) -> a.getExpectedDailySaleValue_daily10percentChange() < b.getExpectedDailySaleValue_daily10percentChange() ? a : b
             ).get();
-            dailyReport.appendToDailyReport("Removed " + worstRecipe.recipe().name());
+            dailyReport.appendToDailyReport("Streamlined our production by retiring " + worstRecipe.recipe().name());
             companyInformation.getKnownRecipes().remove(worstRecipe);
         }
     }

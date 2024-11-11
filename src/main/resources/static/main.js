@@ -150,7 +150,7 @@ function displayStatusTable(data) {
         const row = document.createElement('tr');
 
         const keyCell = document.createElement('td');
-        keyCell.textContent = value.label;
+        keyCell.innerHTML = value.label;
         keyCell.style.fontWeight = 'bold';
         keyCell.style.padding = '8px';
 
@@ -159,7 +159,7 @@ function displayStatusTable(data) {
         keyCell.style.height = '80px'; // Set fixed height for key cells
 
         const valueCell = document.createElement('td');
-        valueCell.textContent = value.value;
+        valueCell.innerHTML  = value.value;
         valueCell.style.padding = '8px';
 
         // Set fixed cell dimensions
