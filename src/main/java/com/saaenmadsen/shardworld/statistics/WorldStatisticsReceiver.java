@@ -90,7 +90,7 @@ public class WorldStatisticsReceiver {
         }
     }
 
-    public int getLastReportedDay(){
-        return this.dayStatistics.getLast().dayId();
+    public WorldDayStats getLastReportedDay(){
+        return this.dayStatistics.getLast();
     }
 }

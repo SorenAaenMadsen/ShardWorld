@@ -47,8 +47,9 @@ public class A_ShardWorld extends AbstractBehavior<A_ShardWorld.WorldCommand> {
         this.worldDay = 1;
 
         for (int i = 0; i < worldSettings.countryCount(); ++i) {
-            String companyName = "country-" + i;
-            allCountries.add(context.spawn(A_ShardCountry.create(worldSettings, getContext().getSelf()), companyName));
+
+            String countryName = "country-" + String.format("%05d", i);
+            allCountries.add(context.spawn(A_ShardCountry.create(countryName, worldSettings, getContext().getSelf()), countryName));
         }
     }
 

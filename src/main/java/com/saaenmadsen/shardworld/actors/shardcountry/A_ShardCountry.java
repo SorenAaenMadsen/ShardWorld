@@ -39,6 +39,7 @@ import java.util.Optional;
 public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainActorCommand> {
     private WorldSettings worldSettings;
     private final ActorRef<A_ShardWorld.WorldCommand> worldActorReference;
+    private final String countryId;
 
     private List<ActorRef<A_ShardCompany.ShardCompanyCommand>> allCompanies = new ArrayList<>();
     private ActorRef<A_CountryMarket.CountryMarketCommand> countryMarket;
@@ -50,17 +51,18 @@ public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainA
     public interface CountryMainActorCommand {
     }
 
-    public static Behavior<CountryMainActorCommand> create(WorldSettings worldSettings, ActorRef<A_ShardWorld.WorldCommand> worldActorReference) {
+    public static Behavior<CountryMainActorCommand> create(String countryId, WorldSettings worldSettings, ActorRef<A_ShardWorld.WorldCommand> worldActorReference) {
         return Behaviors.setup(
                 context -> {
-                    A_ShardCountry countryActor = new A_ShardCountry(context, worldSettings, worldActorReference);
+                    A_ShardCountry countryActor = new A_ShardCountry(countryId, context, worldSettings, worldActorReference);
                     return countryActor;
                 });
 
     }
 
-    public A_ShardCountry(ActorContext<CountryMainActorCommand> context, WorldSettings worldSettings, ActorRef<A_ShardWorld.WorldCommand> worldActorReference) {
+    public A_ShardCountry(String countryId, ActorContext<CountryMainActorCommand> context, WorldSettings worldSettings, ActorRef<A_ShardWorld.WorldCommand> worldActorReference) {
         super(context);
+        this.countryId = countryId;
         this.worldSettings = worldSettings;
         this.worldActorReference = worldActorReference;
         getContext().getLog().info("ShardCountry Constructor Start");
@@ -75,7 +77,7 @@ public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainA
         }
 
         for (int i = allCompanies.size(); i < this.worldSettings.companyCount(); ++i) {
-            String companyName = "company-" + i;
+            String companyName = "company-" + String.format("%05d", i);
             allCompanies.add(
                     context.spawn(
                             A_ShardCompany.create(companyName, context.getSelf(), worldSettings)
@@ -129,7 +131,7 @@ public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainA
     private void checkEndCountryDay() {
         if (endMarketDayCycle.isPresent() && companyDayEnds.size() == allCompanies.size()) {
             CompanyDayStats[] companyDayStatsArray = companyDayEnds.stream().map(message -> message.companyDayStats()).toArray(CompanyDayStats[]::new);
-            CountryDayStats countryDayStats = new CountryDayStats(endMarketDayCycle.get().dayId(), companyDayStatsArray, endMarketDayCycle.get().marketDayStats());
+            CountryDayStats countryDayStats = new CountryDayStats(endMarketDayCycle.get().dayId(), this.countryId, companyDayStatsArray, endMarketDayCycle.get().marketDayStats());
             worldActorReference.tell(new C_WorldDayEnd(endMarketDayCycle.get().dayId(), countryDayStats));
         }
     }

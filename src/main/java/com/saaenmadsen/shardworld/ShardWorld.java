@@ -6,13 +6,13 @@ import com.saaenmadsen.shardworld.actors.shardworld.C_ShardWorldSystemStart;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldRunMode;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
-import com.saaenmadsen.shardworld.statistics.WorldEndStatsWorld;
-import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
+import com.saaenmadsen.shardworld.statistics.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 //import static com.sun.org.apache.xml.internal.serializer.Method.TEXT;
 
@@ -59,8 +59,22 @@ public class ShardWorld {
 
     public List<WorldStatusKeyValue> getWorldStatus() {
         List<WorldStatusKeyValue> worldStatus = new ArrayList<>();
-        worldStatus.add(new WorldStatusKeyValue("test", "value"));
-        worldStatus.add(new WorldStatusKeyValue("Day", ""+worldStatisticsReceiver.getLastReportedDay()));
+        WorldDayStats lastReportedDay = worldStatisticsReceiver.getLastReportedDay();
+
+        // Add all the countries and companies - and sort them.
+        for (CountryDayStats countryDayStats : lastReportedDay.countryDayStats()) {
+            String countryId = countryDayStats.countryId();
+            for (CompanyDayStats companyDayStats : countryDayStats.companyDayStats()) {
+                String label = countryId + " " + companyDayStats.companyId();
+                String value = companyDayStats.dailyReport().getDailyReport();
+                worldStatus.add(new WorldStatusKeyValue(label, value));
+            }
+        }
+        worldStatus.sort(Comparator.comparing(WorldStatusKeyValue::label));
+
+        worldStatus.add(0,new WorldStatusKeyValue("Day", ""+ lastReportedDay.dayId()));
+
+
         return worldStatus;
     }
 

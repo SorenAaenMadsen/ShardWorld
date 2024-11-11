@@ -16,7 +16,7 @@ function loadTabContent(page, textContent) {
             if (page === 'world-control.html') {
                 loadWorldStatus(); // Load world status for "World Control" tab
             } else if (page === 'resource-status.html') {
-                fetchChartDataAndCreateChart();
+                loadResourceStatus();
             }
 
             // Activate the correct tab
@@ -33,28 +33,36 @@ function loadTabContent(page, textContent) {
 window.onload = () => loadTabContent('world-control.html', 'World Control');
 
 // Function to fetch data and create the chart
-function fetchChartDataAndCreateChart() {
-    fetch('http://localhost:8080/api/data/totalworldresourses')
+function loadResourceStatus() {
+    fetchChartDataAndCreateChart('totalworldresourses', 'myChart');
+    //fetchChartDataAndCreateChart('totalworldresourses', 'myChart');
+}
+
+// Function to fetch data and create the chart
+function fetchChartDataAndCreateChart(apiResource, htmlChartElementId) {
+    console.log('fetchChartDataAndCreateChart htmlChartElementId ' + htmlChartElementId);
+    fetch('http://localhost:8080/api/data/' + apiResource)
         .then(response => response.json())
         .then(data => {
-            console.log('Data received:', data); // Debugging line
-            createChart(data);  // Call createChart with fetched data
+            console.log('fetchChartDataAndCreateChart data received:', data, ' ', htmlChartElementId); // Debugging line
+            createChart(data, apiResource, htmlChartElementId);  // Call createChart with fetched data
         })
         .catch(error => console.error('Error fetching data:', error));
 }
 
 // Function to create the chart (in resource-status tab)
-function createChart(data) {
+function createChart(data, apiResource, htmlChartElementId) {
+    console.log('createChart received data:', data, ' apiResource:', apiResource, ' htmlChartElementId:', htmlChartElementId);
     const labels = data.map(item => item.label);
     const values = data.map(item => item.data);
 
-    const ctx = document.getElementById('myChart').getContext('2d');
+    const ctx = document.getElementById(htmlChartElementId).getContext('2d');
     new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Resource Quantities',
+                label: 'Last day quantity',
                 data: values,
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
@@ -69,7 +77,18 @@ function createChart(data) {
                 y: {
                     beginAtZero: true
                 }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'World Resources',
+                    padding: {
+                        top: 10,
+                        bottom: 30
+                    }
+                }
             }
+
         }
     });
 }
@@ -121,7 +140,7 @@ function displayStatusTable(data) {
     tableContainer.innerHTML = ''; // Clear any existing table content
 
     const table = document.createElement('table');
-    table.style.width = '100%';
+    table.style.width = '1000px';
     table.border = '1';
 
     const tbody = document.createElement('tbody');
@@ -135,9 +154,17 @@ function displayStatusTable(data) {
         keyCell.style.fontWeight = 'bold';
         keyCell.style.padding = '8px';
 
+        // Set fixed cell dimensions
+        keyCell.style.width = '300px'; // Set fixed width for key cells
+        keyCell.style.height = '80px'; // Set fixed height for key cells
+
         const valueCell = document.createElement('td');
         valueCell.textContent = value.value;
         valueCell.style.padding = '8px';
+
+        // Set fixed cell dimensions
+        valueCell.style.width = '700px'; // Set fixed width for value cells
+        valueCell.style.height = '80px'; // Set fixed height for value cells
 
         row.appendChild(keyCell);
         row.appendChild(valueCell);
