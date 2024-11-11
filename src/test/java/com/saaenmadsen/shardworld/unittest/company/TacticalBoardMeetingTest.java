@@ -6,7 +6,7 @@ import com.saaenmadsen.shardworld.actors.company.DailyReport;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.actors.company.direction.InnovateOurRecipiesBoardMeeting;
 import com.saaenmadsen.shardworld.constants.Recipe;
-import com.saaenmadsen.shardworld.constants.WorldSettingsBuilder;
+import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

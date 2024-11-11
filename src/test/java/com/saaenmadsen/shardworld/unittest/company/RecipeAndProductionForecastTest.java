@@ -2,7 +2,7 @@ package com.saaenmadsen.shardworld.unittest.company;
 
 import com.saaenmadsen.shardworld.actors.company.*;
 import com.saaenmadsen.shardworld.actors.company.direction.DayEndEvaluationDirectionMeeting;
-import com.saaenmadsen.shardworld.constants.WorldSettingsBuilder;
+import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;

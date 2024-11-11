@@ -12,7 +12,7 @@ import com.saaenmadsen.shardworld.actors.countrymarket.A_CountryMarket;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_StartMarketDayCycle;
 import com.saaenmadsen.shardworld.actors.shardworld.A_ShardWorld;
 import com.saaenmadsen.shardworld.actors.shardworld.C_WorldDayEnd;
-import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
 import com.saaenmadsen.shardworld.statistics.CountryDayStats;
 

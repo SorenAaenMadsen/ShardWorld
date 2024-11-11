@@ -1,6 +1,5 @@
-package com.saaenmadsen.shardworld.constants;
+package com.saaenmadsen.shardworld.constants.worldsettings;
 
-import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 
 import java.util.List;
@@ -11,7 +10,8 @@ public record WorldSettings(
         int maxDaysToRun,
         boolean logAkkaMessages,
         int companyInitialMoney,
-        List<CompanyInformation> startCompanies
+        List<CompanyInformation> startCompanies,
+        WorldRunMode worldRunMode
 ) {
 
 

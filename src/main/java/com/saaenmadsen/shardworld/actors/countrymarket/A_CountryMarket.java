@@ -9,7 +9,7 @@ import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.actors.company.*;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
-import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.statistics.MarketDayStats;
 

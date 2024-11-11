@@ -66,3 +66,30 @@ function createChart(data) {
         }
     });
 }
+
+
+let currentDay = 0;
+function advanceDay() {
+    console.log('advanceDay');
+    currentDay++;
+    document.getElementById('world-status').textContent = `World is at day ${currentDay}.`;
+
+    fetch('http://localhost:8080/api/advance-day', {
+        method: 'POST'
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            // console.log('Advance day response:', response.text());
+            return response.text();
+        })
+        .then(data => {
+            console.log('Advance day response:', data);
+            //alert(data); // Optional: show an alert to confirm the action
+        })
+        .catch(error => {
+            console.error('Error advancing day:', error);
+            alert('Failed to advance day. Please try again.');
+        });
+}

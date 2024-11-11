@@ -9,7 +9,7 @@ import com.saaenmadsen.shardworld.actors.countrymarket.C_EndMarketDay;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
-import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;

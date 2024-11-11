@@ -1,6 +1,5 @@
-package com.saaenmadsen.shardworld.constants;
+package com.saaenmadsen.shardworld.constants.worldsettings;
 
-import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 
 import java.util.ArrayList;
@@ -14,15 +13,17 @@ public class WorldSettingsBuilder {
     private boolean logAkkaMessages;
     private int companyInitialMoney;
     private List<CompanyInformation> startCompanies;
+    private WorldRunMode worldRunMode;
 
 
-    public WorldSettingsBuilder(int companyCount, int countryCount, int maxDaysToRun, boolean logAkkaMessages, int companyInitialMoney, List<CompanyInformation> startCompanies) {
+    public WorldSettingsBuilder(int companyCount, int countryCount, int maxDaysToRun, boolean logAkkaMessages, int companyInitialMoney, List<CompanyInformation> startCompanies, WorldRunMode worldRunMode) {
         this.companyCount = companyCount;
         this.countryCount = countryCount;
         this.maxDaysToRun = maxDaysToRun;
         this.logAkkaMessages = logAkkaMessages;
         this.companyInitialMoney = companyInitialMoney;
         this.startCompanies = startCompanies;
+        this.worldRunMode = worldRunMode;
     }
 
     public static WorldSettingsBuilder ofDefault() {
@@ -32,7 +33,8 @@ public class WorldSettingsBuilder {
                 10,
                 false,
                 100000,
-                new ArrayList<>()
+                new ArrayList<>(),
+                WorldRunMode.AUTO_RUN_TO_END
         );
     }
 
@@ -58,12 +60,18 @@ public class WorldSettingsBuilder {
                 maxDaysToRun,
                 logAkkaMessages,
                 companyInitialMoney,
-                startCompanies
+                startCompanies,
+                worldRunMode
         );
     }
 
     public WorldSettingsBuilder withAkkaMessageLogging() {
         this.logAkkaMessages = true;
+        return this;
+    }
+
+    public WorldSettingsBuilder withWorldRunMode(WorldRunMode worldRunMode) {
+        this.worldRunMode = worldRunMode;
         return this;
     }
 }

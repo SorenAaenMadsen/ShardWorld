@@ -3,7 +3,7 @@ package com.saaenmadsen.shardworld.actors.company;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCultureBuilder;
 import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
-import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;

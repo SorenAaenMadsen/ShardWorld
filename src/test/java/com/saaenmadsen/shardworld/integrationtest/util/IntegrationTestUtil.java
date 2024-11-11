@@ -4,7 +4,7 @@ package com.saaenmadsen.shardworld.integrationtest.util;
 import akka.actor.typed.ActorSystem;
 import com.saaenmadsen.shardworld.actors.shardworld.C_ShardWorldSystemStart;
 import com.saaenmadsen.shardworld.actors.shardworld.A_ShardWorld;
-import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.statistics.WorldEndStatsWorld;
 import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
 

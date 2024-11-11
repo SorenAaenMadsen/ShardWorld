@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saaenmadsen.shardworld.Main;
 import com.saaenmadsen.shardworld.constants.Recipe;
-import com.saaenmadsen.shardworld.constants.WorldSettings;
+import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class WorldStatisticsReceiver {
     }
 
     public WorldEndStatsWorld summarize(){
-        WorldEndStatsWorld worldEndStats;
+
         List<WorldEndStatsCountry> worldEndStatsCountries = new ArrayList<>();
         StockListing finalTotalWorldStock = StockListing.createEmptyStockListing();
         for (CountryDayStats countryDayStats : dayStatistics.getLast().countryDayStats()) {

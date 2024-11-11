@@ -2,8 +2,8 @@ package com.saaenmadsen.shardworld;
 
 import com.saaenmadsen.shardworld.actors.shardworld.A_ShardWorld;
 import com.saaenmadsen.shardworld.actors.shardworld.C_ShardWorldSystemStart;
-import com.saaenmadsen.shardworld.constants.WorldSettings;
-import com.saaenmadsen.shardworld.constants.WorldSettingsBuilder;
+import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
+import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
 import com.saaenmadsen.shardworld.statistics.WorldEndStatsWorld;
 import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
 import org.slf4j.Logger;
@@ -15,19 +15,27 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
-    public static WorldEndStatsWorld summary;
+
 
     public static void main(String[] args) {
 
         log.info("Starting up Main");
 
-        summary = runTheShardWorld();
+//        summary = runTheShardWorld();
+        ShardWorld.instance.start();
 
         SpringApplication.run(Main.class, args);
+
+        try {
+            Thread.sleep(40000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         log.info("Done with Main");
     }
 
+    /**
     private static WorldEndStatsWorld runTheShardWorld() {
         WorldSettings worldSettings = WorldSettingsBuilder
                 .ofDefault()
@@ -48,6 +56,6 @@ public class Main {
         }
         return worldStatisticsReceiver.summarize();
     }
-
+*/
 
 }
