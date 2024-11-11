@@ -11,6 +11,9 @@ import com.saaenmadsen.shardworld.statistics.WorldStatisticsReceiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.ArrayList;
+import java.util.List;
 //import static com.sun.org.apache.xml.internal.serializer.Method.TEXT;
 
 @SpringBootApplication
@@ -18,7 +21,10 @@ public class ShardWorld {
     private static final Logger log = LoggerFactory.getLogger(ShardWorld.class);
 
     public static ShardWorld instance = new ShardWorld();
-//    public static WorldEndStatsWorld summary;
+
+
+    public record WorldStatusKeyValue(String label, String value) {
+    }
 
     WorldSettings worldSettings;
     WorldStatisticsReceiver worldStatisticsReceiver;
@@ -45,20 +51,15 @@ public class ShardWorld {
         worldActor.tell(new C_ShardWorldAdvanceDays(1));
     }
 
-
-
     public WorldEndStatsWorld getLatestSummary() {
         return worldStatisticsReceiver.getLatestSummary();
-        // TODO: This is not thread safe!!
-        /**
-        synchronized (worldStatisticsReceiver) {
-            try {
-                worldStatisticsReceiver.wait(10000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            return worldStatisticsReceiver.summarize();
-        }
-        */
     }
+
+    public List<WorldStatusKeyValue> getWorldStatus() {
+        List<WorldStatusKeyValue> worldStatus = new ArrayList<>();
+        worldStatus.add(new WorldStatusKeyValue("test", "value"));
+        worldStatus.add(new WorldStatusKeyValue("Day", ""+worldStatisticsReceiver.getLastReportedDay()));
+        return worldStatus;
+    }
+
 }

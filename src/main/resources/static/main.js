@@ -1,17 +1,24 @@
 // Function to load content dynamically into the tab-content area
 function loadTabContent(page, textContent) {
+    // document.title = textContent;
+
     // Fetch content from the corresponding HTML file
     console.log('loadTabContent function called for ' + page + ' textContent ' + textContent);
     fetch(page)
         .then(response => response.text())
-        .then(html  => {
+        .then(html => {
 
             // console.log('loadTabContent content ' + content);
             // Insert the fetched content into the tab-content div
-            document.getElementById('tab-content').innerHTML = html ;
-            if (page === 'resource-status.html') {
+            document.getElementById('tab-content').innerHTML = html;
+
+            // Call additional functions based on the page
+            if (page === 'world-control.html') {
+                loadWorldStatus(); // Load world status for "World Control" tab
+            } else if (page === 'resource-status.html') {
                 fetchChartDataAndCreateChart();
             }
+
             // Activate the correct tab
             const tabs = document.querySelectorAll('.tab');
             console.log('loadTabContent tabs ' + tabs);
@@ -69,10 +76,13 @@ function createChart(data) {
 
 
 let currentDay = 0;
+
 function advanceDay() {
     console.log('advanceDay');
     currentDay++;
-    document.getElementById('world-status').textContent = `World is at day ${currentDay}.`;
+    document.getElementById('world-advance-button').textContent = `World advance button has been pressed ${currentDay} times.`;
+
+    // document.getElementById('world-status').textContent = `World is at day ${currentDay}.`;
 
     fetch('http://localhost:8080/api/advance-day', {
         method: 'POST'
@@ -92,4 +102,53 @@ function advanceDay() {
             console.error('Error advancing day:', error);
             alert('Failed to advance day. Please try again.');
         });
+    loadWorldStatus();
 }
+
+function loadWorldStatus() {
+    fetch('http://localhost:8080/api/world/status')
+        .then(response => response.json())
+        .then(data => {
+            console.log('World status data:', data); // Debugging log
+            displayStatusTable(data);  // Populate the table with the data
+        })
+        .catch(error => console.error('Error fetching world status:', error));
+}
+
+// Function to populate the table with the status data
+function displayStatusTable(data) {
+    const tableContainer = document.getElementById('status-table-container');
+    tableContainer.innerHTML = ''; // Clear any existing table content
+
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.border = '1';
+
+    const tbody = document.createElement('tbody');
+
+    // Loop through each key-value pair and create a row
+    for (const [key, value] of Object.entries(data)) {
+        const row = document.createElement('tr');
+
+        const keyCell = document.createElement('td');
+        keyCell.textContent = value.label;
+        keyCell.style.fontWeight = 'bold';
+        keyCell.style.padding = '8px';
+
+        const valueCell = document.createElement('td');
+        valueCell.textContent = value.value;
+        valueCell.style.padding = '8px';
+
+        row.appendChild(keyCell);
+        row.appendChild(valueCell);
+        tbody.appendChild(row);
+    }
+
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
+}
+
+// Call loadWorldStatus when the "World Control" tab is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    loadTabContent('world-control.html', 'World Control');
+});

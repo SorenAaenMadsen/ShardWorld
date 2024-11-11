@@ -89,4 +89,8 @@ public class WorldStatisticsReceiver {
             throw new RuntimeException(e);
         }
     }
+
+    public int getLastReportedDay(){
+        return this.dayStatistics.getLast().dayId();
+    }
 }
