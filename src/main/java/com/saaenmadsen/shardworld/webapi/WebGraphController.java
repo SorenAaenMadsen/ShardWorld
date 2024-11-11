@@ -1,6 +1,7 @@
 package com.saaenmadsen.shardworld.webapi;
 
 import com.saaenmadsen.shardworld.ShardWorld;
+import com.saaenmadsen.shardworld.statistics.WorldEndStatsWorld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -18,21 +19,15 @@ import java.util.stream.Collectors;
 public class WebGraphController {
     private static final Logger log = LoggerFactory.getLogger(ShardWorld.class);
 
-    public record DataPoint(String label, int data) {
-    }
-
-    ;
-
-    //    public record WorldStatus(String currentDay, String lastDayOfWorld, long aggregatedWorldStockValue){};
 
 
-    ;
 
     @GetMapping("/data/graph")
-    public ResponseEntity<List<DataPoint>> getGraphData() {
+    public ResponseEntity<List<ShardWorld.DataPoint>> getGraphData() {
         log.info("WebGraphController GET getGraphData");
         // Fetch or generate your data here
-        List<DataPoint> data = ShardWorld.instance.getLatestSummary().finalWorldTotalStockMap().stream().map(stock -> new DataPoint(stock.getKey(), stock.getValue())).collect(Collectors.toUnmodifiableList());
+        WorldEndStatsWorld latestSummary = ShardWorld.instance.getLatestSummary();
+        List<ShardWorld.DataPoint> data = latestSummary.finalWorldTotalStockMap().getAsDataPointsForWebGraph();
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 

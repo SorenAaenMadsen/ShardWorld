@@ -22,8 +22,10 @@ public class ShardWorld {
 
     public static ShardWorld instance = new ShardWorld();
 
-
+    // Records for display in the browser.
     public record WorldStatusKeyValue(String label, String value) {
+    }
+    public record DataPoint(String label, int data) {
     }
 
     WorldSettings worldSettings;
