@@ -84,10 +84,6 @@ public class CompanyInformation {
         return (dice.nextInt(20) < 2);
     }
 
-    public boolean timeForStrategicBoardMeeting() {
-        return (dice.nextInt(180) < 2);
-    }
-
     public PriceList getPriceList() {
         return priceList;
     }

@@ -161,11 +161,11 @@ public enum Recipe {
 //        skillLevel2 = Integer.parseInt(skillLevel_2);
 
         Optional<SkuAndCount> toolRequirement1 = SkuAndCount.fromStrings(Tool_Requirement_1, Tool_Requirement_1_amount);
-        toolRequirement1.ifPresent(inputs::add);
+        toolRequirement1.ifPresent(toolRequirements::add);
         Optional<SkuAndCount> toolRequirement2 = SkuAndCount.fromStrings(Tool_Requirement_2, Tool_Requirement_2_amount);
-        toolRequirement2.ifPresent(inputs::add);
+        toolRequirement2.ifPresent(toolRequirements::add);
         Optional<SkuAndCount> toolRequirement3 = SkuAndCount.fromStrings(Tool_Requirement_3, Tool_Requirement_3_amount);
-        toolRequirement3.ifPresent(inputs::add);
+        toolRequirement3.ifPresent(toolRequirements::add);
     }
 
 

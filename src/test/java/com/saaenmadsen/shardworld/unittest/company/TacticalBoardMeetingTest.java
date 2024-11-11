@@ -22,7 +22,7 @@ public class TacticalBoardMeetingTest {
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.PRIMITIVE_TIMBER_CURING, 100));
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.WOOD_SAWING, 100));
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.GATHER_RAW_TIMBER, 100));
-        DailyReport dailyReport = new DailyReport("Testcompany");
+        DailyReport dailyReport = new DailyReport("Testcompany",1);
         InnovateOurRecipiesBoardMeeting.reduceNumberOfKnownRecipiesToMax5(companyInformation, dailyReport);
 
         assertThat("The recipe with worst projected revenue (GATHER_CURED_WOOD) should be the one removed.",

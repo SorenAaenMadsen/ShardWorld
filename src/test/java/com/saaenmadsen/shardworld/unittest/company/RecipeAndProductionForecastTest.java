@@ -53,7 +53,7 @@ public class RecipeAndProductionForecastTest {
     public void DailyDirectionMeeting_CompanySoldAllTenWoodenShues_Test(){
         CompanyInformation companyInformation = CompanyInformationBuilder.ofWorldDefault("testcompany", WorldSettingsBuilder.ofDefault().build()).build();
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.PRIMITIVE_WOODEN_SHUE, 0));
-        DailyReport dailyReport = new DailyReport("testcompany");
+        DailyReport dailyReport = new DailyReport("testcompany", 1);
 
         StockListing forSaleList = StockListing.createEmptyStockListing();
         forSaleList.addStockAmount(StockKeepUnit.PAIR_OF_SHUES_WOODEN.getArrayId(), 10);

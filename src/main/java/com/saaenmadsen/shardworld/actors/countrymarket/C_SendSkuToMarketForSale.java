@@ -19,7 +19,6 @@ public record C_SendSkuToMarketForSale(
     }
 
     public String toJson(){
-
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(this);
