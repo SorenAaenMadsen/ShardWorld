@@ -1,21 +1,49 @@
-// Fetch data from the Java backend
-async function fetchData() {
-    const response = await fetch('/api/data/graph');
-    const data = await response.json();
-    return data;
+// Function to load content dynamically into the tab-content area
+function loadTabContent(page, textContent) {
+    // Fetch content from the corresponding HTML file
+    console.log('loadTabContent function called for ' + page + ' textContent ' + textContent);
+    fetch(page)
+        .then(response => response.text())
+        .then(html  => {
+
+            // console.log('loadTabContent content ' + content);
+            // Insert the fetched content into the tab-content div
+            document.getElementById('tab-content').innerHTML = html ;
+            if (page === 'resource-status.html') {
+                fetchChartDataAndCreateChart();
+            }
+            // Activate the correct tab
+            const tabs = document.querySelectorAll('.tab');
+            console.log('loadTabContent tabs ' + tabs);
+            tabs.forEach(tab => tab.classList.remove('active'));
+            const activeTab = [...tabs].find(tab => tab.textContent.toLowerCase().includes(textContent.toLowerCase()));
+            activeTab.classList.add('active');
+        })
+        .catch(error => console.error('Error loading tab content:', error));
 }
 
-// Function to create a chart
-async function createChart() {
-    const data = await fetchData();
+// Initial load of the first tab (World Control)
+window.onload = () => loadTabContent('world-control.html', 'World Control');
 
-    // Transform the data for the chart
+// Function to fetch data and create the chart
+function fetchChartDataAndCreateChart() {
+    fetch('http://localhost:8080/api/data/graph')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Data received:', data); // Debugging line
+            createChart(data);  // Call createChart with fetched data
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+// Function to create the chart (in resource-status tab)
+function createChart(data) {
     const labels = data.map(item => item.label);
     const values = data.map(item => item.data);
 
     const ctx = document.getElementById('myChart').getContext('2d');
     new Chart(ctx, {
-        type: 'bar',  // Example chart type
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [{
@@ -38,6 +66,3 @@ async function createChart() {
         }
     });
 }
-
-// Initialize the chart on page load
-createChart();

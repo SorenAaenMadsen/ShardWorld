@@ -51,11 +51,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    // Azure Connectivity
-    implementation("com.azure.spring:spring-cloud-azure-starter")
-    implementation("com.azure.spring:spring-cloud-azure-starter-jdbc-mysql")
-    implementation("com.azure:azure-messaging-servicebus")
-    implementation("com.azure:azure-identity")
 
     // Ollama AI:
     testImplementation("org.testcontainers:testcontainers:1.19.0")
@@ -78,6 +73,18 @@ dependencies {
     //    testImplementation(platform("org.junit:junit-bom:5.10.0"))
     //    testImplementation("org.junit.jupiter:junit-jupiter")
 
+}
+
+configurations.all {
+    resolutionStrategy {
+        // Force the specific version of Netty across all dependencies
+//        force("io.netty:netty-common:4.1.112.Final")
+//        force("io.netty:netty-handler:4.1.112.Final")
+//        force("io.netty:netty-buffer:4.1.112.Final")
+//        force("io.netty:netty-codec:4.1.112.Final")
+//        force("io.netty:netty-transport:4.1.112.Final")
+        // Add other Netty dependencies if needed
+    }
 }
 
 dependencyManagement { 

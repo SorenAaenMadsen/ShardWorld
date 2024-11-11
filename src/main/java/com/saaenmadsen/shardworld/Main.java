@@ -31,7 +31,7 @@ public class Main {
     private static WorldEndStatsWorld runTheShardWorld() {
         WorldSettings worldSettings = WorldSettingsBuilder
                 .ofDefault()
-                .withDaysToRun(500)
+                .withDaysToRun(100)
                 .build();
 
         WorldStatisticsReceiver worldStatisticsReceiver = new WorldStatisticsReceiver(worldSettings, 10);

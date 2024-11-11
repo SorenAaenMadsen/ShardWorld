@@ -1,0 +1,43 @@
+<h2>Resource Status</h2>
+
+<canvas id="myChart" width="400" height="400"></canvas> <!-- Canvas for the Chart -->
+
+<script>
+    // Fetch and display chart data (same as before)
+    async function createChart() {
+        console.log('createChart function called');
+        const data = await fetchData();
+        console.log('createChart data: ' + data);
+        // Transform the data for the chart
+        const labels = data.map(item => item.label);
+        const values = data.map(item => item.data);
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',  // Example chart type
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Resource Quantities',
+                    data: values,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y', // Set to 'y' for horizontal bars
+                responsive: false,  // Disable responsive resizing
+
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    window.onload = createChart;
+
+</script>
