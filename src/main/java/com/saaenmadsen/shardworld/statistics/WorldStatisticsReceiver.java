@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class WorldStatisticsReceiver {
@@ -30,7 +31,7 @@ public class WorldStatisticsReceiver {
     private WorldEndStatsWorld worldEndStatus;
 
 
-    List<WorldDayStats> dayStatistics = new ArrayList<>();
+    List<WorldDayStats> dayStatistics = new CopyOnWriteArrayList<>();
 
     public WorldStatisticsReceiver(WorldSettings worldSettings, int maxDayReportsToKeep) {
         this.worldSettings = worldSettings;
@@ -46,8 +47,7 @@ public class WorldStatisticsReceiver {
         }
     }
 
-    public WorldEndStatsWorld summarize(){
-
+    public WorldEndStatsWorld getLatestSummary() {
         List<WorldEndStatsCountry> worldEndStatsCountries = new ArrayList<>();
         StockListing finalTotalWorldStock = StockListing.createEmptyStockListing();
         for (CountryDayStats countryDayStats : dayStatistics.getLast().countryDayStats()) {
@@ -58,7 +58,11 @@ public class WorldStatisticsReceiver {
             worldEndStatsCountries.add(new WorldEndStatsCountry(finalTotalCountryStock));
             finalTotalWorldStock.addStockFromList(finalTotalCountryStock);
         }
-        this.worldEndStatus = new WorldEndStatsWorld(finalTotalWorldStock, worldEndStatsCountries);
+        return new WorldEndStatsWorld(finalTotalWorldStock, worldEndStatsCountries);
+    }
+
+    public WorldEndStatsWorld worldEndSummarizeAndWriteFile(){
+        this.worldEndStatus = getLatestSummary();
         writeToFile();
         return worldEndStatus;
     }

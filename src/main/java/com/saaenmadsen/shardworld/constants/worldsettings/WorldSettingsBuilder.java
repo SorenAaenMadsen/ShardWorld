@@ -43,8 +43,18 @@ public class WorldSettingsBuilder {
         return this;
     }
 
-    public WorldSettingsBuilder withDaysToRun(int daysToRun) {
+    public WorldSettingsBuilder withMaxDaysToRun(int daysToRun) {
         this.maxDaysToRun = daysToRun;
+        return this;
+    }
+
+    public WorldSettingsBuilder withNumberOfCompaniesPrCountry(int companyCount) {
+        this.companyCount = companyCount;
+        return this;
+    }
+
+    public WorldSettingsBuilder withShardCountryCount(int countryCount) {
+        this.countryCount = countryCount;
         return this;
     }
 

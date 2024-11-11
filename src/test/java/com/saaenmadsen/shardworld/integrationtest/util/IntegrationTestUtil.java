@@ -29,6 +29,6 @@ public class IntegrationTestUtil {
                 throw new RuntimeException(e);
             }
         }
-        return worldStatisticsReceiver.summarize();
+        return worldStatisticsReceiver.worldEndSummarizeAndWriteFile();
     }
 }

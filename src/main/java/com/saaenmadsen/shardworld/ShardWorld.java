@@ -27,10 +27,11 @@ public class ShardWorld {
     public ShardWorld() {
         worldSettings = WorldSettingsBuilder
                 .ofDefault()
-                .withDaysToRun(10)
+                .withMaxDaysToRun(20)
+                .withNumberOfCompaniesPrCountry(20)
                 .withWorldRunMode(WorldRunMode.MANUAL_DAY_ADVANCE)
                 .build();
-        worldStatisticsReceiver = new WorldStatisticsReceiver(worldSettings, 10);
+        worldStatisticsReceiver = new WorldStatisticsReceiver(worldSettings, 20);
         worldActor = akka.actor.typed.ActorSystem.create(A_ShardWorld.create(worldSettings, worldStatisticsReceiver), "MyWorld");
     }
 
@@ -47,7 +48,7 @@ public class ShardWorld {
 
 
     public WorldEndStatsWorld getLatestSummary() {
-        return worldStatisticsReceiver.summarize();
+        return worldStatisticsReceiver.getLatestSummary();
         // TODO: This is not thread safe!!
         /**
         synchronized (worldStatisticsReceiver) {
