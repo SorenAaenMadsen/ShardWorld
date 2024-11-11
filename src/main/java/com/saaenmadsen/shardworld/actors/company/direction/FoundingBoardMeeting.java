@@ -5,6 +5,9 @@ import com.saaenmadsen.shardworld.actors.company.DailyReport;
 
 public class FoundingBoardMeeting {
     public FoundingBoardMeeting(CompanyInformation companyInformation, DailyReport dailyReport) {
+        new InnovateOurRecipiesBoardMeeting(companyInformation, dailyReport);
+        new InnovateOurRecipiesBoardMeeting(companyInformation, dailyReport);
+        new InnovateOurRecipiesBoardMeeting(companyInformation, dailyReport);
     }
 
 }

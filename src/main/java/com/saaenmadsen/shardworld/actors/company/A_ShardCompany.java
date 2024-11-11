@@ -58,6 +58,8 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         this.countryActor = countryActor;
         this.worldSettings = worldSettings;
         this.companyInformation = CompanyInformationBuilder.ofWorldDefault(companyId, worldSettings).build();
+        this.dailyReport = new DailyReport(companyId, 0);
+        new FoundingBoardMeeting(companyInformation, dailyReport);
         getContext().getLog().info("After constructor: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
         getContext().getLog().debug(companyId + "Constructor done");
     }
