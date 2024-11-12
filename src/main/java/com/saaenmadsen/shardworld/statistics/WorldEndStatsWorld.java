@@ -1,13 +1,11 @@
 package com.saaenmadsen.shardworld.statistics;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.saaenmadsen.shardworld.ShardWorld;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public record WorldEndStatsWorld(@JsonIgnore StockListing finalWorldTotalStock,
@@ -33,11 +31,6 @@ public record WorldEndStatsWorld(@JsonIgnore StockListing finalWorldTotalStock,
     public Map<String, Object> getPricesInAllCountriesAsDataPointsForWebGraph() {
         Map<String, Object> response = new HashMap<>();
 
-        // Define countries and goods with prices (replace with actual data or DB fetch)
-//        List<String> countries = List.of("USA", "Canada", "Germany", "France");
-//        List<String> goods = List.of("Apples", "Bananas", "Oranges");
-
-        // Prices in each country for each good (example data)
         List<Map<String, Object>> skuData = new ArrayList<>();
 
         for (StockKeepUnit sku : StockKeepUnit.values()) {
@@ -52,6 +45,7 @@ public record WorldEndStatsWorld(@JsonIgnore StockListing finalWorldTotalStock,
             skuEntry.put("prices", prices);
             skuData.add(skuEntry);
         }
+        skuData.sort(Comparator.comparing(map -> (String) map.get("sku")));
 
         response.put("countries", worldEndStatsCountries.stream().map(c->c.getCountryId()).collect(Collectors.toUnmodifiableList()));
         response.put("skuData", skuData);

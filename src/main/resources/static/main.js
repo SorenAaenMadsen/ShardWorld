@@ -135,7 +135,7 @@ function advanceDay() {
 
 function loadWorldStatus() {
     fetchWorldStockChartDataAndCreateChart('totalworldresourses', 'worldWideResourceChart');
-
+    renderGlobalMarketPriceChart();
     fetch('http://localhost:8080/api/world/status')
         .then(response => response.json())
         .then(data => {
@@ -189,8 +189,8 @@ function createCompanyDayReportsTable(data) {
 // Call loadWorldStatus when the "World Control" tab is loaded
 document.addEventListener('DOMContentLoaded', () => {
     loadTabContent('world-control.html', 'World Control');
+    renderGlobalMarketPriceChart();
 });
-
 
 
 // Global prices:
@@ -229,14 +229,19 @@ async function renderGlobalMarketPriceChart() {
     const chartData = generateGlobalMarketPriceChartData(data);
 
     const ctx = document.getElementById('worldMarketPriceChart').getContext('2d');
+    let chartStatus = Chart.getChart('worldMarketPriceChart'); // <canvas> id
+    if (chartStatus != undefined) {
+        chartStatus.destroy();
+    }
     new Chart(ctx, {
         type: 'bar',
         data: chartData,
         options: {
-            responsive: true,
+            indexAxis: 'y', // Set to 'y' for horizontal bars
+            responsive: false,  // Disable responsive resizing
             scales: {
                 x: {
-                    stacked: true,
+                    stacked: false,
                     title: {
                         display: true,
                         text: 'Country'
@@ -252,22 +257,32 @@ async function renderGlobalMarketPriceChart() {
             },
             plugins: {
                 legend: {
-                    position: 'top',
+                    display: false // Hides legend box, since we're putting labels on bars
                 },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`;
+                            return `${context.dataset.label}: $${context.parsed.y.toFixed(0)}`;
                         }
+                    }
+                },
+                datalabels: {
+                    anchor: 'center',         // Position label in the center of the bar
+                    align: 'right',          // Align label in the center of the bar
+                    color: 'black',           // Text color
+                    font: {
+                        weight: 'bold'
+                    },
+                    formatter: function(value, context) {
+                        return `${context.dataset.label}: $${value.toFixed(0)}`; // Label with good name and price
                     }
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 }
 
-// Initialize the chart on page load
-document.addEventListener("DOMContentLoaded", renderGlobalMarketPriceChart);
 
 
 

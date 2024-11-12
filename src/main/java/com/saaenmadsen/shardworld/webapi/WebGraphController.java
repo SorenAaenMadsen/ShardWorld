@@ -35,12 +35,12 @@ public class WebGraphController {
         log.info("WebGraphController GET getGraphData_marketPriceDayEnd");
         WorldEndStatsWorld latestSummary = ShardWorld.instance.getLatestSummary();
 
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            log.info("WebGraphController getGraphData_marketPriceDayEnd : " +mapper.writeValueAsString( latestSummary.getPricesInAllCountriesAsDataPointsForWebGraph()));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            ObjectMapper mapper = new ObjectMapper();
+//            log.info("WebGraphController getGraphData_marketPriceDayEnd : " +mapper.writeValueAsString( latestSummary.getPricesInAllCountriesAsDataPointsForWebGraph()));
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
 
         return new ResponseEntity<>(latestSummary.getPricesInAllCountriesAsDataPointsForWebGraph(), HttpStatus.OK);
     }
