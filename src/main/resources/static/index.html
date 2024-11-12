@@ -38,29 +38,29 @@
         }
 
         /* Canvas Styling */
-        #myChart {
+        #worldWideResourceChart {
             width: 100%;
             height: 300px;
         }
 
         /* Grid layout */
-        .item1 {
+        .itemHeader {
             grid-area: header;
         }
 
-        .item2 {
+        .itemMenu {
             grid-area: menu;
         }
 
-        .item3 {
+        .itemMain {
             grid-area: main;
         }
 
-        .item4 {
+        .itemRight {
             grid-area: right;
         }
 
-        .item5 {
+        .itemFooter {
             grid-area: footer;
         }
 
@@ -77,9 +77,10 @@
 
         .grid-container > div {
             background-color: rgba(255, 255, 255, 0.8);
-            text-align: center;
-            padding: 20px 0;
-            font-size: 30px;
+            text-align: left;
+            vertical-align: top;
+            padding: 10px 0;
+            font-size: 18px;
         }
 
     </style>
@@ -87,7 +88,7 @@
 <body>
 
 <div class="grid-container">
-    <div class="item1">
+    <div class="itemHeader">
         <div id="header-text"></div>
         <div class="tabs">
             <!-- Tabs Navigation -->
@@ -95,16 +96,25 @@
             <div class="tab" onclick="loadTabContent('resource-status.html', 'Resource Status')">Resource Status</div>
         </div>
     </div>
-    <div class="item2">
+    <div class="itemMenu">
         <div id="menu-control">
             <h2>Menu</h2>
             <button onclick="advanceDay()">Advance World by One Day</button>
             <p id="world-advance-button">World advance button has been pressed 0 times.</p>
         </div>
     </div>
-    <div class="item3">
+    <div class="itemMain">
         <!-- Tab Content (Initially Empty) -->
         <div id="main-tab-content"></div>
+    </div>
+    <div class="itemRight">
+        <!-- Tab Content (Initially Empty) -->
+        <canvas id="worldWideResourceChart" width="400" height="400"></canvas>
+        <div id="right-tab-content"></div>
+    </div>
+    <div class="itemFooter">
+        <!-- Tab Content (Initially Empty) -->
+        <div id="footer-tab-content"></div>
     </div>
 
 </div>

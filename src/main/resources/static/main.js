@@ -35,8 +35,8 @@ window.onload = () => loadTabContent('world-control.html', 'World Control');
 
 // Function to fetch data and create the chart
 function loadResourceStatus() {
-    fetchChartDataAndCreateChart('totalworldresourses', 'myChart');
-    //fetchChartDataAndCreateChart('totalworldresourses', 'myChart');
+    //fetchChartDataAndCreateChart('totalworldresourses', 'worldWideResourceChart');
+
 }
 
 // Function to fetch data and create the chart
@@ -57,8 +57,12 @@ function createChart(data, apiResource, htmlChartElementId) {
     const labels = data.map(item => item.label);
     const values = data.map(item => item.data);
 
-    const ctx = document.getElementById(htmlChartElementId).getContext('2d');
-    new Chart(ctx, {
+    const grapharea = document.getElementById(htmlChartElementId).getContext('2d');
+    let chartStatus = Chart.getChart(htmlChartElementId); // <canvas> id
+    if (chartStatus != undefined) {
+        chartStatus.destroy();
+    }
+    new Chart(grapharea, {
         type: 'bar',
         data: {
             labels: labels,
@@ -95,7 +99,12 @@ function createChart(data, apiResource, htmlChartElementId) {
 }
 
 
+
+
+
+
 let currentDay = 0;
+
 function advanceDay() {
     console.log('advanceDay');
     currentDay++;
@@ -125,6 +134,8 @@ function advanceDay() {
 }
 
 function loadWorldStatus() {
+    fetchChartDataAndCreateChart('totalworldresourses', 'worldWideResourceChart');
+
     fetch('http://localhost:8080/api/world/status')
         .then(response => response.json())
         .then(data => {
@@ -159,7 +170,7 @@ function createCompanyDayReportsTable(data) {
         keyCell.style.height = '80px'; // Set fixed height for key cells
 
         const valueCell = document.createElement('td');
-        valueCell.innerHTML  = value.value;
+        valueCell.innerHTML = value.value;
         valueCell.style.padding = '8px';
 
         // Set fixed cell dimensions
@@ -206,7 +217,7 @@ function createMarketDayReportTable(data) {
         keyCell.style.height = '80px'; // Set fixed height for key cells
 
         const valueCell = document.createElement('td');
-        valueCell.innerHTML  = value.value;
+        valueCell.innerHTML = value.value;
         valueCell.style.padding = '8px';
 
         // Set fixed cell dimensions
