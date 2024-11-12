@@ -20,8 +20,11 @@ public class ReallyLongWorldRun {
 
     @Test
     public void run100Companies500daysTest() throws InterruptedException {
-//        WorldSettings worldSettings = new WorldSettings(100, 1, 500, false, 1000);
-        WorldSettings worldSettings = WorldSettingsBuilder.ofDefault().build();
+        WorldSettings worldSettings = WorldSettingsBuilder
+                .ofDefault()
+                .withMaxDaysToRun(500)
+                .withNumberOfCompaniesPrCountry(100)
+                .build();
 
         IntegrationTestUtil countryLevelIntegrationTestUtil = new IntegrationTestUtil(worldSettings);
 

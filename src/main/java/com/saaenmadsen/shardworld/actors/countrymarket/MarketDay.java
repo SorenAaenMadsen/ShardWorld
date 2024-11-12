@@ -17,7 +17,7 @@ public class MarketDay {
     public List<C_BuyOrder> buyOrderList;
     public int companiesDoneWithMarketDay;
 
-    private StockListing unfulfilledOrders;
+    private StockListing unfulfilledOrders= StockListing.createEmptyStockListing();
     private StockListing totalUnsoldGoods;
     private StockListing totalGoodsForSale = StockListing.createEmptyStockListing();
     private MarketDailyReport marketDailyReport;

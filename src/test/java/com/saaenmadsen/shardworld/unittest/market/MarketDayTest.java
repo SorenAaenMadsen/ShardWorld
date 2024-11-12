@@ -63,16 +63,17 @@ public class MarketDayTest {
                 equalTo(1000));
     }
 
-
     @Test
-    public void testPriceAdjustments() {
-        int amountForSale = 100;
-        for(int amountUnsold=0;amountUnsold<=100;amountUnsold++) {
-            //for (int amountForSale = 0; amountForSale < 100; amountForSale++) {
-            int percentUnsoldBucketsOfTen = (10 * amountUnsold) / (amountForSale);
-                System.out.println ("amountUnsold" +amountUnsold+ " gives: " + percentUnsoldBucketsOfTen);
-            //}
-        }
-
+    public void testPriceContinuesToFallUntilWorthless(){
+        assertThat("Price must be able to fall to worthless",
+                MarketDay.calculateNewPrice(2, 1000, 1000, 0),
+                equalTo(1));
+        assertThat("Price must be able to fall to worthless",
+                MarketDay.calculateNewPrice(1, 1000, 1000, 0),
+                equalTo(0));
+        assertThat("Price cannot be negative",
+                MarketDay.calculateNewPrice(0, 1000, 1000, 0),
+                equalTo(0));
     }
+
 }
