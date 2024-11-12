@@ -30,10 +30,10 @@ public class MarketBooth {
     public void performTradeAccordingToShoppingList(StockListing shoppingCart, StockListing shoppingList, PriceList priceList, MoneyBox customersMoney) {
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
 
-            int missingAmountInCart = shoppingList.getSkuCount(i)-shoppingCart.getSkuCount(i);
-            if (missingAmountInCart>0) {
+            int missingAmountInCart = shoppingList.getSkuCount(i) - shoppingCart.getSkuCount(i);
+            if (missingAmountInCart > 0) {
                 int amountThisBoothHaveInStock = boothStock.getSkuCount(i);
-                int amountTheCustomerCanAfford = Math.toIntExact(customersMoney.getMoney() / priceList.getPrice(i));
+                int amountTheCustomerCanAfford = priceList.getPrice(i) == 0 ? Integer.MAX_VALUE : Math.toIntExact(customersMoney.getMoney() / priceList.getPrice(i));
 
                 int amountThisBoothWillSell = Math.min(missingAmountInCart, Math.min(amountTheCustomerCanAfford, amountThisBoothHaveInStock));
 
