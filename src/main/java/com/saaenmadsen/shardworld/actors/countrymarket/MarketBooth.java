@@ -23,11 +23,13 @@ public class MarketBooth {
      * The customer comes with his shopping list, and his cart. We fulfill what we can, and he will continue his merry way.
      * This also transfers money in the opposite direction.
      * Only allow purchaser to buy what can be afforded.
-     * @param shoppingCart The customer may already have purchases in his shopping cart from other shops. This also holds the shopping money.
-     * @param shoppingList This is the customers absolute needs.
-     * @param priceList current prices at the market.
+     *
+     * @param shoppingCart      The customer may already have purchases in his shopping cart from other shops. This also holds the shopping money.
+     * @param shoppingList      This is the customers absolute needs.
+     * @param priceList         current prices at the market.
+     * @param marketDailyReport
      */
-    public void performTradeAccordingToShoppingList(StockListing shoppingCart, StockListing shoppingList, PriceList priceList, MoneyBox customersMoney) {
+    public void performTradeAccordingToShoppingList(StockListing shoppingCart, StockListing shoppingList, PriceList priceList, MoneyBox customersMoney, MarketDailyReport marketDailyReport) {
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
 
             int missingAmountInCart = shoppingList.getSkuCount(i) - shoppingCart.getSkuCount(i);
@@ -42,6 +44,7 @@ public class MarketBooth {
 
                 int tradePrice = amountThisBoothWillSell * priceList.getPrice(i);
                 customersMoney.payAmount(this.boothMoney, tradePrice);
+                marketDailyReport.addToMarketDayTotalTurnover(tradePrice);
             }
         }
     }

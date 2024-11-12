@@ -1,13 +1,13 @@
 package com.saaenmadsen.shardworld.statistics;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.saaenmadsen.shardworld.actors.company.DailyReport;
+import com.saaenmadsen.shardworld.actors.company.CompanyDailyReport;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 import java.util.List;
 
-public record CompanyDayStats(@JsonIgnore DailyReport dailyReport,
+public record CompanyDayStats(@JsonIgnore CompanyDailyReport companyDailyReport,
                               String companyId,
                               java.util.List<KnownRecipe> companyRecipes,
                               @JsonIgnore StockListing unsoldGoods,
@@ -17,17 +17,17 @@ public record CompanyDayStats(@JsonIgnore DailyReport dailyReport,
                               PrintableStockListing unsoldGoodsMap,
                               PrintableDailyReport dailyReportPrint) {
 
-    public CompanyDayStats(DailyReport dailyReport, List<KnownRecipe> companyRecipes, StockListing unsoldGoods, StockListing companyWarehouse) {
+    public CompanyDayStats(CompanyDailyReport companyDailyReport, List<KnownRecipe> companyRecipes, StockListing unsoldGoods, StockListing companyWarehouse) {
         this(
-                dailyReport,
-                dailyReport.getCompanyId(),
+                companyDailyReport,
+                companyDailyReport.getCompanyId(),
                 companyRecipes,
                 unsoldGoods,
                 companyWarehouse,
-                dailyReport.getDayEndLiquidity(),
+                companyDailyReport.getDayEndLiquidity(),
                 new PrintableStockListing(companyWarehouse),
                 new PrintableStockListing(unsoldGoods),
-                new PrintableDailyReport(dailyReport)
+                new PrintableDailyReport(companyDailyReport)
         );
     }
 

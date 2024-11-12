@@ -1,9 +1,8 @@
 package com.saaenmadsen.shardworld.actors.company;
 
-import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
-public class DailyReport {
+public class CompanyDailyReport {
     private final String companyId;
     private final int dayId;
     StringBuilder dailyReport;
@@ -13,7 +12,7 @@ public class DailyReport {
     private Long marketDayRevenue;
 
 
-    public DailyReport(String companyId, int dayId) {
+    public CompanyDailyReport(String companyId, int dayId) {
         this.companyId = companyId;
         this.dayId = dayId;
         dailyReport = new StringBuilder();

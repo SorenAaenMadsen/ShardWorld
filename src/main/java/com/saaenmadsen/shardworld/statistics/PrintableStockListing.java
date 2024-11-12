@@ -1,5 +1,6 @@
 package com.saaenmadsen.shardworld.statistics;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.saaenmadsen.shardworld.ShardWorld;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
@@ -25,6 +26,7 @@ public class PrintableStockListing {
         return printableStockListing.entrySet().stream();
     }
 
+    @JsonIgnore
     public List<ShardWorld.DataPoint> getAsDataPointsForWebGraph() {
         return this.stream().map(stock -> new ShardWorld.DataPoint(stock.getKey(), stock.getValue())).collect(Collectors.toUnmodifiableList());
     }

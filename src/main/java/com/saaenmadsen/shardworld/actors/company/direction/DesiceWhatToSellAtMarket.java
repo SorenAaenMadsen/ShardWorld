@@ -1,20 +1,20 @@
 package com.saaenmadsen.shardworld.actors.company.direction;
 
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
-import com.saaenmadsen.shardworld.actors.company.DailyReport;
+import com.saaenmadsen.shardworld.actors.company.CompanyDailyReport;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 public class DesiceWhatToSellAtMarket {
 
     private final StockListing forSaleList;
 
-    public DesiceWhatToSellAtMarket(CompanyInformation companyInformation, DailyReport dailyReport) {
-        this.forSaleList = justSetItAllForSale(companyInformation, dailyReport);
+    public DesiceWhatToSellAtMarket(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
+        this.forSaleList = justSetItAllForSale(companyInformation, companyDailyReport);
     }
 
-    private StockListing justSetItAllForSale(CompanyInformation companyInformation, DailyReport dailyReport) {
+    private StockListing justSetItAllForSale(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
         StockListing forSaleList = companyInformation.getWarehouse().retrieve(companyInformation.getWarehouse());
-        dailyReport.setForSaleList(forSaleList);
+        companyDailyReport.setForSaleList(forSaleList);
         return forSaleList;
     }
 

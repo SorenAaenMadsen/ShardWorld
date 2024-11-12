@@ -53,18 +53,18 @@ public class RecipeAndProductionForecastTest {
     public void DailyDirectionMeeting_CompanySoldAllTenWoodenShues_Test(){
         CompanyInformation companyInformation = CompanyInformationBuilder.ofWorldDefault("testcompany", WorldSettingsBuilder.ofDefault().build()).build();
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.PRIMITIVE_WOODEN_SHUE, 0));
-        DailyReport dailyReport = new DailyReport("testcompany", 1);
+        CompanyDailyReport companyDailyReport = new CompanyDailyReport("testcompany", 1);
 
         StockListing forSaleList = StockListing.createEmptyStockListing();
         forSaleList.addStockAmount(StockKeepUnit.PAIR_OF_SHUES_WOODEN.getArrayId(), 10);
-        dailyReport.setForSaleList(forSaleList);
+        companyDailyReport.setForSaleList(forSaleList);
 
         StockListing unsoldList = StockListing.createEmptyStockListing();
         unsoldList.addStockAmount(StockKeepUnit.PAIR_OF_SHUES_WOODEN.getArrayId(), 0);
-        dailyReport.setUnsoldGoods(unsoldList);
+        companyDailyReport.setUnsoldGoods(unsoldList);
 
 
-        DayEndEvaluationDirectionMeeting meeting = new DayEndEvaluationDirectionMeeting(companyInformation,dailyReport);
+        DayEndEvaluationDirectionMeeting meeting = new DayEndEvaluationDirectionMeeting(companyInformation, companyDailyReport);
 
         KnownRecipe updatedKnownRecipe = companyInformation.getKnownRecipes().getFirst();
         assertThat("Expecting the daily sale value to change",

@@ -1,7 +1,7 @@
 package com.saaenmadsen.shardworld.actors.company.direction;
 
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
-import com.saaenmadsen.shardworld.actors.company.DailyReport;
+import com.saaenmadsen.shardworld.actors.company.CompanyDailyReport;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
@@ -13,34 +13,34 @@ import java.util.Random;
 
 public class InnovateOurRecipiesBoardMeeting {
 
-    public InnovateOurRecipiesBoardMeeting(CompanyInformation companyInformation, DailyReport dailyReport) {
+    public InnovateOurRecipiesBoardMeeting(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
         if (companyInformation.getCulture().getInnovativenessLevel().getLevel() == 1) {
             return;
         } else {
-            reduceNumberOfKnownRecipiesToMax5(companyInformation, dailyReport);
-            investInBestOfXRandomProductionRecipes(companyInformation, dailyReport, companyInformation.getCulture().getInnovativenessLevel().getLevel() + 2);
+            reduceNumberOfKnownRecipiesToMax5(companyInformation, companyDailyReport);
+            investInBestOfXRandomProductionRecipes(companyInformation, companyDailyReport, companyInformation.getCulture().getInnovativenessLevel().getLevel() + 2);
         }
     }
 
-    public static void investInNewCompletelyRandomProductionRecipe(CompanyInformation companyInformation, DailyReport dailyReport) {
+    public static void investInNewCompletelyRandomProductionRecipe(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
         Random dice = new Random();
         int newRecipeIndex = dice.nextInt(Recipe.values().length);
         Recipe newRecipe = Recipe.values()[newRecipeIndex];
         companyInformation.getKnownRecipes().add(new KnownRecipe(newRecipe, 0));
-        dailyReport.appendToDailyReport("We have invested in " + newRecipe.name());
+        companyDailyReport.appendToDailyReport("We have invested in " + newRecipe.name());
     }
 
-    public static void reduceNumberOfKnownRecipiesToMax5(CompanyInformation companyInformation, DailyReport dailyReport) {
+    public static void reduceNumberOfKnownRecipiesToMax5(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
         if (companyInformation.getKnownRecipes().size() > 5) {
             KnownRecipe worstRecipe = companyInformation.getKnownRecipes().stream().reduce(
                     (a, b) -> a.getExpectedDailySaleValue_daily10percentChange() < b.getExpectedDailySaleValue_daily10percentChange() ? a : b
             ).get();
-            dailyReport.appendToDailyReport("Streamlined our production by retiring " + worstRecipe.recipe().name());
+            companyDailyReport.appendToDailyReport("Streamlined our production by retiring " + worstRecipe.recipe().name());
             companyInformation.getKnownRecipes().remove(worstRecipe);
         }
     }
 
-    public static void investInBestOfXRandomProductionRecipes(CompanyInformation companyInformation, DailyReport dailyReport, int numberOfIdeasToGenerate) {
+    public static void investInBestOfXRandomProductionRecipes(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport, int numberOfIdeasToGenerate) {
         List<KnownRecipe> newIdeas = new ArrayList<>(companyInformation.getKnownRecipes());
         Random dice = new Random();
         for (int i = 0; i < numberOfIdeasToGenerate; ++i) {
@@ -52,7 +52,7 @@ public class InnovateOurRecipiesBoardMeeting {
 
         for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : report.productionChoices()) {
             companyInformation.getKnownRecipes().add(new KnownRecipe(productionChoice.recipe(), 0));
-            dailyReport.appendToDailyReport("We have invested in " + productionChoice.recipe().name());
+            companyDailyReport.appendToDailyReport("We have invested in " + productionChoice.recipe().name());
         }
     }
 }

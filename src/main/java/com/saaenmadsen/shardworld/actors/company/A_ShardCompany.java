@@ -21,7 +21,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
     private String companyId;
     private final akka.actor.typed.ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor;
     private final WorldSettings worldSettings;
-    DailyReport dailyReport = new DailyReport(companyId, 1);
+    CompanyDailyReport companyDailyReport = new CompanyDailyReport(companyId, 1);
 
 
     private CompanyInformation companyInformation;
@@ -47,7 +47,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         this.countryActor = countryActor;
         this.worldSettings = worldSettings;
         this.companyInformation = companyInformation;
-        getContext().getLog().info("After constructor: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
+        getContext().getLog().debug("After constructor: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
         getContext().getLog().debug(companyId + "Constructor done");
     }
 
@@ -58,9 +58,9 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         this.countryActor = countryActor;
         this.worldSettings = worldSettings;
         this.companyInformation = CompanyInformationBuilder.ofWorldDefault(companyId, worldSettings).build();
-        this.dailyReport = new DailyReport(companyId, 0);
-        new FoundingBoardMeeting(companyInformation, dailyReport);
-        getContext().getLog().info("After constructor: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
+        this.companyDailyReport = new CompanyDailyReport(companyId, 0);
+        new FoundingBoardMeeting(companyInformation, companyDailyReport);
+        getContext().getLog().debug("After constructor: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
         getContext().getLog().debug(companyId + "Constructor done");
     }
 
@@ -82,14 +82,14 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
-        getContext().getLog().info("onReceiveMarketOpenForSellers: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
+        getContext().getLog().debug("onReceiveMarketOpenForSellers: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
 
-        dailyReport = new DailyReport(companyId, message.dayId());
+        companyDailyReport = new CompanyDailyReport(companyId, message.dayId());
         companyInformation.setPriceList(message.priceList());
 
-        new ProductionPlanningAndExecution(companyInformation, dailyReport);
+        new ProductionPlanningAndExecution(companyInformation, companyDailyReport);
 
-        StockListing forSaleList = new DesiceWhatToSellAtMarket(companyInformation, dailyReport).getForSaleList();
+        StockListing forSaleList = new DesiceWhatToSellAtMarket(companyInformation, companyDailyReport).getForSaleList();
         message.countryMarket().tell(new C_SendSkuToMarketForSale(forSaleList, getContext().getSelf()));
 
         return Behaviors.same();
@@ -99,7 +99,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
-        getContext().getLog().info("onReceiveMarketOpenForBuyers: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
+        getContext().getLog().debug("onReceiveMarketOpenForBuyers: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
         companyInformation.setPriceList(message.priceList());
         ArrayList<KnownRecipe> prepareToProduceRecipies = getListOfTwoMostProfitableRecipes(message);
         StockListing buyList = buildBuyList(prepareToProduceRecipies, companyInformation.calculateWorkTimeAvailable());
@@ -174,21 +174,21 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
 
-        dailyReport.setUnsoldGoods(message.unsoldGoods());
-        dailyReport.setMarketDayRevenue(message.boothRevenue().getMoney());
+        companyDailyReport.setUnsoldGoods(message.unsoldGoods());
+        companyDailyReport.setMarketDayRevenue(message.boothRevenue().getMoney());
 
         companyInformation.getWarehouse().addStockFromList(message.unsoldGoods());
         companyInformation.getMoneyBox().addMoney(message.boothRevenue().getMoney());
 
-        dailyReport.setLiquidityDayEnd(this.companyInformation.getMoneyBox().getMoney());
+        companyDailyReport.setLiquidityDayEnd(this.companyInformation.getMoneyBox().getMoney());
 
-        new DayEndEvaluationDirectionMeeting(companyInformation, dailyReport);
+        new DayEndEvaluationDirectionMeeting(companyInformation, companyDailyReport);
 
         if (companyInformation.timeForTacticalBoardMeeting()) {
-            new InnovateOurRecipiesBoardMeeting(companyInformation, dailyReport);
+            new InnovateOurRecipiesBoardMeeting(companyInformation, companyDailyReport);
         }
         message.market().tell(new C_EndMarketDay(this.companyId));
-        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(dailyReport, companyInformation.getKnownRecipes(), dailyReport.getUnsoldGoods(), companyInformation.getWarehouse().createDuplicate())));
+        countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(companyDailyReport, companyInformation.getKnownRecipes(), companyDailyReport.getUnsoldGoods(), companyInformation.getWarehouse().createDuplicate())));
         return Behaviors.same();
     }
 }

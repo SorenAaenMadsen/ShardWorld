@@ -56,7 +56,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info("Market got message {}", message.toString());
         }
-        marketDay = new MarketDay(marketDay);
+        marketDay = new MarketDay(marketDay, message.dayId());
 
         this.allCompanies = message.allCompanies();
         this.dayId = message.dayId();
@@ -83,7 +83,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         }
         marketDay.buyOrderList.add(message);
         MoneyBox buyersMoney = message.moneyBox();
-        getContext().getLog().info("Market buyer {} money is {}", message.buyerCompanyId(), message.moneyBox().getMoney());
+        getContext().getLog().debug("Market buyer {} money is {}", message.buyerCompanyId(), message.moneyBox().getMoney());
 
         message.buyer().tell(
                 new C_CompletedBuyOrder(
@@ -93,13 +93,14 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         );
 
         if (marketDay.buyOrderList.size() >= allCompanies.size()) {
+            // All buyers have done their business:
             closeDownMarketForToday();
         }
         return Behaviors.same();
     }
 
     private void closeDownMarketForToday() {
-        marketDay.adjustPricesAccordingToUnsoldGoods(getContext().getLog());
+        marketDay.adjustPrices(getContext().getLog());
         marketDay.marketBooths.forEach(booth -> booth.getSeller().tell(
                         new C_SendUnsoldSkuBackToSeller(
                                 booth.closeBoothAndGetRemainingForSaleList(),
@@ -111,11 +112,12 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
 
     private Behavior<CountryMarketCommand> onReceiveEndMarketDay(C_EndMarketDay message) {
         if (worldSettings.logAkkaMessages()) {
-            getContext().getLog().info("Market got message {}", message.toString());
+            getContext().getLog().info("Company is home from market safely {}", message.toString());
         }
         marketDay.companiesDoneWithMarketDay++;
         if (marketDay.companiesDoneWithMarketDay == allCompanies.size()) {
-            country.tell(new C_EndMarketDayCycle(dayId, new MarketDayStats(marketDay.getPriceListDayStart().duplicate(), marketDay.getNewestPriceList().duplicate())));
+            getContext().getLog().debug("Market can now close. All sellers and buyers are home safely. {}", message.toString());
+            country.tell(new C_EndMarketDayCycle(dayId, new MarketDayStats(marketDay.createMarketDayClosedownReport())));
         }
         return Behaviors.same();
     }

@@ -1,15 +1,27 @@
 package com.saaenmadsen.shardworld.statistics;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.saaenmadsen.shardworld.modeltypes.PriceList;
+import com.saaenmadsen.shardworld.actors.countrymarket.MarketDailyReport;
 
 public record MarketDayStats(
-        @JsonIgnore PriceList pricelistDayStart,
-        @JsonIgnore PriceList pricelistDayEnd,
         PrintablePriceList pricelistDayStartMap,
-        PrintablePriceList pricelistDayEndap
+        PrintablePriceList pricelistDayEndap,
+        PrintableStockListing itemsForSale,
+        PrintableStockListing unsoldItems,
+        long totalMarketTurnover,
+        String managementReport,
+
+        @JsonIgnore MarketDailyReport marketDailyReport
 ) {
-    public MarketDayStats(PriceList pricelistDayStart, PriceList pricelistDayEnd) {
-        this(pricelistDayStart, pricelistDayEnd, new PrintablePriceList(pricelistDayStart), new PrintablePriceList(pricelistDayEnd));
+    public MarketDayStats(MarketDailyReport marketDailyReport) {
+        this(
+                new PrintablePriceList(marketDailyReport.getPriceListDayStart()),
+                new PrintablePriceList(marketDailyReport.getPriceListDayEnd()),
+                new PrintableStockListing(marketDailyReport.getForSaleList()),
+                new PrintableStockListing(marketDailyReport.getUnsoldGoods()),
+                marketDailyReport.getMarketDayTotalTurnover(),
+                marketDailyReport.getDailyReport(),
+                marketDailyReport
+        );
     }
 }

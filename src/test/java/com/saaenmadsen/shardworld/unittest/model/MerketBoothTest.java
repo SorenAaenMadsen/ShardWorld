@@ -1,15 +1,14 @@
 package com.saaenmadsen.shardworld.unittest.model;
 
-import akka.actor.typed.ActorRef;
-import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
 import com.saaenmadsen.shardworld.actors.countrymarket.MarketBooth;
+import com.saaenmadsen.shardworld.actors.countrymarket.MarketDailyReport;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class MerketBoothTest {
     @Test
@@ -34,8 +33,9 @@ public class MerketBoothTest {
         MoneyBox customersMoney = new MoneyBox();
         customersMoney.addMoney(10000000);
 
-        booth1.performTradeAccordingToShoppingList(shoppingCart, wishList, new PriceList(), customersMoney);
-        booth2.performTradeAccordingToShoppingList(shoppingCart, wishList, new PriceList(), customersMoney);
+        MarketDailyReport marketDailyReport = new MarketDailyReport(1);
+        booth1.performTradeAccordingToShoppingList(shoppingCart, wishList, new PriceList(), customersMoney, marketDailyReport);
+        booth2.performTradeAccordingToShoppingList(shoppingCart, wishList, new PriceList(), customersMoney, marketDailyReport);
 
         assertEquals(0, seller1.getSkuCount(0));
         assertEquals(2, seller1.getSkuCount(1));
@@ -45,6 +45,7 @@ public class MerketBoothTest {
         assertEquals(9999876, customersMoney.getMoney());
         assertEquals(114, booth1.getBoothRevenue().getMoney());
         assertEquals(10, booth2.getBoothRevenue().getMoney());
+        assertEquals(124,marketDailyReport.getMarketDayTotalTurnover());
 
     }
 }

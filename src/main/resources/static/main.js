@@ -95,7 +95,6 @@ function createChart(data, apiResource, htmlChartElementId) {
 
 
 let currentDay = 0;
-
 function advanceDay() {
     console.log('advanceDay');
     currentDay++;
@@ -129,14 +128,14 @@ function loadWorldStatus() {
         .then(response => response.json())
         .then(data => {
             console.log('World status data:', data); // Debugging log
-            displayStatusTable(data);  // Populate the table with the data
+            createCompanyDayReportsTable(data);  // Populate the table with the data
         })
         .catch(error => console.error('Error fetching world status:', error));
 }
 
 // Function to populate the table with the status data
-function displayStatusTable(data) {
-    const tableContainer = document.getElementById('status-table-container');
+function createCompanyDayReportsTable(data) {
+    const tableContainer = document.getElementById('company-day-reports');
     tableContainer.innerHTML = ''; // Clear any existing table content
 
     const table = document.createElement('table');
@@ -179,3 +178,45 @@ function displayStatusTable(data) {
 document.addEventListener('DOMContentLoaded', () => {
     loadTabContent('world-control.html', 'World Control');
 });
+
+
+// Function to populate the table with the status data
+function createMarketDayReportTable(data) {
+    const tableContainer = document.getElementById('company-day-reports');
+    tableContainer.innerHTML = ''; // Clear any existing table content
+
+    const table = document.createElement('table');
+    table.style.width = '1000px';
+    table.border = '1';
+
+    const tbody = document.createElement('tbody');
+
+    // Loop through each key-value pair and create a row
+    for (const [key, value] of Object.entries(data)) {
+        const row = document.createElement('tr');
+
+        const keyCell = document.createElement('td');
+        keyCell.innerHTML = value.label;
+        keyCell.style.fontWeight = 'bold';
+        keyCell.style.padding = '8px';
+
+        // Set fixed cell dimensions
+        keyCell.style.width = '300px'; // Set fixed width for key cells
+        keyCell.style.height = '80px'; // Set fixed height for key cells
+
+        const valueCell = document.createElement('td');
+        valueCell.innerHTML  = value.value;
+        valueCell.style.padding = '8px';
+
+        // Set fixed cell dimensions
+        valueCell.style.width = '700px'; // Set fixed width for value cells
+        valueCell.style.height = '80px'; // Set fixed height for value cells
+
+        row.appendChild(keyCell);
+        row.appendChild(valueCell);
+        tbody.appendChild(row);
+    }
+
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
+}

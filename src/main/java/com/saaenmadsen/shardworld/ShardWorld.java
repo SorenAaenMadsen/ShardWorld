@@ -66,7 +66,7 @@ public class ShardWorld {
             String countryId = countryDayStats.countryId();
             for (CompanyDayStats companyDayStats : countryDayStats.companyDayStats()) {
                 String label = countryId + " " + companyDayStats.companyId();
-                String value = companyDayStats.dailyReport().getDailyReport();
+                String value = companyDayStats.companyDailyReport().getDailyReport();
                 worldStatus.add(new WorldStatusKeyValue(label, value));
             }
         }

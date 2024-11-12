@@ -100,6 +100,15 @@ public class StockListing {
         }
     }
 
+    public void removeStockFromList(StockListing stockListing) {
+        for (int i = 0; i < StockKeepUnit.values().length; ++i) {
+            stock[i] -= stockListing.stock[i];
+            if(stock[i]<0) {
+                throw new IllegalArgumentException("Cannot remove stock as it would be negative");
+            }
+        }
+    }
+
     public int getStockAmount(StockKeepUnit stockKeepUnit) {
         return this.stock[stockKeepUnit.getArrayId()];
     }
