@@ -35,7 +35,7 @@ public class ShardWorld {
     public ShardWorld() {
         worldSettings = WorldSettingsBuilder
                 .ofDefault()
-                .withMaxDaysToRun(20)
+                .withMaxDaysToRun(1000)
                 .withNumberOfCompaniesPrCountry(20)
                 .withWorldRunMode(WorldRunMode.MANUAL_DAY_ADVANCE)
                 .build();

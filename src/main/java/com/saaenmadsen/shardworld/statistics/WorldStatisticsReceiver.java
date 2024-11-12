@@ -42,7 +42,7 @@ public class WorldStatisticsReceiver {
 
     public void addDay(WorldDayStats worldDayStats) {
         dayStatistics.add(worldDayStats);
-        if(dayStatistics.size()>maxDayReportsToKeep){
+        if (dayStatistics.size() > maxDayReportsToKeep) {
             dayStatistics.removeFirst();
         }
     }
@@ -55,13 +55,13 @@ public class WorldStatisticsReceiver {
             for (CompanyDayStats companyDayStats : countryDayStats.companyDayStats()) {
                 finalTotalCountryStock.addStockFromList(companyDayStats.companyWarehouse());
             }
-            worldEndStatsCountries.add(new WorldEndStatsCountry(finalTotalCountryStock));
+            worldEndStatsCountries.add(new WorldEndStatsCountry(countryDayStats.countryId(), finalTotalCountryStock, countryDayStats.marketDayStats()));
             finalTotalWorldStock.addStockFromList(finalTotalCountryStock);
         }
         return new WorldEndStatsWorld(finalTotalWorldStock, worldEndStatsCountries);
     }
 
-    public WorldEndStatsWorld worldEndSummarizeAndWriteFile(){
+    public WorldEndStatsWorld worldEndSummarizeAndWriteFile() {
         this.worldEndStatus = getLatestSummary();
         writeToFile();
         return worldEndStatus;
@@ -80,7 +80,7 @@ public class WorldStatisticsReceiver {
     public void writeToFile() {
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS_Z");
-            String fileName = "worldrunreports/ShardWorldRun" + simpleDateFormat.format(new Date())+ ".json";
+            String fileName = "worldrunreports/ShardWorldRun" + simpleDateFormat.format(new Date()) + ".json";
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             writer.write(this.toString());
             log.info("Written report to " + fileName);
@@ -90,7 +90,7 @@ public class WorldStatisticsReceiver {
         }
     }
 
-    public WorldDayStats getLastReportedDay(){
+    public WorldDayStats getLastReportedDay() {
         return this.dayStatistics.getLast();
     }
 }

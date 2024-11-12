@@ -5,7 +5,7 @@ import com.saaenmadsen.shardworld.actors.countrymarket.MarketDailyReport;
 
 public record MarketDayStats(
         PrintablePriceList pricelistDayStartMap,
-        PrintablePriceList pricelistDayEndap,
+        PrintablePriceList pricelistDayEndMap,
         PrintableStockListing itemsForSale,
         PrintableStockListing unsoldItems,
         long totalMarketTurnover,

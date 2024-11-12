@@ -40,7 +40,7 @@ function loadResourceStatus() {
 }
 
 // Function to fetch data and create the chart
-function fetchChartDataAndCreateChart(apiResource, htmlChartElementId) {
+function fetchWorldStockChartDataAndCreateChart(apiResource, htmlChartElementId) {
     console.log('fetchChartDataAndCreateChart htmlChartElementId ' + htmlChartElementId);
     fetch('http://localhost:8080/api/data/' + apiResource)
         .then(response => response.json())
@@ -134,7 +134,7 @@ function advanceDay() {
 }
 
 function loadWorldStatus() {
-    fetchChartDataAndCreateChart('totalworldresourses', 'worldWideResourceChart');
+    fetchWorldStockChartDataAndCreateChart('totalworldresourses', 'worldWideResourceChart');
 
     fetch('http://localhost:8080/api/world/status')
         .then(response => response.json())
@@ -192,43 +192,82 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// Function to populate the table with the status data
-function createMarketDayReportTable(data) {
-    const tableContainer = document.getElementById('company-day-reports');
-    tableContainer.innerHTML = ''; // Clear any existing table content
 
-    const table = document.createElement('table');
-    table.style.width = '1000px';
-    table.border = '1';
+// Global prices:
+// resources/static/js/main.js
 
-    const tbody = document.createElement('tbody');
-
-    // Loop through each key-value pair and create a row
-    for (const [key, value] of Object.entries(data)) {
-        const row = document.createElement('tr');
-
-        const keyCell = document.createElement('td');
-        keyCell.innerHTML = value.label;
-        keyCell.style.fontWeight = 'bold';
-        keyCell.style.padding = '8px';
-
-        // Set fixed cell dimensions
-        keyCell.style.width = '300px'; // Set fixed width for key cells
-        keyCell.style.height = '80px'; // Set fixed height for key cells
-
-        const valueCell = document.createElement('td');
-        valueCell.innerHTML = value.value;
-        valueCell.style.padding = '8px';
-
-        // Set fixed cell dimensions
-        valueCell.style.width = '700px'; // Set fixed width for value cells
-        valueCell.style.height = '80px'; // Set fixed height for value cells
-
-        row.appendChild(keyCell);
-        row.appendChild(valueCell);
-        tbody.appendChild(row);
-    }
-
-    table.appendChild(tbody);
-    tableContainer.appendChild(table);
+// Fetches data from the REST API
+async function fetchGlobalMarketPrices() {
+    const response = await fetch('/api/data/marketpricesdayend');
+    return response.json();
 }
+
+// Generates Chart.js-compatible data from the API response
+function generateGlobalMarketPriceChartData(data) {
+    const countries = data.countries;
+    const skuData = data.skuData;
+
+    const datasets = skuData.map((skuEntry, index) => {
+        return {
+            label: skuEntry.sku,
+            data: skuEntry.prices,
+            backgroundColor: `hsl(${index * 60}, 70%, 60%)`,
+            borderColor: `hsl(${index * 60}, 70%, 50%)`,
+            borderWidth: 1
+        };
+    });
+
+    return {
+        labels: countries,
+        datasets: datasets
+    };
+}
+
+// Renders the Chart.js bar chart
+async function renderGlobalMarketPriceChart() {
+    const data = await fetchGlobalMarketPrices();
+    const chartData = generateGlobalMarketPriceChartData(data);
+
+    const ctx = document.getElementById('worldMarketPriceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: chartData,
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Country'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Price (USD)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Initialize the chart on page load
+document.addEventListener("DOMContentLoaded", renderGlobalMarketPriceChart);
+
+
+

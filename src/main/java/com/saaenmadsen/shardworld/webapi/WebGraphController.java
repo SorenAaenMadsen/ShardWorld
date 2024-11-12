@@ -1,5 +1,7 @@
 package com.saaenmadsen.shardworld.webapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saaenmadsen.shardworld.ShardWorld;
 import com.saaenmadsen.shardworld.statistics.WorldEndStatsWorld;
 import org.slf4j.Logger;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -20,14 +22,27 @@ public class WebGraphController {
     private static final Logger log = LoggerFactory.getLogger(ShardWorld.class);
 
 
-
-
     @GetMapping("/data/totalworldresourses")
-    public ResponseEntity<List<ShardWorld.DataPoint>> getGraphData() {
-        log.info("WebGraphController GET getGraphData");
+    public ResponseEntity<List<ShardWorld.DataPoint>> getGraphData_totalWorldResources() {
+        log.info("WebGraphController GET getGraphData_totalWorldResources");
         WorldEndStatsWorld latestSummary = ShardWorld.instance.getLatestSummary();
         List<ShardWorld.DataPoint> data = latestSummary.finalWorldTotalStockMap().getAsDataPointsForWebGraph();
         return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+
+    @GetMapping("/data/marketpricesdayend")
+    public ResponseEntity<Map<String, Object>> getGraphData_marketPriceDayEnd() {
+        log.info("WebGraphController GET getGraphData_marketPriceDayEnd");
+        WorldEndStatsWorld latestSummary = ShardWorld.instance.getLatestSummary();
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            log.info("WebGraphController getGraphData_marketPriceDayEnd : " +mapper.writeValueAsString( latestSummary.getPricesInAllCountriesAsDataPointsForWebGraph()));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new ResponseEntity<>(latestSummary.getPricesInAllCountriesAsDataPointsForWebGraph(), HttpStatus.OK);
     }
 
     @GetMapping("/world/status")
