@@ -42,20 +42,73 @@
             width: 100%;
             height: 300px;
         }
+
+        /* Grid layout */
+        .item1 {
+            grid-area: header;
+        }
+
+        .item2 {
+            grid-area: menu;
+        }
+
+        .item3 {
+            grid-area: main;
+        }
+
+        .item4 {
+            grid-area: right;
+        }
+
+        .item5 {
+            grid-area: footer;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-areas:
+    'header header header header header header'
+    'menu main main main right right'
+    'menu footer footer footer footer footer';
+            gap: 10px;
+            background-color: #2196F3;
+            padding: 10px;
+        }
+
+        .grid-container > div {
+            background-color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            padding: 20px 0;
+            font-size: 30px;
+        }
+
     </style>
 </head>
 <body>
 
-<!-- Tabs Navigation -->
-<div class="tabs">
-    <div class="tab active" onclick="loadTabContent('world-control.html', 'World Control')">World Control</div>
-    <div class="tab" onclick="loadTabContent('resource-status.html', 'Resource Status')">Resource Status</div>
+<div class="grid-container">
+    <div class="item1">
+        <div id="header-text"></div>
+        <div class="tabs">
+            <!-- Tabs Navigation -->
+            <div class="tab active" onclick="loadTabContent('world-control.html', 'World Control')">World Control</div>
+            <div class="tab" onclick="loadTabContent('resource-status.html', 'Resource Status')">Resource Status</div>
+        </div>
+    </div>
+    <div class="item2">
+        <div id="menu-control">
+            <h2>Menu</h2>
+            <button onclick="advanceDay()">Advance World by One Day</button>
+            <p id="world-advance-button">World advance button has been pressed 0 times.</p>
+        </div>
+    </div>
+    <div class="item3">
+        <!-- Tab Content (Initially Empty) -->
+        <div id="main-tab-content"></div>
+    </div>
+
 </div>
-
-<!-- Tab Content (Initially Empty) -->
-<div id="tab-content"></div>
-
 <script src="main.js"></script>
-
 </body>
 </html>
+

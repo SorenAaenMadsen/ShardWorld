@@ -1,6 +1,7 @@
 // Function to load content dynamically into the tab-content area
 function loadTabContent(page, textContent) {
     // document.title = textContent;
+    document.getElementById('header-text').textContent = textContent;
 
     // Fetch content from the corresponding HTML file
     console.log('loadTabContent function called for ' + page + ' textContent ' + textContent);
@@ -10,7 +11,7 @@ function loadTabContent(page, textContent) {
 
             // console.log('loadTabContent content ' + content);
             // Insert the fetched content into the tab-content div
-            document.getElementById('tab-content').innerHTML = html;
+            document.getElementById('main-tab-content').innerHTML = html;
 
             // Call additional functions based on the page
             if (page === 'world-control.html') {
