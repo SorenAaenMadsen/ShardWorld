@@ -22,6 +22,10 @@ public class PriceList implements Cloneable {
         return prices[skuId];
     }
 
+    public void setPrice(int skuId, int price){
+        prices[skuId] = price;
+    }
+
     public IntStream stream(){
         return Arrays.stream(prices);
     }

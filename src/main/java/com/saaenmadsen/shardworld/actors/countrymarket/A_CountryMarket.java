@@ -93,18 +93,20 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         );
 
         if (marketDay.buyOrderList.size() >= allCompanies.size()) {
-            // This could be a state shift :)
-
-            // Send unsold stuff back to the sellers.
-            marketDay.marketBooths.forEach(booth -> booth.getSeller().tell(
-                            new C_SendUnsoldSkuBackToSeller(
-                                    booth.closeBoothAndGetRemainingForSaleList(),
-                                    booth.getBoothRevenue(),
-                                    getContext().getSelf())
-                    )
-            );
+            closeDownMarketForToday();
         }
         return Behaviors.same();
+    }
+
+    private void closeDownMarketForToday() {
+        marketDay.adjustPricesAccordingToUnsoldGoods(getContext().getLog());
+        marketDay.marketBooths.forEach(booth -> booth.getSeller().tell(
+                        new C_SendUnsoldSkuBackToSeller(
+                                booth.closeBoothAndGetRemainingForSaleList(),
+                                booth.getBoothRevenue(),
+                                getContext().getSelf())
+                )
+        );
     }
 
     private Behavior<CountryMarketCommand> onReceiveEndMarketDay(C_EndMarketDay message) {
