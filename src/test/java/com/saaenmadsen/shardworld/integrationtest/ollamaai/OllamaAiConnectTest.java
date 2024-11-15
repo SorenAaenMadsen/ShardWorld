@@ -1,4 +1,4 @@
-package com.saaenmadsen.shardworld.unittest.ollamaai;
+package com.saaenmadsen.shardworld.integrationtest.ollamaai;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;

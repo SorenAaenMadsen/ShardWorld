@@ -1,13 +1,12 @@
 package com.saaenmadsen.shardworld.modeltypes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 public class StockListing {
-
-
     private int[] stock;
 
     private StockListing(int initialVal) {
@@ -24,6 +23,19 @@ public class StockListing {
         }
     }
 
+    /**
+     * Constructor for serialization only.
+     */
+    private StockListing() {
+    }
+
+    public int[] getStock() {
+        return stock;
+    }
+    public void setStock(int[] stockOverride) {
+        this.stock = stockOverride;
+    }
+
     public static StockListing ofEmpty() {
         return new StockListing(new StockListing(0));
     }
@@ -36,10 +48,12 @@ public class StockListing {
         return new StockListing(this);
     }
 
+    @JsonIgnore
     public int getSkuCount(int skuId) {
         return stock[skuId];
     }
 
+    @JsonIgnore
     public void setSkuCount(int skuId, int newAmount) {
         stock[skuId] = newAmount;
     }
@@ -86,13 +100,7 @@ public class StockListing {
         return Arrays.hashCode(stock);
     }
 
-    public int[] getStock() {
-        return stock;
-    }
 
-    public void setStock(int[] stockOverride) {
-        this.stock = stockOverride;
-    }
 
     public void addStockFromList(StockListing stockListing) {
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
@@ -109,6 +117,7 @@ public class StockListing {
         }
     }
 
+    @JsonIgnore
     public int getStockAmount(StockKeepUnit stockKeepUnit) {
         return this.stock[stockKeepUnit.getArrayId()];
     }
