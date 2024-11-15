@@ -1,6 +1,7 @@
 package com.saaenmadsen.shardworld.actors.company;
 
 import com.saaenmadsen.shardworld.constants.Recipe;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 import java.util.Objects;
 
@@ -10,7 +11,30 @@ public class KnownRecipe {
     private int expectedDailySaleValue_daily5percentChange = 10;
     private int expectedDailySaleValue_daily10percentChange = 10;
     private int expectedDailySaleValue_daily20percentChange = 10;
-    private boolean haveToolsSetup = false;
+    private boolean isProductionLine = false;
+
+    public int getCountOfFailedProductionLineSetups() {
+        return countOfFailedProductionLineSetups;
+    }
+
+    private int countOfFailedProductionLineSetups = 0;
+
+    public boolean isProductionLine() {
+        return isProductionLine;
+    }
+
+    public void setupProductionLine(StockListing companyWarehouse) {
+        if (isProductionLine) {
+            throw new IllegalStateException("Production line is already set");
+        }
+        if (companyWarehouse.hasStock(recipe.getToolRequirements())) {
+            companyWarehouse.removeStockFromList(recipe.getToolRequirements());
+        } else {
+            countOfFailedProductionLineSetups++;
+        }
+        this.isProductionLine = true;
+    }
+
 
     public Recipe getRecipe() {
         return recipe;
@@ -22,7 +46,6 @@ public class KnownRecipe {
         this.expectedDailySaleValue_daily10percentChange = forecastedDailySalesValue;
         this.expectedDailySaleValue_daily20percentChange = forecastedDailySalesValue;
     }
-
 
 
     public Recipe recipe() {

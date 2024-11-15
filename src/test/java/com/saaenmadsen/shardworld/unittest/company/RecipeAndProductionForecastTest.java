@@ -56,7 +56,6 @@ public class RecipeAndProductionForecastTest {
 
         StockListing buylist = buyDecision.decide();
         assertEquals(8, buylist.getSkuCount(StockKeepUnit.WOOD_KG.getArrayId()));
-
     }
 
     @Test

@@ -34,11 +34,9 @@ public enum Recipe {
     SHAFT_FURNACE_WROUGHT_IRON_SMELTING(20, "Shaft Furnace Wrought Iron Smelting", "Wrought Iron", "150", "Using a Shaft Furnace, the temperature of the iron can be brought to 1,300–1,500°C, high enough to produce molten iron, especially with effective bellows.  With this high temperature, the efficiency of the melting process increases, and requires fewer passes through the heating process to reduce impurities.", "Iron Ore", "1500", "Charcoal", "350", "Null", "0", "", "3200", "", "", "", "Iron tools", "20", "Stone tools", "70", "Null", "0"),
     SHAFT_FURNACE_IRON_CASTING_AND_SMITHING_OF_IRON_TOOLS(21, "Shaft Furnace Iron Casting and Smithing of Iron Tools", "Iron tools", "150", "Using a Shaft Furnace, the temperature of the iron can be brought to 1,300–1,500°C, high enough to produce molten iron, especially with effective bellows.  This allow production of cast iron, by pouring molten iron into molds for larger-scale production.", "Wrought Iron", "160", "Charcoal", "240", "Null", "0", "", "3200", "", "", "", "Iron tools", "40", "Stone tools", "80", "Null", "0"),
     SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING(22, "Shaft Furnace Crucible Hard Steel Smelting", "Hard Steel", "150", "Using a Shaft Furnace, the temperature of the iron can be brought to 1,300–1,500°C, high enough to produce molten iron, especially with effective bellows. TODO: More description here", "Wrought Iron", "160", "Charcoal", "240", "Null", "0", "", "3200", "", "", "", "Iron tools", "30", "Stone tools", "70", "Null", "0"),
-    PRIMITIVE_CHARCOAL_BURNING(23, "Primitive Charcoal burning", StockKeepUnit.CHARCOAL, 50, "Description", StockKeepUnit.FIREWOOD_KG, 180, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0,48, new SkillLevel(Skill.WOODWORKER,3), null, null, null,0, null,0, null,0),
-    PRIMITIVE_STONE_TOOLS(24, "Primitive Stone Tools", StockKeepUnit.STONE_TOOLS, 1, "Making stone tools with only the tools and ingredients which can be found in nature.", StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0,80, new SkillLevel(Skill.STONEWORKER,1), null, null, null,0, null,0, null,0),
-    PRIMITIVE_WOOD_TOOLS(25, "Primitive Wood Tools", StockKeepUnit.WOOD_TOOLS, 1, "Making wooden tools with only the tools which can be found in nature.", StockKeepUnit.WOOD_KG, 2, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0,30, new SkillLevel(Skill.WOODWORKER,1), null, null, null,0, null,0, null,0)
-    ;
-
+    PRIMITIVE_CHARCOAL_BURNING(23, "Primitive Charcoal burning", StockKeepUnit.CHARCOAL, 50, "Description", StockKeepUnit.FIREWOOD_KG, 180, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0, 48, new SkillLevel(Skill.WOODWORKER, 3), null, null, null, 0, null, 0, null, 0),
+    PRIMITIVE_STONE_TOOLS(24, "Primitive Stone Tools", StockKeepUnit.STONE_TOOLS, 1, "Making stone tools with only the tools and ingredients which can be found in nature.", StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0, 80, new SkillLevel(Skill.STONEWORKER, 1), null, null, null, 0, null, 0, null, 0),
+    PRIMITIVE_WOOD_TOOLS(25, "Primitive Wood Tools", StockKeepUnit.WOOD_TOOLS, 1, "Making wooden tools with only the tools which can be found in nature.", StockKeepUnit.WOOD_KG, 2, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0, 30, new SkillLevel(Skill.WOODWORKER, 1), null, null, null, 0, null, 0, null, 0);
 
 
     /**
@@ -60,6 +58,7 @@ public enum Recipe {
             if (productName.equals("Null")) return Optional.empty();
             return Optional.of(new SkuAndCount(StockKeepUnit.getByProductName(productName), Integer.parseInt(amount)));
         }
+
         public static Optional<SkuAndCount> from(StockKeepUnit sku, int amount) {
             if (null == sku) return Optional.empty();
             if (sku.equals(StockKeepUnit.NULL)) return Optional.empty();
@@ -151,7 +150,7 @@ public enum Recipe {
         Optional<SkuAndCount> input3 = SkuAndCount.fromStrings(input_3, input_3_amount);
         input3.ifPresent(inputs::add);
 
-        if(calenderWaitTimeFromProductionToAvailable.isEmpty()){
+        if (calenderWaitTimeFromProductionToAvailable.isEmpty()) {
             calenderWaitTimeFromProductionToAvailable = "0";
         }
         this.calenderWaitTimeFromProductionToAvailable = Integer.parseInt(calenderWaitTimeFromProductionToAvailable);
@@ -167,7 +166,6 @@ public enum Recipe {
         Optional<SkuAndCount> toolRequirement3 = SkuAndCount.fromStrings(Tool_Requirement_3, Tool_Requirement_3_amount);
         toolRequirement3.ifPresent(toolRequirements::add);
     }
-
 
 
     Recipe(
@@ -260,11 +258,9 @@ public enum Recipe {
         }
     }
 
-    public List<SkuAndCount> getInputs() {
-        return inputs;
-    }
-
+    public List<SkuAndCount> getInputs() {return inputs; }
     public List<SkuAndCount> getOutputs() {
         return outputs;
     }
+    public List<SkuAndCount> getToolRequirements() { return toolRequirements; }
 }

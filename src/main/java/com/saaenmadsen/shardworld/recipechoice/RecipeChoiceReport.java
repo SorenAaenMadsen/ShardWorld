@@ -1,6 +1,5 @@
 package com.saaenmadsen.shardworld.recipechoice;
 
-import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
@@ -9,9 +8,11 @@ import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import java.util.ArrayList;
 import java.util.List;
 
-public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoices) {
+public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoices,
+                                 List<RecipeChoiceReportElement> nonSelectedChoices) {
 
-    public record RecipeChoiceReportElement(Recipe recipe, ProductionImpactReport productionImpactReport, int projectedProfit){
+    public record RecipeChoiceReportElement(Recipe recipe, ProductionImpactReport productionImpactReport,
+                                            int projectedProfit, String selectionReport) {
         @Override
         public String toString() {
             return "RecipeChoiceReportElement{" +
@@ -22,16 +23,13 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
         }
     }
 
-
-
-    public static RecipeChoiceReport findRecipeWithHighestProjectedProfit(CompanyInformation companyInformation, PriceList priceList) {
-        return findRecipeWithHighestProjectedProfit(companyInformation.getKnownRecipes(), companyInformation.getWarehouse(), priceList, companyInformation.calculateWorkTimeAvailable());
-    }
-
     public static RecipeChoiceReport findRecipeWithHighestProjectedProfit(List<KnownRecipe> availableRecipies, StockListing myRawMaterials, PriceList priceList, int workTimeAvailable) {
         int projectedProfit = 0;
 
         RecipeChoiceReportElement chosenRecipe = null;
+
+        ArrayList<RecipeChoiceReportElement> selectedElements = new ArrayList<>();
+        ArrayList<RecipeChoiceReportElement> nonSelectedElements = new ArrayList<>();
 
         for (KnownRecipe availableKnownRecipe : availableRecipies) {
 
@@ -39,18 +37,25 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
             ProductionImpactReport rawMaterialForProductionReport = availableKnownRecipe.recipe().evaluateRawMaterialImpact(workTimeAvailable, myRawMaterials);
             boolean usingRelevantAmountOfWorkTime = (rawMaterialForProductionReport.leftOverWorkTime() < (workTimeAvailable / 2));
 
-            if(usingRelevantAmountOfWorkTime && thisProjectedProfit > projectedProfit ){
-                projectedProfit = thisProjectedProfit;
-                chosenRecipe = new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, projectedProfit);
+            if (usingRelevantAmountOfWorkTime) {
+                if (thisProjectedProfit > projectedProfit) {
+                    projectedProfit = thisProjectedProfit;
+                    selectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, projectedProfit, "Projected profit: " + thisProjectedProfit));
+                } else {
+                    nonSelectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, projectedProfit, "Other recipies have higher projected profit than " + thisProjectedProfit));
+                }
+            } else {
+                nonSelectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, projectedProfit, "Not able to use a resonable amount of worktime. " + rawMaterialForProductionReport.leftOverWorkTime() + " / " + (workTimeAvailable / 2)));
             }
-
         }
-        ArrayList<RecipeChoiceReportElement> reportElements = new ArrayList<>();
-        if(chosenRecipe == null){
-            return new RecipeChoiceReport(reportElements);
+
+        if (chosenRecipe == null) {
+
+            return new RecipeChoiceReport(selectedElements, nonSelectedElements);
         } else {
-            reportElements.add(chosenRecipe);
-            return new RecipeChoiceReport(reportElements);
+
+            return new RecipeChoiceReport(selectedElements, nonSelectedElements);
         }
     }
+
 }

@@ -24,7 +24,14 @@ public class DesiceWhatToBuyAtMarket {
 
     public StockListing decide() {
         addRawMaterialsForTwoMostProfitableRecipes(companyInformation);
+        addToolsForRecipiesWithNoProductionLine(companyInformation);
         return shoppingList;
+    }
+
+    private void addToolsForRecipiesWithNoProductionLine(CompanyInformation companyInformation) {
+        for (KnownRecipe myRecipe : companyInformation.getKnownRecipes()) {
+
+        }
     }
 
     public void addRawMaterialsForTwoMostProfitableRecipes(CompanyInformation companyInformation) {
