@@ -6,6 +6,7 @@ import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoices,
@@ -48,6 +49,38 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
                 nonSelectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, projectedProfit, "Not able to use a resonable amount of worktime. " + rawMaterialForProductionReport.leftOverWorkTime() + " / " + (workTimeAvailable / 2)));
             }
         }
+
+        if (chosenRecipe == null) {
+
+            return new RecipeChoiceReport(selectedElements, nonSelectedElements);
+        } else {
+
+            return new RecipeChoiceReport(selectedElements, nonSelectedElements);
+        }
+    }
+
+    public static RecipeChoiceReport evaluateRecipiesForProfitability(List<KnownRecipe> availableRecipies, StockListing myRawMaterials, PriceList priceList, int workTimeAvailable) {
+
+
+        RecipeChoiceReportElement chosenRecipe = null;
+
+        ArrayList<RecipeChoiceReportElement> selectedElements = new ArrayList<>();
+        ArrayList<RecipeChoiceReportElement> nonSelectedElements = new ArrayList<>();
+
+        for (KnownRecipe availableKnownRecipe : availableRecipies) {
+
+            int thisProjectedProfit = availableKnownRecipe.recipe().calculateProfitPrWorkTenMin(priceList);
+
+            ProductionImpactReport rawMaterialForProductionReport = availableKnownRecipe.recipe().evaluateRawMaterialImpact(workTimeAvailable, myRawMaterials);
+
+            if (thisProjectedProfit > 0) {
+                selectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, thisProjectedProfit, "Projected profit: " + thisProjectedProfit));
+            } else {
+                nonSelectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, thisProjectedProfit, "Other recipies have higher projected profit than " + thisProjectedProfit));
+            }
+        }
+
+        selectedElements.sort(Comparator.comparing(element ->element.projectedProfit()));
 
         if (chosenRecipe == null) {
 

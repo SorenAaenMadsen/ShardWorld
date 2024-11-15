@@ -3,6 +3,7 @@ package com.saaenmadsen.shardworld.constants;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -229,8 +230,7 @@ public enum Recipe {
 
     public ProductionImpactReport evaluateRawMaterialImpact(int workTimeAvailable, StockListing myRawMaterials) {
         int productionTimeLimit = workTimeAvailable / this.workTimeTimes10Minutes;
-        Stream<Integer> rawMaterialsLimits = inputs.stream().map(inputProduct -> howManyProductionRunsWillThisRawMaterialSupport(myRawMaterials, inputProduct));
-        OptionalInt rawMaterialsLimit = rawMaterialsLimits.mapToInt(Integer::intValue).min();
+        OptionalInt rawMaterialsLimit = maxProductionRunsWithRawMaterials(myRawMaterials);
 
         int maxRuns = rawMaterialsLimit.isPresent() ? Math.min(rawMaterialsLimit.getAsInt(), productionTimeLimit) : productionTimeLimit;
         int leftOverTime = workTimeAvailable - maxRuns * workTimeTimes10Minutes;
@@ -243,6 +243,12 @@ public enum Recipe {
         copyOfStock.retrieve(consumptionStock);
 
         return new ProductionImpactReport(maxRuns, leftOverTime, consumptionStock, copyOfStock);
+    }
+
+    public OptionalInt maxProductionRunsWithRawMaterials(StockListing myRawMaterials) {
+        Stream<Integer> rawMaterialsLimits = inputs.stream().map(inputProduct -> howManyProductionRunsWillThisRawMaterialSupport(myRawMaterials, inputProduct));
+        OptionalInt rawMaterialsLimit = rawMaterialsLimits.mapToInt(Integer::intValue).min();
+        return rawMaterialsLimit;
     }
 
     private static int howManyProductionRunsWillThisRawMaterialSupport(StockListing myRawMaterials, SkuAndCount inputProduct) {
