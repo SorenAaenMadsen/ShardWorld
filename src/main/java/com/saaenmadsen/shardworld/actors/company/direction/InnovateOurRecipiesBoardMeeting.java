@@ -80,17 +80,11 @@ public class InnovateOurRecipiesBoardMeeting {
     public static void investInDesiredProductionRecipe(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport, StockListing unfulfilledOrdersAtMarket, int numberOfIdeasToGenerate) {
         List<KnownRecipe> newIdeas = new ArrayList<>(companyInformation.getKnownRecipes());
 
-        Random dice = new Random();
-
         List<Recipe> recipiesWithDesiredOutput = Arrays.stream(Recipe.values()).filter(recipe -> recipeOutputIsDesired(recipe.getOutputs(), unfulfilledOrdersAtMarket)).collect(Collectors.toUnmodifiableList());
 
+        Random dice = new Random();
         addIdeasProducingDesiredOutput(Math.min(recipiesWithDesiredOutput.size(), numberOfIdeasToGenerate), dice, recipiesWithDesiredOutput, newIdeas);
-
-
         fillNewIdeasUpWithCompletelyRandomIdeas(numberOfIdeasToGenerate-newIdeas.size(), dice, newIdeas);
-
-
-
 
         RecipeChoiceReport report = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(newIdeas, StockListing.createMaxedOutStockListing(), companyInformation.getPriceList(), 1000);
 
