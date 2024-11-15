@@ -238,7 +238,7 @@ public enum Recipe {
         int leftOverTime = workTimeAvailable - maxRuns * workTimeTimes10Minutes;
 
         StockListing copyOfStock = myRawMaterials.createDuplicate();
-        StockListing consumptionStock = StockListing.createEmptyStockListing();
+        StockListing consumptionStock = StockListing.ofEmpty();
         for (SkuAndCount input : inputs) {
             consumptionStock.setSkuCount(input.sku().getArrayId(), input.amount * maxRuns);
         }

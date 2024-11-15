@@ -11,7 +11,7 @@ public class CSellOrderTest {
 
     @Test
     public void toAndFromJsonTest() {
-        StockListing originalStock = StockListing.createEmptyStockListing();
+        StockListing originalStock = StockListing.ofEmpty();
         originalStock.setSkuCount(0, 14);
         originalStock.setSkuCount(1, 18);
 
@@ -21,7 +21,7 @@ public class CSellOrderTest {
 
         assertEquals(originalCommand.forSaleList(), parsed.forSaleList());
 
-        StockListing differentStock = StockListing.createEmptyStockListing();
+        StockListing differentStock = StockListing.ofEmpty();
         originalStock.setSkuCount(0, 64);
         originalStock.setSkuCount(1, 564);
         C_SendSkuToMarketForSale differentCommand = new C_SendSkuToMarketForSale(differentStock, null);

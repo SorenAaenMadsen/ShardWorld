@@ -9,6 +9,7 @@ import com.saaenmadsen.shardworld.modeltypes.StockListing;
 public record C_SendUnsoldSkuBackToSeller(
         StockListing unsoldGoods,
         MoneyBox boothRevenue,
+        StockListing unfulfilledOrders,
         akka.actor.typed.ActorRef<A_CountryMarket.CountryMarketCommand> market) implements A_ShardCompany.ShardCompanyCommand{
 
     public static C_SendUnsoldSkuBackToSeller fromJson(String json){
@@ -28,6 +29,5 @@ public record C_SendUnsoldSkuBackToSeller(
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
     }
 }

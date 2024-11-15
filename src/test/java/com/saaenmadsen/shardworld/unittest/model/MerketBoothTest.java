@@ -13,10 +13,10 @@ import static org.mockito.Mockito.mock;
 public class MerketBoothTest {
     @Test
     public void StockPurchaseSaleTest() {
-        StockListing seller1 = StockListing.createEmptyStockListing();
-        StockListing seller2 = StockListing.createEmptyStockListing();
-        StockListing shoppingCart = StockListing.createEmptyStockListing();
-        StockListing wishList = StockListing.createEmptyStockListing();
+        StockListing seller1 = StockListing.ofEmpty();
+        StockListing seller2 = StockListing.ofEmpty();
+        StockListing shoppingCart = StockListing.ofEmpty();
+        StockListing wishList = StockListing.ofEmpty();
 
 
 

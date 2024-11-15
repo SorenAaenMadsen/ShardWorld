@@ -26,7 +26,7 @@ public class CompanyInformationBuilder {
     private CompanyInformationBuilder(String companyId, WorldSettings worldSettings) {
         this.companyId = companyId;
         this.culture = CompanyCultureBuilder.ofRandom().build();
-        this.warehouse = StockListing.createEmptyStockListing();
+        this.warehouse = StockListing.ofEmpty();
         this.dice = new Random();
         this.myRecipes = new ArrayList<>();
         this.priceList = new PriceList();
@@ -71,7 +71,7 @@ public class CompanyInformationBuilder {
                 companyId,
                 CompanyCultureBuilder.ofRandom().build(),
                 new CompanyFlawor(),
-                StockListing.createEmptyStockListing(),
+                StockListing.ofEmpty(),
                 new ArrayList<>(),
                 10,
                 new Random(),

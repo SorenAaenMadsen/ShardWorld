@@ -44,7 +44,7 @@ public class KnownRecipe {
     @Override
     public String toString() {
         return "KnownRecipe{" +
-                "recipe=" + recipe +
+                "recipe=" + recipe.name() +
                 ", profitability=" + profitability +
                 ", expectedDailySaleAmount_daily5percent=" + expectedDailySaleValue_daily5percentChange +
                 ", expectedDailySaleAmount_daily10percent=" + expectedDailySaleValue_daily10percentChange +

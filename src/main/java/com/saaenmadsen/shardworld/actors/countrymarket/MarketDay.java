@@ -17,9 +17,13 @@ public class MarketDay {
     public List<C_BuyOrder> buyOrderList;
     public int companiesDoneWithMarketDay;
 
-    private StockListing unfulfilledOrders= StockListing.createEmptyStockListing();
+    public StockListing getUnfulfilledOrders() {
+        return unfulfilledOrders;
+    }
+
+    private StockListing unfulfilledOrders= StockListing.ofEmpty();
     private StockListing totalUnsoldGoods;
-    private StockListing totalGoodsForSale = StockListing.createEmptyStockListing();
+    private StockListing totalGoodsForSale = StockListing.ofEmpty();
     private MarketDailyReport marketDailyReport;
 
 
@@ -44,7 +48,7 @@ public class MarketDay {
     }
 
     public StockListing doShoppingAndReturnShoppingCart(StockListing wishList, MoneyBox buyersMoney) {
-        StockListing shoppingCart = StockListing.createEmptyStockListing();
+        StockListing shoppingCart = StockListing.ofEmpty();
 
         marketBooths.forEach(booth -> booth.performTradeAccordingToShoppingList(shoppingCart, wishList, newestPriceList, buyersMoney, marketDailyReport));
 
@@ -81,7 +85,7 @@ public class MarketDay {
     }
 
     public void adjustPrices(Logger log) {
-        totalUnsoldGoods = StockListing.createEmptyStockListing();
+        totalUnsoldGoods = StockListing.ofEmpty();
         marketBooths.forEach(booth -> totalUnsoldGoods.addStockFromList(booth.boothStock));
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             int oldPrice = newestPriceList.getPrice(i);

@@ -105,6 +105,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
                         new C_SendUnsoldSkuBackToSeller(
                                 booth.closeBoothAndGetRemainingForSaleList(),
                                 booth.getBoothRevenue(),
+                                marketDay.getUnfulfilledOrders(),
                                 getContext().getSelf())
                 )
         );

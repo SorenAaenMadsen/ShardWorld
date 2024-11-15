@@ -24,7 +24,7 @@ public class StockListing {
         }
     }
 
-    public static StockListing createEmptyStockListing() {
+    public static StockListing ofEmpty() {
         return new StockListing(new StockListing(0));
     }
 
@@ -48,7 +48,7 @@ public class StockListing {
      * Substracts the amounts in the wishlist from this wishList, and returns the new wishList list.
      */
     public StockListing retrieve(StockListing wishList) {
-        StockListing retrieved = StockListing.createEmptyStockListing();
+        StockListing retrieved = StockListing.ofEmpty();
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             int actualAmount = 0;
             if (wishList.getSkuCount(i) <= stock[i]) {

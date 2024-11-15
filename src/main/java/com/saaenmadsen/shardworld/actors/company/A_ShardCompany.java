@@ -116,7 +116,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
     }
 
     public static StockListing buildBuyList(ArrayList<KnownRecipe> prepareToProduceRecipies, int workTimeAvailable) {
-        StockListing buyList = StockListing.createEmptyStockListing();
+        StockListing buyList = StockListing.ofEmpty();
 
         for (KnownRecipe knownRecipe : prepareToProduceRecipies) {
             ProductionImpactReport evaluation = knownRecipe.getRecipe().evaluateRawMaterialImpact(workTimeAvailable, StockListing.createMaxedOutStockListing());
@@ -185,7 +185,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         new DayEndEvaluationDirectionMeeting(companyInformation, companyDailyReport);
 
         if (companyInformation.timeForTacticalBoardMeeting()) {
-            new InnovateOurRecipiesBoardMeeting(companyInformation, companyDailyReport);
+            new InnovateOurRecipiesBoardMeeting(companyInformation, companyDailyReport, message.unfulfilledOrders());
         }
         message.market().tell(new C_EndMarketDay(this.companyId));
         countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(companyDailyReport, companyInformation.getKnownRecipes(), companyDailyReport.getUnsoldGoods(), companyInformation.getWarehouse().createDuplicate())));

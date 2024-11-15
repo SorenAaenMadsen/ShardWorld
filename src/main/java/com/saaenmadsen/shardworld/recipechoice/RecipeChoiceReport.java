@@ -11,7 +11,16 @@ import java.util.List;
 
 public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoices) {
 
-    public record RecipeChoiceReportElement(Recipe recipe, ProductionImpactReport productionImpactReport, int projectedProfit){}
+    public record RecipeChoiceReportElement(Recipe recipe, ProductionImpactReport productionImpactReport, int projectedProfit){
+        @Override
+        public String toString() {
+            return "RecipeChoiceReportElement{" +
+                    "recipe=" + recipe.name() +
+                    ", productionImpactReport=" + productionImpactReport +
+                    ", projectedProfit=" + projectedProfit +
+                    '}';
+        }
+    }
 
 
 

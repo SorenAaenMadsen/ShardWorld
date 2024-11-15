@@ -49,9 +49,9 @@ public class WorldStatisticsReceiver {
 
     public WorldEndStatsWorld getLatestSummary() {
         List<WorldEndStatsCountry> worldEndStatsCountries = new ArrayList<>();
-        StockListing finalTotalWorldStock = StockListing.createEmptyStockListing();
+        StockListing finalTotalWorldStock = StockListing.ofEmpty();
         for (CountryDayStats countryDayStats : dayStatistics.getLast().countryDayStats()) {
-            StockListing finalTotalCountryStock = StockListing.createEmptyStockListing();
+            StockListing finalTotalCountryStock = StockListing.ofEmpty();
             for (CompanyDayStats companyDayStats : countryDayStats.companyDayStats()) {
                 finalTotalCountryStock.addStockFromList(companyDayStats.companyWarehouse());
             }

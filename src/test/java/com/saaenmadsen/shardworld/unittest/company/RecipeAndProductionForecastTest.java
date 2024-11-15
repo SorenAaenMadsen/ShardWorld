@@ -30,7 +30,7 @@ public class RecipeAndProductionForecastTest {
     @Test
     public void ProductionImpactReportTest() {
         Recipe recipe = Recipe.PRIMITIVE_WOODEN_SHUE;
-        StockListing stockListing = StockListing.createEmptyStockListing();
+        StockListing stockListing = StockListing.ofEmpty();
         stockListing.setSkuCount(StockKeepUnit.WOOD_KG.getArrayId(), 100);
         ProductionImpactReport report = recipe.evaluateRawMaterialImpact(200, stockListing);
         assertEquals(8, report.maxProductionBeforeRunningOutOfTimeOrMaterials());
@@ -55,11 +55,11 @@ public class RecipeAndProductionForecastTest {
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.PRIMITIVE_WOODEN_SHUE, 0));
         CompanyDailyReport companyDailyReport = new CompanyDailyReport("testcompany", 1);
 
-        StockListing forSaleList = StockListing.createEmptyStockListing();
+        StockListing forSaleList = StockListing.ofEmpty();
         forSaleList.addStockAmount(StockKeepUnit.PAIR_OF_SHUES_WOODEN.getArrayId(), 10);
         companyDailyReport.setForSaleList(forSaleList);
 
-        StockListing unsoldList = StockListing.createEmptyStockListing();
+        StockListing unsoldList = StockListing.ofEmpty();
         unsoldList.addStockAmount(StockKeepUnit.PAIR_OF_SHUES_WOODEN.getArrayId(), 0);
         companyDailyReport.setUnsoldGoods(unsoldList);
 
