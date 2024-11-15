@@ -1,4 +1,4 @@
-package com.saaenmadsen.shardworld.unittest.jav21cert;
+package com.saaenmadsen.shardworld.jav21cert;
 
 import org.junit.jupiter.api.Test;
 
