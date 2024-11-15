@@ -88,6 +88,7 @@ public class InnovateOurRecipiesBoardMeeting {
 
         RecipeChoiceReport report = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(newIdeas, StockListing.createMaxedOutStockListing(), companyInformation.getPriceList(), 1000);
 
+        // TODO: Tools requirements should be respected. We need a demand for tools :)
         for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : report.productionChoices()) {
             companyInformation.getKnownRecipes().add(new KnownRecipe(productionChoice.recipe(), 0));
             String ideas = newIdeas.stream().map(i -> i.toString()).collect(Collectors.joining(", "));

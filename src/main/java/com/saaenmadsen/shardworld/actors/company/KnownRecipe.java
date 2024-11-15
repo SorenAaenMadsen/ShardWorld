@@ -10,6 +10,7 @@ public class KnownRecipe {
     private int expectedDailySaleValue_daily5percentChange = 10;
     private int expectedDailySaleValue_daily10percentChange = 10;
     private int expectedDailySaleValue_daily20percentChange = 10;
+    private boolean haveToolsSetup = false;
 
     public Recipe getRecipe() {
         return recipe;
@@ -59,7 +60,6 @@ public class KnownRecipe {
     public void setProfitability(int profitability) {
         this.profitability = profitability;
     }
-
 
     public int getExpectedDailySaleValue_daily5percentChange() {
         return expectedDailySaleValue_daily5percentChange;

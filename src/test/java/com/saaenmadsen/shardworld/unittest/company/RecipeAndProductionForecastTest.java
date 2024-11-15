@@ -2,6 +2,7 @@ package com.saaenmadsen.shardworld.unittest.company;
 
 import com.saaenmadsen.shardworld.actors.company.*;
 import com.saaenmadsen.shardworld.actors.company.direction.DayEndEvaluationDirectionMeeting;
+import com.saaenmadsen.shardworld.actors.company.direction.DesiceWhatToBuyAtMarket;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.constants.Recipe;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RecipeAndProductionForecastTest {
 
@@ -44,7 +47,14 @@ public class RecipeAndProductionForecastTest {
     public void PrepareBuyListForCompanyTest(){
         ArrayList<KnownRecipe> knownRecipes = new ArrayList<>();
         knownRecipes.add(new KnownRecipe(Recipe.PRIMITIVE_WOODEN_SHUE, 0));
-        StockListing buylist = A_ShardCompany.buildBuyList(knownRecipes, 100);
+        CompanyInformation companyInformation = mock(CompanyInformation.class);
+        when(companyInformation.calculateWorkTimeAvailable()).thenReturn(100);
+        when(companyInformation.getKnownRecipes()).thenReturn(knownRecipes);
+        when(companyInformation.getPriceList()).thenReturn(new PriceList());
+
+        DesiceWhatToBuyAtMarket buyDecision = new DesiceWhatToBuyAtMarket(companyInformation, mock(CompanyDailyReport.class));
+
+        StockListing buylist = buyDecision.decide();
         assertEquals(8, buylist.getSkuCount(StockKeepUnit.WOOD_KG.getArrayId()));
 
     }

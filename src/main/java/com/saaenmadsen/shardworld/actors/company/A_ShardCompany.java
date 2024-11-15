@@ -10,6 +10,7 @@ import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
+import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
@@ -101,12 +102,12 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         }
         getContext().getLog().debug("onReceiveMarketOpenForBuyers: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
         companyInformation.setPriceList(message.priceList());
-        ArrayList<KnownRecipe> prepareToProduceRecipies = getListOfTwoMostProfitableRecipes(message);
-        StockListing buyList = buildBuyList(prepareToProduceRecipies, companyInformation.calculateWorkTimeAvailable());
+
+        StockListing shoppingList = new DesiceWhatToBuyAtMarket(companyInformation, companyDailyReport).decide();
 
         message.countryMarket().tell(
                 new C_BuyOrder(
-                        buyList,
+                        shoppingList,
                         companyInformation.getMoneyBox().newBoxWithAllTheMoeny(),
                         getContext().getSelf(),
                         this.companyId
@@ -115,47 +116,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         return Behaviors.same();
     }
 
-    public static StockListing buildBuyList(ArrayList<KnownRecipe> prepareToProduceRecipies, int workTimeAvailable) {
-        StockListing buyList = StockListing.ofEmpty();
 
-        for (KnownRecipe knownRecipe : prepareToProduceRecipies) {
-            ProductionImpactReport evaluation = knownRecipe.getRecipe().evaluateRawMaterialImpact(workTimeAvailable, StockListing.createMaxedOutStockListing());
-            buyList.addStockFromList(evaluation.usedRawMaterial());
-        }
-        return buyList;
-    }
-
-    private ArrayList<KnownRecipe> getListOfTwoMostProfitableRecipes(C_MarketOpenForBuyers message) {
-        Optional<KnownRecipe> prepare1 = Optional.empty();
-        Optional<KnownRecipe> prepare2 = Optional.empty();
-
-        for (KnownRecipe myRecipe : companyInformation.getKnownRecipes()) {
-            myRecipe.setProfitability(myRecipe.recipe().calculateProfitPrWorkTenMin(message.priceList()));
-            if (prepare1.isEmpty()) {
-                prepare1 = Optional.of(myRecipe);
-            } else {
-                if (prepare2.isEmpty()) {
-                    prepare2 = Optional.of(myRecipe);
-                } else {
-                    if (prepare1.get().getProfitability() < myRecipe.getProfitability()) {
-                        prepare1 = Optional.of(myRecipe);
-                    } else {
-                        if (prepare2.get().getProfitability() < myRecipe.getProfitability()) {
-                            prepare2 = Optional.of(myRecipe);
-                        }
-                    }
-                }
-            }
-        }
-        ArrayList<KnownRecipe> result = new ArrayList<>();
-        if (prepare1.isPresent()) {
-            result.add(prepare1.get());
-        }
-        if (prepare2.isPresent()) {
-            result.add(prepare2.get());
-        }
-        return result;
-    }
 
 
     private Behavior<ShardCompanyCommand> onReceiveCompletedBuyOrder(C_CompletedBuyOrder message) {
