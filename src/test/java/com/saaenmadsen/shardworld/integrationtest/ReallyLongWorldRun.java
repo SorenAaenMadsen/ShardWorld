@@ -24,15 +24,15 @@ public class ReallyLongWorldRun {
                 .ofDefault()
                 .withMaxDaysToRun(500)
                 .withNumberOfCompaniesPrCountry(100)
+                .withCompanyInitialMoney(1000000)
                 .build();
 
         IntegrationTestUtil countryLevelIntegrationTestUtil = new IntegrationTestUtil(worldSettings);
 
         WorldEndStatsWorld report = countryLevelIntegrationTestUtil.runWorld(60000);
 
-        assertThat( report.finalWorldTotalStock().getStockAmount(StockKeepUnit.FIREWOOD_KG), greaterThan(0));
-        assertThat( report.finalWorldTotalStock().getStockAmount(StockKeepUnit.WOOD_KG), greaterThan(0));
+        assertThat(report.finalWorldTotalStock().getStockAmount(StockKeepUnit.FIREWOOD_KG), greaterThan(0));
+        assertThat(report.finalWorldTotalStock().getStockAmount(StockKeepUnit.WOOD_KG), greaterThan(0));
     }
-
 
 }

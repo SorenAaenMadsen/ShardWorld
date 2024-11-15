@@ -1,4 +1,4 @@
-package com.saaenmadsen.shardworld.integrationtest;
+package com.saaenmadsen.shardworld.integrationtest.util;
 
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;

@@ -1,6 +1,7 @@
 package com.saaenmadsen.shardworld.constants.worldsettings;
 
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
+import com.saaenmadsen.shardworld.actors.company.CompanyInformationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +83,11 @@ public class WorldSettingsBuilder {
 
     public WorldSettingsBuilder withWorldRunMode(WorldRunMode worldRunMode) {
         this.worldRunMode = worldRunMode;
+        return this;
+    }
+
+    public WorldSettingsBuilder withCompanyInitialMoney(int amount) {
+        this.companyInitialMoney = amount;
         return this;
     }
 }

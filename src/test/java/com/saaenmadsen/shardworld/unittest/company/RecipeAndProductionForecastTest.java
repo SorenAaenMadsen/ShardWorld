@@ -14,9 +14,9 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import java.util.ArrayList;
+import java.util.OptionalInt;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -86,5 +86,23 @@ public class RecipeAndProductionForecastTest {
                 updatedKnownRecipe.getExpectedDailySaleValue_daily20percentChange(),
                 equalTo(624));
 
+    }
+
+    @Test
+    public void testMaxProductionRunsWithRawMaterials_noInputs(){
+        Recipe recipe = Recipe.GATHER_FIREWOOD;
+        StockListing stockListing = StockListing.ofEmpty();
+        stockListing.setSkuCount(StockKeepUnit.WOOD_KG.getArrayId(), 100);
+        OptionalInt limit = recipe.findProductionLimitAccordingToRawMaterials(stockListing);
+        assertFalse(limit.isPresent());
+    }
+
+    @Test
+    public void testMaxProductionRunsWithRawMaterials(){
+        Recipe recipe = Recipe.PRIMITIVE_WOODEN_SHUE;
+        StockListing stockListing = StockListing.ofEmpty();
+        stockListing.setSkuCount(StockKeepUnit.WOOD_KG.getArrayId(), 100);
+        OptionalInt limit = recipe.findProductionLimitAccordingToRawMaterials(stockListing);
+        assertEquals(50, limit.getAsInt());
     }
 }

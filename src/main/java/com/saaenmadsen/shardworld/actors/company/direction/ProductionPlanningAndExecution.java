@@ -24,19 +24,24 @@ public class ProductionPlanningAndExecution {
         );
 
         if (productionLineSelectionReport.productionChoices().isEmpty()) {
-            String reasoning = productionLineSelectionReport.nonSelectedChoices().stream().map(nonSelected -> nonSelected.recipe().name() + ":" +nonSelected.selectionReport()).collect(Collectors.joining(","));
+            String reasoning = productionLineSelectionReport.nonSelectedChoices().stream().map(nonSelected -> nonSelected.recipe().name() + ":" + nonSelected.selectionReport()).collect(Collectors.joining(","));
             companyDailyReport.appendToDailyReport("No production. " + reasoning);
         }
+        doProduction(companyInformation, companyDailyReport, productionLineSelectionReport);
+    }
+
+    private static void doProduction(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport, RecipeChoiceReport productionLineSelectionReport) {
+        int workTimeAvailable = companyInformation.calculateWorkTimeAvailable();
+
         for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : productionLineSelectionReport.productionChoices()) {
+            OptionalInt rawMaterialsLimit = productionChoice.recipe().findProductionLimitAccordingToRawMaterials(companyInformation.getWarehouse());
+            int productionTimeLimit = workTimeAvailable / productionChoice.recipe().getWorkTimeTimes10Minutes();
+            int maxRuns = rawMaterialsLimit.isPresent() ? Math.min(rawMaterialsLimit.getAsInt(), productionTimeLimit) : productionTimeLimit;
+            workTimeAvailable = workTimeAvailable - (maxRuns * productionChoice.recipe().getWorkTimeTimes10Minutes());
 
-            OptionalInt runs = productionChoice.recipe().maxProductionRunsWithRawMaterials(companyInformation.getWarehouse());
+            productionChoice.recipe().runProduction(maxRuns, companyInformation.getWarehouse());
+            companyDailyReport.appendToDailyReport("Executed " + productionChoice.recipe().name() + " a total of " + maxRuns + " times.");
 
-            if(runs.isPresent()) {
-                productionChoice.recipe().runProduction(runs.getAsInt(), companyInformation.getWarehouse());
-                companyDailyReport.appendToDailyReport("Executed " + productionChoice.recipe().name() + " a total of " + runs.getAsInt() + " times.");
-            } else {
-                companyDailyReport.appendToDailyReport("Executed " + productionChoice.recipe().name() + " a total of 0 times due to raw materials.");
-            }
         }
     }
 
