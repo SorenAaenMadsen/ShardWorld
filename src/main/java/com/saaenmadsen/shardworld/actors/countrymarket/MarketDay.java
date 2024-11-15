@@ -36,8 +36,8 @@ public class MarketDay {
             this.priceListDayStart = marketDay.newestPriceList;
             this.newestPriceList = marketDay.newestPriceList;
         } else {
-            this.priceListDayStart = new PriceList();
-            this.newestPriceList = new PriceList();
+            this.priceListDayStart = PriceList.ofDefault();
+            this.newestPriceList = PriceList.ofDefault();
         }
         marketBooths = new ArrayList<>();
         buyOrderList = new ArrayList<>();

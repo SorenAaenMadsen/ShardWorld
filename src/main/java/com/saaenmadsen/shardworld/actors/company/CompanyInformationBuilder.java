@@ -29,7 +29,7 @@ public class CompanyInformationBuilder {
         this.warehouse = StockListing.ofEmpty();
         this.dice = new Random();
         this.myRecipes = new ArrayList<>();
-        this.priceList = new PriceList();
+        this.priceList = PriceList.ofDefault();
         this.companyFlawor = new CompanyFlawor();
         this.moneyBox = new MoneyBox();
         moneyBox.addMoney(worldSettings.companyInitialMoney());
@@ -75,7 +75,7 @@ public class CompanyInformationBuilder {
                 new ArrayList<>(),
                 10,
                 new Random(),
-                new PriceList(),
+                PriceList.ofDefault(),
                 moneyBox
         );
     }

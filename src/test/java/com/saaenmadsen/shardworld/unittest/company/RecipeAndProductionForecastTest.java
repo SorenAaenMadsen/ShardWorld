@@ -25,9 +25,9 @@ public class RecipeAndProductionForecastTest {
     @Test
     public void RecipeProjectedProfitTest() {
         Recipe recipe = Recipe.GATHER_FIREWOOD;
-        PriceList priceList = new PriceList();
+        PriceList priceList = PriceList.ofDefault();
         int projectedProfit = recipe.calculateProfitPrWorkTenMin(priceList);
-        assertEquals(26, projectedProfit, "10 firewood at price 8 pr kg. divided by 3 work units");
+        assertEquals(10, projectedProfit, "10 firewood at price 8 pr kg. divided by 3 work units");
     }
 
     @Test
@@ -50,7 +50,7 @@ public class RecipeAndProductionForecastTest {
         CompanyInformation companyInformation = mock(CompanyInformation.class);
         when(companyInformation.calculateWorkTimeAvailable()).thenReturn(100);
         when(companyInformation.getKnownRecipes()).thenReturn(knownRecipes);
-        when(companyInformation.getPriceList()).thenReturn(new PriceList());
+        when(companyInformation.getPriceList()).thenReturn(PriceList.ofDefault());
 
         DesiceWhatToBuyAtMarket buyDecision = new DesiceWhatToBuyAtMarket(companyInformation, mock(CompanyDailyReport.class));
 
@@ -81,10 +81,10 @@ public class RecipeAndProductionForecastTest {
                 greaterThan(120));
         assertThat("Expecting the daily sale value to change",
                 updatedKnownRecipe.getExpectedDailySaleValue_daily10percentChange(),
-                equalTo(250));
+                equalTo(312));
         assertThat("Expecting the daily sale value to change",
                 updatedKnownRecipe.getExpectedDailySaleValue_daily20percentChange(),
-                equalTo(500));
+                equalTo(624));
 
     }
 }

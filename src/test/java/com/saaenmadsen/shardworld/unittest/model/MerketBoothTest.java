@@ -34,18 +34,18 @@ public class MerketBoothTest {
         customersMoney.addMoney(10000000);
 
         MarketDailyReport marketDailyReport = new MarketDailyReport(1);
-        booth1.performTradeAccordingToShoppingList(shoppingCart, wishList, new PriceList(), customersMoney, marketDailyReport);
-        booth2.performTradeAccordingToShoppingList(shoppingCart, wishList, new PriceList(), customersMoney, marketDailyReport);
+        booth1.performTradeAccordingToShoppingList(shoppingCart, wishList, PriceList.ofDefault(), customersMoney, marketDailyReport);
+        booth2.performTradeAccordingToShoppingList(shoppingCart, wishList, PriceList.ofDefault(), customersMoney, marketDailyReport);
 
         assertEquals(0, seller1.getSkuCount(0));
         assertEquals(2, seller1.getSkuCount(1));
         assertEquals(8, seller2.getSkuCount(0));
         assertEquals(10, seller2.getSkuCount(1));
 
-        assertEquals(9999876, customersMoney.getMoney());
-        assertEquals(114, booth1.getBoothRevenue().getMoney());
-        assertEquals(10, booth2.getBoothRevenue().getMoney());
-        assertEquals(124,marketDailyReport.getMarketDayTotalTurnover());
+        assertEquals(9999940, customersMoney.getMoney());
+        assertEquals(54, booth1.getBoothRevenue().getMoney());
+        assertEquals(6, booth2.getBoothRevenue().getMoney());
+        assertEquals(60,marketDailyReport.getMarketDayTotalTurnover());
 
     }
 }

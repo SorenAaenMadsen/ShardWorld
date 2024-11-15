@@ -21,7 +21,7 @@ public class PriceListTest {
 
     @Test
     public void testPriceListSimple() {
-        PriceList priceList = new PriceList();
+        PriceList priceList = PriceList.ofDefault();
 
 
 //        for(int i=0;i<StockKeepUnit.values().length;++i){

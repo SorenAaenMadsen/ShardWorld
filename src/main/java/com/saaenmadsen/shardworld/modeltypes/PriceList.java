@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public class PriceList implements Cloneable {
     private int[] prices;
 
-    public PriceList() {
+    private PriceList() {
         this.prices = new int[StockKeepUnit.values().length];
     }
 
