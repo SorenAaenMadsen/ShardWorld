@@ -4,6 +4,7 @@ import com.saaenmadsen.shardworld.actors.company.CompanyDailyReport;
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.constants.Recipe;
+import com.saaenmadsen.shardworld.modeltypes.SkuAndCount;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.RecipeChoiceReport;
 
@@ -14,7 +15,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class InnovateOurRecipiesBoardMeeting {
-
 
 
     public InnovateOurRecipiesBoardMeeting(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport, StockListing unfulfilledOrdersAtMarket) {
@@ -60,17 +60,17 @@ public class InnovateOurRecipiesBoardMeeting {
     }
 
     private static void fillNewIdeasUpWithCompletelyRandomIdeas(int numberOfIdeasToGenerate, Random dice, List<KnownRecipe> newIdeas) {
-        if(newIdeas.size()<numberOfIdeasToGenerate) {
-            for (int i = 0; i < (numberOfIdeasToGenerate- newIdeas.size()); ++i) {
+        if (newIdeas.size() < numberOfIdeasToGenerate) {
+            for (int i = 0; i < (numberOfIdeasToGenerate - newIdeas.size()); ++i) {
                 int newRecipeIndex = dice.nextInt(Recipe.values().length);
                 newIdeas.add(new KnownRecipe(Recipe.values()[newRecipeIndex], 100));
             }
         }
     }
 
-    private static boolean recipeOutputIsDesired(List<Recipe.SkuAndCount> recipeOutputs, StockListing unfulfilledOrdersAtMarket) {
-        for (Recipe.SkuAndCount recipeOutput : recipeOutputs) {
-            if(unfulfilledOrdersAtMarket.getSkuCount(recipeOutput.sku().getArrayId())>0){
+    private static boolean recipeOutputIsDesired(List<SkuAndCount> recipeOutputs, StockListing unfulfilledOrdersAtMarket) {
+        for (SkuAndCount recipeOutput : recipeOutputs) {
+            if (unfulfilledOrdersAtMarket.getSkuCount(recipeOutput.sku().getArrayId()) > 0) {
                 return true;
             }
         }
@@ -80,20 +80,37 @@ public class InnovateOurRecipiesBoardMeeting {
     public static void investInDesiredProductionRecipe(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport, StockListing unfulfilledOrdersAtMarket, int numberOfIdeasToGenerate) {
         List<KnownRecipe> newIdeas = new ArrayList<>(companyInformation.getKnownRecipes());
 
-        List<Recipe> recipiesWithDesiredOutput = Arrays.stream(Recipe.values()).filter(recipe -> recipeOutputIsDesired(recipe.getOutputs(), unfulfilledOrdersAtMarket)).collect(Collectors.toUnmodifiableList());
+        List<Recipe> recipiesWithDesiredOutput =
+                Arrays.stream(Recipe.values())
+                        .filter(recipe -> recipeOutputIsDesired(recipe.getOutputs().skuAndCounts, unfulfilledOrdersAtMarket))
+                        .filter(recipe -> !recipeIsInList(recipe, companyInformation.getKnownRecipes()))
+                        .collect(Collectors.toUnmodifiableList());
 
         Random dice = new Random();
         addIdeasProducingDesiredOutput(Math.min(recipiesWithDesiredOutput.size(), numberOfIdeasToGenerate), dice, recipiesWithDesiredOutput, newIdeas);
-        fillNewIdeasUpWithCompletelyRandomIdeas(numberOfIdeasToGenerate-newIdeas.size(), dice, newIdeas);
+        fillNewIdeasUpWithCompletelyRandomIdeas(numberOfIdeasToGenerate - newIdeas.size(), dice, newIdeas);
+
 
         RecipeChoiceReport report = RecipeChoiceReport.findRecipeWithHighestProjectedProfit(newIdeas, StockListing.createMaxedOutStockListing(), companyInformation.getPriceList(), 1000);
 
-        // TODO: Tools requirements should be respected. We need a demand for tools :)
         for (RecipeChoiceReport.RecipeChoiceReportElement productionChoice : report.productionChoices()) {
-            companyInformation.getKnownRecipes().add(new KnownRecipe(productionChoice.recipe(), 0));
-            String ideas = newIdeas.stream().map(i -> i.toString()).collect(Collectors.joining(", "));
-            companyDailyReport.appendToDailyReport("We have invested in " + productionChoice.recipe().name() + ". Our ideas were: " + ideas);
+            if (recipeIsInList(productionChoice.recipe(), companyInformation.getKnownRecipes())) {
+                companyDailyReport.appendToDailyReport("Not investing in " + productionChoice.recipe().name() + ". We already have that productionline.");
+            } else {
+                companyInformation.getKnownRecipes().add(new KnownRecipe(productionChoice.recipe(), 0));
+                String ideas = newIdeas.stream().map(i -> i.toString()).collect(Collectors.joining(", "));
+                companyDailyReport.appendToDailyReport("We have invested in " + productionChoice.recipe().name() + ". Our ideas were: " + ideas);
+            }
         }
+    }
+
+    private static boolean recipeIsInList(Recipe recipe, List<KnownRecipe> knownRecipes) {
+        for (KnownRecipe knownRecipe : knownRecipes) {
+            if (knownRecipe.getRecipe().name().equals(recipe.name())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void addIdeasProducingDesiredOutput(int numberOfIdeasToGenerate, Random dice, List<Recipe> recipiesWithDesiredOutput, List<KnownRecipe> newIdeas) {

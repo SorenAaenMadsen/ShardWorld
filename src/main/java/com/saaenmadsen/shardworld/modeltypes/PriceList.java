@@ -11,7 +11,17 @@ public class PriceList implements Cloneable {
 
     public PriceList() {
         this.prices = new int[StockKeepUnit.values().length];
-        Arrays.stream(StockKeepUnit.values()).forEach(sku->this.prices[sku.getArrayId()] = sku.getInitialPrice());
+    }
+
+    public static PriceList ofDefault() {
+        PriceList list = new PriceList();
+        Arrays.stream(StockKeepUnit.values()).forEach(sku->list.prices[sku.getArrayId()] = sku.getInitialPrice());
+        return list;
+    }
+    public static PriceList ofMinusOnePrices() {
+        PriceList list = new PriceList();
+        Arrays.stream(StockKeepUnit.values()).forEach(sku->list.prices[sku.getArrayId()] = -1);
+        return list;
     }
 
     public int getPrice(StockKeepUnit sku){

@@ -1,12 +1,11 @@
 package com.saaenmadsen.shardworld.constants;
 
+import com.saaenmadsen.shardworld.modeltypes.ListSkuAndCount;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
+import com.saaenmadsen.shardworld.modeltypes.SkuAndCount;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
@@ -37,56 +36,17 @@ public enum Recipe {
     SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING(22, "Shaft Furnace Crucible Hard Steel Smelting", "Hard Steel", "150", "Using a Shaft Furnace, the temperature of the iron can be brought to 1,300–1,500°C, high enough to produce molten iron, especially with effective bellows. TODO: More description here", "Wrought Iron", "160", "Charcoal", "240", "Null", "0", "", "3200", "", "", "", "Iron tools", "30", "Stone tools", "70", "Null", "0"),
     PRIMITIVE_CHARCOAL_BURNING(23, "Primitive Charcoal burning", StockKeepUnit.CHARCOAL, 50, "Description", StockKeepUnit.FIREWOOD_KG, 180, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0, 48, new SkillLevel(Skill.WOODWORKER, 3), null, null, null, 0, null, 0, null, 0),
     PRIMITIVE_STONE_TOOLS(24, "Primitive Stone Tools", StockKeepUnit.STONE_TOOLS, 1, "Making stone tools with only the tools and ingredients which can be found in nature.", StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0, 80, new SkillLevel(Skill.STONEWORKER, 1), null, null, null, 0, null, 0, null, 0),
-    PRIMITIVE_WOOD_TOOLS(25, "Primitive Wood Tools", StockKeepUnit.WOOD_TOOLS, 1, "Making wooden tools with only the tools which can be found in nature.", StockKeepUnit.WOOD_KG, 2, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0, 30, new SkillLevel(Skill.WOODWORKER, 1), null, null, null, 0, null, 0, null, 0);
-
-
-    /**
-
-     Furnace Type	Period	Temperature Range	Output Type
-     Bloomery Furnace	c. 1200 BCE onward	1,200–1,300°C	Wrought Iron
-     Early Shaft Furnace	Iron Age (c. 5th century BCE)	1,300–1,500°C	Wrought and Cast Iron
-     Chinese Blast Furnace	Han Dynasty (c. 200 BCE)	1,500–1,600°C	Cast Iron
-     Medieval European Blast Furnace	12th–15th Century CE	1,600°C	Cast Iron
-     Puddling Furnace	18th Century	1,350–1,450°C	Wrought Iron
-     Bessemer Converter	1856	1,600–1,700°C	Low-Carbon Steel
-     Electric Arc Furnace	20th Century	1,800°C+	Steel and Alloys
-
-     */
-
-    public record SkuAndCount(StockKeepUnit sku, int amount) {
-        public static Optional<SkuAndCount> fromStrings(String productName, String amount) {
-            if (productName.isEmpty()) return Optional.empty();
-            if (productName.equals("Null")) return Optional.empty();
-            return Optional.of(new SkuAndCount(StockKeepUnit.getByProductName(productName), Integer.parseInt(amount)));
-        }
-
-        public static Optional<SkuAndCount> from(StockKeepUnit sku, int amount) {
-            if (null == sku) return Optional.empty();
-            if (sku.equals(StockKeepUnit.NULL)) return Optional.empty();
-            return Optional.of(new SkuAndCount(sku, amount));
-        }
-
-        @Override
-        public String toString() {
-            return "SkuAndCount{" +
-                    "skuId=" + sku.getArrayId() +
-                    "productName=" + sku.getProductName() +
-                    ", amount=" + amount +
-                    '}';
-        }
-    }
-
-    ;
-    private final List<SkuAndCount> inputs = new ArrayList<>();
-    private final List<SkuAndCount> toolRequirements = new ArrayList<>();
-    private final List<SkuAndCount> outputs = new ArrayList<>();
+    PRIMITIVE_WOOD_TOOLS(25, "Primitive Wood Tools", StockKeepUnit.WOOD_TOOLS, 1, "Making wooden tools with only the tools which can be found in nature.", StockKeepUnit.WOOD_KG, 2, StockKeepUnit.NULL, 0, StockKeepUnit.NULL, 0, 0, 30, new SkillLevel(Skill.WOODWORKER, 1), null, null, null, 0, null, 0, null, 0);;
+    private final ListSkuAndCount inputs = new ListSkuAndCount();
+    private final ListSkuAndCount toolRequirements = new ListSkuAndCount();
+    private final ListSkuAndCount outputs = new ListSkuAndCount();
 
     private final int recipeId;
     private final String recipeName;
 
     private final String processDescription;
 
-    private final int calenderWaitTimeFromProductionToAvailable;
+    private final int calenderWaitDaysFromProductionToAvailable;
     private final int workTimeTimes10Minutes;
 //    private final int skillLevel1;
 //    private final int skillLevel2;
@@ -108,7 +68,7 @@ public enum Recipe {
                 ", recipeId=" + recipeId +
                 ", recipeName='" + recipeName + '\'' +
                 ", processDescription='" + processDescription + '\'' +
-                ", calenderWaitTimeFromProductionToAvailable=" + calenderWaitTimeFromProductionToAvailable +
+                ", calenderWaitTimeFromProductionToAvailable=" + calenderWaitDaysFromProductionToAvailable +
                 ", workTimeTimes10Minutes=" + workTimeTimes10Minutes +
                 '}';
     }
@@ -154,7 +114,7 @@ public enum Recipe {
         if (calenderWaitTimeFromProductionToAvailable.isEmpty()) {
             calenderWaitTimeFromProductionToAvailable = "0";
         }
-        this.calenderWaitTimeFromProductionToAvailable = Integer.parseInt(calenderWaitTimeFromProductionToAvailable);
+        this.calenderWaitDaysFromProductionToAvailable = Integer.parseInt(calenderWaitTimeFromProductionToAvailable);
         workTimeTimes10Minutes = Integer.parseInt(workTime_times10Minutes);
 
 //        skillLevel1 = Integer.parseInt(skillLevel_1);
@@ -208,7 +168,7 @@ public enum Recipe {
         Optional<SkuAndCount> input3 = SkuAndCount.from(input_3, input_3_amount);
         input3.ifPresent(inputs::add);
 
-        this.calenderWaitTimeFromProductionToAvailable = calenderWaitTimeFromProductionToAvailable;
+        this.calenderWaitDaysFromProductionToAvailable = calenderWaitTimeFromProductionToAvailable;
         workTimeTimes10Minutes = workTime_times10Minutes;
 
 //        skillLevel1 = Integer.parseInt(skillLevel_1);
@@ -223,9 +183,17 @@ public enum Recipe {
     }
 
     public int calculateProfitPrWorkTenMin(PriceList priceList) {
-        Integer expenses = inputs.stream().map(skuAndCount -> priceList.getPrice(skuAndCount.sku.getArrayId()) * skuAndCount.amount).mapToInt(Integer::intValue).sum();
-        Integer valueCreated = outputs.stream().map(skuAndCount -> priceList.getPrice(skuAndCount.sku.getArrayId()) * skuAndCount.amount).mapToInt(Integer::intValue).sum();
+        Integer expenses = calculateRawProductPriceForProductionRun(priceList);
+        Integer valueCreated = calculateValueOfFinishedProductForProductionRun(priceList);
         return (valueCreated - expenses) / workTimeTimes10Minutes;
+    }
+
+    public int calculateValueOfFinishedProductForProductionRun(PriceList priceList) {
+        return outputs.stream().map(skuAndCount -> priceList.getPrice(skuAndCount.sku().getArrayId()) * skuAndCount.amount()).mapToInt(Integer::intValue).sum();
+    }
+
+    public int calculateRawProductPriceForProductionRun(PriceList priceList) {
+        return inputs.stream().map(skuAndCount -> priceList.getPrice(skuAndCount.sku().getArrayId()) * skuAndCount.amount()).mapToInt(Integer::intValue).sum();
     }
 
     public ProductionImpactReport evaluateRawMaterialImpact(int workTimeAvailable, StockListing myRawMaterials) {
@@ -237,8 +205,8 @@ public enum Recipe {
 
         StockListing copyOfStock = myRawMaterials.createDuplicate();
         StockListing consumptionStock = StockListing.ofEmpty();
-        for (SkuAndCount input : inputs) {
-            consumptionStock.setSkuCount(input.sku().getArrayId(), input.amount * maxRuns);
+        for (SkuAndCount input : inputs.skuAndCounts) {
+            consumptionStock.setSkuCount(input.sku().getArrayId(), input.amount() * maxRuns);
         }
         copyOfStock.retrieve(consumptionStock);
 
@@ -252,21 +220,29 @@ public enum Recipe {
     }
 
     private static int howManyProductionRunsWillThisRawMaterialSupport(StockListing myRawMaterials, SkuAndCount inputProduct) {
-        return myRawMaterials.getSkuCount(inputProduct.sku.getArrayId()) / inputProduct.amount;
+        return myRawMaterials.getSkuCount(inputProduct.sku().getArrayId()) / inputProduct.amount();
     }
 
     public void runProduction(int numberOfRuns, StockListing stock) {
-        for (SkuAndCount input : inputs) {
-            stock.addStockAmount(input.sku().getArrayId(), -input.amount * numberOfRuns);
+        for (SkuAndCount input : inputs.skuAndCounts) {
+            stock.addStockAmount(input.sku().getArrayId(), -input.amount() * numberOfRuns);
         }
-        for (SkuAndCount output : outputs) {
-            stock.addStockAmount(output.sku().getArrayId(), output.amount * numberOfRuns);
+        for (SkuAndCount output : outputs.skuAndCounts) {
+            stock.addStockAmount(output.sku().getArrayId(), output.amount() * numberOfRuns);
         }
     }
 
-    public List<SkuAndCount> getInputs() {return inputs; }
-    public List<SkuAndCount> getOutputs() {
+    public int getWorkTimeTimes10Minutes() {
+        return workTimeTimes10Minutes;
+    }
+
+    public int getCalenderWaitDaysFromProductionToAvailable() {
+        return calenderWaitDaysFromProductionToAvailable;
+    }
+
+    public ListSkuAndCount getInputs() {return inputs; }
+    public ListSkuAndCount getOutputs() {
         return outputs;
     }
-    public List<SkuAndCount> getToolRequirements() { return toolRequirements; }
+    public ListSkuAndCount getToolRequirements() { return toolRequirements; }
 }

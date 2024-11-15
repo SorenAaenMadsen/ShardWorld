@@ -1,7 +1,6 @@
 package com.saaenmadsen.shardworld.modeltypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 
 import java.util.Arrays;
@@ -124,20 +123,20 @@ public class StockListing {
         return this.stock[stockKeepUnit.getArrayId()];
     }
 
-    public boolean hasStock(Recipe.SkuAndCount toolRequirement) {
+    public boolean hasStock(SkuAndCount toolRequirement) {
         int myStock = this.getSkuCount(toolRequirement.sku().getArrayId());
         return myStock>=toolRequirement.amount();
     }
 
-    public boolean hasStock(List<Recipe.SkuAndCount> listOfRequirements) {
+    public boolean hasStock(ListSkuAndCount listOfRequirements) {
         return listOfRequirements.stream().allMatch(req->this.hasStock(req));
     }
 
-    public void removeStockFromList(List<Recipe.SkuAndCount> toRemoveList) {
+    public void removeStockFromList(ListSkuAndCount toRemoveList) {
         if(!hasStock(toRemoveList)) {
             throw new IllegalArgumentException("Cannot remove stock as it would be negative");
         }
-        for (Recipe.SkuAndCount skuAndCounToRemove : toRemoveList) {
+        for (SkuAndCount skuAndCounToRemove : toRemoveList.skuAndCounts) {
             int skuId = skuAndCounToRemove.sku().getArrayId();
             this.stock[skuId]-=skuAndCounToRemove.amount();
         }
