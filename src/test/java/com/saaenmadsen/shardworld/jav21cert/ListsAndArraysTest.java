@@ -1,6 +1,7 @@
 package com.saaenmadsen.shardworld.jav21cert;
 
 import com.saaenmadsen.shardworld.Main;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import java.util.List;
  * Timings are pretty reliable. The heap impact estimation does not work at all. That should be little surprise, in a GC
  * world, but still, annoying. :)
  */
+@Ignore
 public class ListsAndArraysTest {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 

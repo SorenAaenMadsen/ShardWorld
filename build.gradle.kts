@@ -2,7 +2,7 @@ plugins {
     id("java")
     id("org.springframework.boot") version "3.3.3"
     id("io.spring.dependency-management") version "1.1.6"
-//    kotlin("jvm") version "1.9.10"
+    id("org.liquibase.gradle") version "2.1.1"
 }
 
 group = "com.saaenmadsen.shardworld"
@@ -75,23 +75,10 @@ dependencies {
     // H2 Database
     testImplementation("com.h2database:h2:2.2.224")
     // JUnit for testing
+
+    implementation("org.liquibase:liquibase-core:4.23.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    // Additional utilities for database testing (optional)
-    testImplementation("org.testcontainers:junit-jupiter:1.19.0") // For containerized MariaDB testing
-
-
-}
-
-configurations.all {
-    resolutionStrategy {
-        // Force the specific version of Netty across all dependencies
-//        force("io.netty:netty-common:4.1.112.Final")
-//        force("io.netty:netty-handler:4.1.112.Final")
-//        force("io.netty:netty-buffer:4.1.112.Final")
-//        force("io.netty:netty-codec:4.1.112.Final")
-//        force("io.netty:netty-transport:4.1.112.Final")
-        // Add other Netty dependencies if needed
-    }
+    testImplementation("org.testcontainers:mariadb:1.19.1")
 }
 
 dependencyManagement { 

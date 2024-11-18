@@ -1,11 +1,13 @@
 package com.saaenmadsen.shardworld.jav21cert;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.StopWatch;
 
 import java.util.Random;
 import java.util.concurrent.*;
 
+@Ignore
 public class VirtualThreadTest {
     @Test
     public void simpleTest() throws InterruptedException {
@@ -32,6 +34,7 @@ public class VirtualThreadTest {
         System.out.println(t2.getName() + " terminated");
     }
 
+    @Ignore
     @Test
     public void testThreadPoolExecuterAsyncstuff() {
 

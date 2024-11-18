@@ -1,0 +1,21 @@
+
+
+To migrate the database, go to
+    C:\src\akka_shardworld
+then run
+    ./gradlew flywayMigrate
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
