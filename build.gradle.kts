@@ -2,6 +2,7 @@ plugins {
     id("java")
     id("org.springframework.boot") version "3.3.3"
     id("io.spring.dependency-management") version "1.1.6"
+//    kotlin("jvm") version "1.9.10"
 }
 
 group = "com.saaenmadsen.shardworld"
@@ -46,6 +47,7 @@ dependencies {
     implementation("com.typesafe.akka:akka-persistence-typed_${versions_ScalaBinary}:${versions_AkkaVersion}")
     implementation("com.typesafe.akka:akka-bom_${versions_ScalaBinary}:${versions_AkkaVersion}")
 
+
     testImplementation("com.typesafe.akka:akka-persistence-testkit_${versions_ScalaBinary}:${versions_AkkaVersion}")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -68,10 +70,15 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    //Not used:
-    //    implementation ("org.slf4j.slf4j-log4j12")
-    //    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    //    testImplementation("org.junit.jupiter:junit-jupiter")
+    // MariaDB driver
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.1.4")
+    // H2 Database
+    testImplementation("com.h2database:h2:2.2.224")
+    // JUnit for testing
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    // Additional utilities for database testing (optional)
+    testImplementation("org.testcontainers:junit-jupiter:1.19.0") // For containerized MariaDB testing
+
 
 }
 
