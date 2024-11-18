@@ -1,14 +1,38 @@
-CREATE TABLE recipes (
-                         id INT AUTO_INCREMENT PRIMARY KEY,
-                         name VARCHAR(255) NOT NULL,
-                         description VARCHAR(500)
+CREATE TABLE recipes
+(
+    recipeid                                  INT PRIMARY KEY,
+    recipename                                VARCHAR(255) NOT NULL,
+    processdescription                        VARCHAR(2500),
+    calenderwaittimefromproductiontoavailable INT,
+    workTime_times10Minutes                   INT
 );
 
-CREATE TABLE recipe_stockkeepunit_relation (
-                                               recipe_id INT NOT NULL,
-                                               stockkeepunit_id INT NOT NULL,
-                                               relation_type ENUM('INPUT', 'OUTPUT', 'TOOL') NOT NULL,
-                                               FOREIGN KEY (recipe_id) REFERENCES recipes(id),
-                                               FOREIGN KEY (stockkeepunit_id) REFERENCES stockkeepunits(id),
-                                               PRIMARY KEY (recipe_id, stockkeepunit_id, relation_type)
+CREATE TABLE recipe_input_sku
+(
+    recipeid INT NOT NULL,
+    skuid    INT NOT NULL,
+    amount   INT NOT NULL,
+    FOREIGN KEY (recipeid) REFERENCES recipes (recipeid),
+    FOREIGN KEY (skuid) REFERENCES stockkeepunits (skuid),
+    PRIMARY KEY (recipeid, skuid)
+);
+
+CREATE TABLE recipe_output_sku
+(
+    recipeid INT NOT NULL,
+    skuid    INT NOT NULL,
+    amount   INT NOT NULL,
+    FOREIGN KEY (recipeid) REFERENCES recipes (recipeid),
+    FOREIGN KEY (skuid) REFERENCES stockkeepunits (skuid),
+    PRIMARY KEY (recipeid, skuid)
+);
+
+CREATE TABLE recipe_toolreq_sku
+(
+    recipeid INT NOT NULL,
+    skuid    INT NOT NULL,
+    amount   INT NOT NULL,
+    FOREIGN KEY (recipeid) REFERENCES recipes (recipeid),
+    FOREIGN KEY (skuid) REFERENCES stockkeepunits (skuid),
+    PRIMARY KEY (recipeid, skuid)
 );

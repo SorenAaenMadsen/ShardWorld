@@ -1,5 +1,9 @@
-CREATE TABLE stockkeepunits (
-                                id INT AUTO_INCREMENT PRIMARY KEY,
-                                name VARCHAR(255) NOT NULL,
-                                description VARCHAR(500)
+CREATE TABLE stockkeepunits
+(
+    skuid         INT PRIMARY KEY,
+    productname   VARCHAR(255) NOT NULL,
+    initialprice  INT,
+    unit          VARCHAR(10)  NOT NULL,
+    description   VARCHAR(500),
+    usagecategory varchar(255)
 );
