@@ -24,11 +24,11 @@ public class DesiceWhatToBuyAtMarket {
 
     public StockListing decide() {
         addRawMaterialsForTwoMostProfitableRecipes(companyInformation);
-        addToolsForRecipiesWithNoProductionLine(companyInformation);
+        addToolsForRecipesWithNoProductionLine(companyInformation);
         return shoppingList;
     }
 
-    private void addToolsForRecipiesWithNoProductionLine(CompanyInformation companyInformation) {
+    private void addToolsForRecipesWithNoProductionLine(CompanyInformation companyInformation) {
         for (KnownRecipe myRecipe : companyInformation.getKnownRecipes()) {
 
         }

@@ -24,7 +24,7 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
         }
     }
 
-    public static RecipeChoiceReport findRecipeWithHighestProjectedProfit(List<KnownRecipe> availableRecipies, StockListing myRawMaterials, PriceList priceList, int workTimeAvailable) {
+    public static RecipeChoiceReport findRecipeWithHighestProjectedProfit(List<KnownRecipe> availableRecipes, StockListing myRawMaterials, PriceList priceList, int workTimeAvailable) {
         int projectedProfit = 0;
 
         RecipeChoiceReportElement chosenRecipe = null;
@@ -32,7 +32,7 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
         ArrayList<RecipeChoiceReportElement> selectedElements = new ArrayList<>();
         ArrayList<RecipeChoiceReportElement> nonSelectedElements = new ArrayList<>();
 
-        for (KnownRecipe availableKnownRecipe : availableRecipies) {
+        for (KnownRecipe availableKnownRecipe : availableRecipes) {
 
             int thisProjectedProfit = availableKnownRecipe.recipe().calculateProfitPrWorkTenMin(priceList);
             ProductionImpactReport rawMaterialForProductionReport = availableKnownRecipe.recipe().evaluateRawMaterialImpact(workTimeAvailable, myRawMaterials);
@@ -43,7 +43,7 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
                     projectedProfit = thisProjectedProfit;
                     selectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, projectedProfit, "Projected profit: " + thisProjectedProfit));
                 } else {
-                    nonSelectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, projectedProfit, "Other recipies have higher projected profit than " + thisProjectedProfit));
+                    nonSelectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, projectedProfit, "Other recipes have higher projected profit than " + thisProjectedProfit));
                 }
             } else {
                 nonSelectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, projectedProfit, "Not able to use a resonable amount of worktime. " + rawMaterialForProductionReport.leftOverWorkTime() + " / " + (workTimeAvailable / 2)));
@@ -59,7 +59,7 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
         }
     }
 
-    public static RecipeChoiceReport evaluateRecipiesForProfitability(List<KnownRecipe> availableRecipies, StockListing myRawMaterials, PriceList priceList, int workTimeAvailable) {
+    public static RecipeChoiceReport evaluateRecipesForProfitability(List<KnownRecipe> availableRecipes, StockListing myRawMaterials, PriceList priceList, int workTimeAvailable) {
 
 
         RecipeChoiceReportElement chosenRecipe = null;
@@ -67,7 +67,7 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
         ArrayList<RecipeChoiceReportElement> selectedElements = new ArrayList<>();
         ArrayList<RecipeChoiceReportElement> nonSelectedElements = new ArrayList<>();
 
-        for (KnownRecipe availableKnownRecipe : availableRecipies) {
+        for (KnownRecipe availableKnownRecipe : availableRecipes) {
 
             int thisProjectedProfit = availableKnownRecipe.recipe().calculateProfitPrWorkTenMin(priceList);
 
@@ -76,7 +76,7 @@ public record RecipeChoiceReport(List<RecipeChoiceReportElement> productionChoic
             if (thisProjectedProfit > 0) {
                 selectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, thisProjectedProfit, "Projected profit: " + thisProjectedProfit));
             } else {
-                nonSelectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, thisProjectedProfit, "Other recipies have higher projected profit than " + thisProjectedProfit));
+                nonSelectedElements.add(new RecipeChoiceReportElement(availableKnownRecipe.recipe(), rawMaterialForProductionReport, thisProjectedProfit, "Other recipes have higher projected profit than " + thisProjectedProfit));
             }
         }
 

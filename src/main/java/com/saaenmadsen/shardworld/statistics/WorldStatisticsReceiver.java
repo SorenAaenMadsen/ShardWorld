@@ -26,7 +26,7 @@ public class WorldStatisticsReceiver {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private final WorldSettings worldSettings;
     private final int maxDayReportsToKeep;
-    private final String recipies;
+    private final String recipes;
     private final String stockKeepUnits;
     private WorldEndStatsWorld worldEndStatus;
 
@@ -36,7 +36,7 @@ public class WorldStatisticsReceiver {
     public WorldStatisticsReceiver(WorldSettings worldSettings, int maxDayReportsToKeep) {
         this.worldSettings = worldSettings;
         this.maxDayReportsToKeep = maxDayReportsToKeep;
-        this.recipies = Arrays.stream(Recipe.values()).map(Recipe::toString).collect(Collectors.joining(","));
+        this.recipes = Arrays.stream(Recipe.values()).map(Recipe::toString).collect(Collectors.joining(","));
         this.stockKeepUnits = Arrays.stream(Recipe.values()).map(Recipe::toString).collect(Collectors.joining(","));
     }
 

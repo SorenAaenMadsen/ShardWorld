@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 public class ProductionPlanningAndExecution {
 
     public ProductionPlanningAndExecution(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
-        attemptToSetupProductionLinesForRecipies(companyInformation);
+        attemptToSetupProductionLinesForRecipes(companyInformation);
 
         List<KnownRecipe> availableProductionLines = companyInformation.getKnownRecipes().stream().filter(knownRecipe -> knownRecipe.isProductionLine()).collect(Collectors.toUnmodifiableList());
 
-        RecipeChoiceReport productionLineSelectionReport = RecipeChoiceReport.evaluateRecipiesForProfitability(
+        RecipeChoiceReport productionLineSelectionReport = RecipeChoiceReport.evaluateRecipesForProfitability(
                 availableProductionLines,
                 companyInformation.getWarehouse(),
                 companyInformation.getPriceList(),
@@ -45,7 +45,7 @@ public class ProductionPlanningAndExecution {
         }
     }
 
-    private static void attemptToSetupProductionLinesForRecipies(CompanyInformation companyInformation) {
+    private static void attemptToSetupProductionLinesForRecipes(CompanyInformation companyInformation) {
         companyInformation.getKnownRecipes().stream().filter(knownRecipe -> knownRecipe.isProductionLine() == false).forEach(knownRecipe -> {
             knownRecipe.setupProductionLine(companyInformation.getWarehouse());
         });

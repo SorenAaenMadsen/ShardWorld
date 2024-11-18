@@ -1,11 +1,11 @@
 
 
 
-Connect a database, make recipies and StockKeepUnits load from the database.
+Connect a database, make recipes and StockKeepUnits load from the database.
 Make Akka Actor for the Flawor. Maybe two actor types, one to ask and one in from to accept questions and use a database?
 Add database backed cache of flawor texts.
 
-Add population, to make for domestic consumption. Requires food, so do database recipies first.
+Add population, to make for domestic consumption. Requires food, so do database recipes first.
 - Build in salary, market buying from the start
 - Add living standards
 
@@ -13,3 +13,7 @@ Problems:
 Production is stopping, because prices adjustments are ... crazy.
 
 
+
+Notes:
+Maria port: 3306
+Maria service name: MariaDB

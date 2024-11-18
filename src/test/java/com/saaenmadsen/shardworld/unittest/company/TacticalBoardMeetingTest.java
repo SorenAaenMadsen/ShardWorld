@@ -4,7 +4,7 @@ import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.company.CompanyInformationBuilder;
 import com.saaenmadsen.shardworld.actors.company.CompanyDailyReport;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
-import com.saaenmadsen.shardworld.actors.company.direction.InnovateOurRecipiesBoardMeeting;
+import com.saaenmadsen.shardworld.actors.company.direction.InnovateOurRecipesBoardMeeting;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class TacticalBoardMeetingTest {
     @Test
-    public void testReduceNumberOfKnownRecipiesToMax5() {
+    public void testReduceNumberOfKnownrecipesToMax5() {
         CompanyInformation companyInformation = CompanyInformationBuilder.ofWorldDefault("Testcompany", WorldSettingsBuilder.ofDefault().build()).build();
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.PRIMITIVE_WOODEN_SHUE, 100));
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.GATHER_FIREWOOD, 100));
@@ -23,7 +23,7 @@ public class TacticalBoardMeetingTest {
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.WOOD_SAWING, 100));
         companyInformation.getKnownRecipes().add(new KnownRecipe(Recipe.GATHER_RAW_TIMBER, 100));
         CompanyDailyReport companyDailyReport = new CompanyDailyReport("Testcompany",1);
-        InnovateOurRecipiesBoardMeeting.reduceNumberOfKnownRecipiesToMax5(companyInformation, companyDailyReport);
+        InnovateOurRecipesBoardMeeting.reduceNumberOfKnownrecipesToMax5(companyInformation, companyDailyReport);
 
         assertThat("The recipe with worst projected revenue (GATHER_CURED_WOOD) should be the one removed.",
                 companyInformation.getKnownRecipes().size(),

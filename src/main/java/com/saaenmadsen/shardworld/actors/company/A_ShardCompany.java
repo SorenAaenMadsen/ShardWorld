@@ -146,7 +146,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         new DayEndEvaluationDirectionMeeting(companyInformation, companyDailyReport);
 
         if (companyInformation.timeForTacticalBoardMeeting()) {
-            new InnovateOurRecipiesBoardMeeting(companyInformation, companyDailyReport, message.unfulfilledOrders());
+            new InnovateOurRecipesBoardMeeting(companyInformation, companyDailyReport, message.unfulfilledOrders());
         }
         message.market().tell(new C_EndMarketDay(this.companyId));
         countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(companyDailyReport, companyInformation.getKnownRecipes(), companyDailyReport.getUnsoldGoods(), companyInformation.getWarehouse().createDuplicate())));

@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class InnovateOurRecipiesBoardMeeting {
+public class InnovateOurRecipesBoardMeeting {
 
 
-    public InnovateOurRecipiesBoardMeeting(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport, StockListing unfulfilledOrdersAtMarket) {
+    public InnovateOurRecipesBoardMeeting(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport, StockListing unfulfilledOrdersAtMarket) {
         if (companyInformation.getCulture().getInnovativenessLevel().getLevel() == 1) {
             return;
         } else {
-            reduceNumberOfKnownRecipiesToMax5(companyInformation, companyDailyReport);
+            reduceNumberOfKnownrecipesToMax5(companyInformation, companyDailyReport);
 //            investInBestOfXRandomProductionRecipes(companyInformation, companyDailyReport, unfulfilledOrdersAtMarket, companyInformation.getCulture().getInnovativenessLevel().getLevel() / 2);
             investInDesiredProductionRecipe(companyInformation, companyDailyReport, unfulfilledOrdersAtMarket, companyInformation.getCulture().getInnovativenessLevel().getLevel() / 2);
         }
@@ -35,7 +35,7 @@ public class InnovateOurRecipiesBoardMeeting {
         companyDailyReport.appendToDailyReport("We have invested in " + newRecipe.name());
     }
 
-    public static void reduceNumberOfKnownRecipiesToMax5(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
+    public static void reduceNumberOfKnownrecipesToMax5(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
         if (companyInformation.getKnownRecipes().size() > 5) {
             KnownRecipe worstRecipe = companyInformation.getKnownRecipes().stream().reduce(
                     (a, b) -> a.getExpectedDailySaleValue_daily10percentChange() < b.getExpectedDailySaleValue_daily10percentChange() ? a : b
@@ -80,14 +80,14 @@ public class InnovateOurRecipiesBoardMeeting {
     public static void investInDesiredProductionRecipe(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport, StockListing unfulfilledOrdersAtMarket, int numberOfIdeasToGenerate) {
         List<KnownRecipe> newIdeas = new ArrayList<>(companyInformation.getKnownRecipes());
 
-        List<Recipe> recipiesWithDesiredOutput =
+        List<Recipe> recipesWithDesiredOutput =
                 Arrays.stream(Recipe.values())
                         .filter(recipe -> recipeOutputIsDesired(recipe.getOutputs().skuAndCounts, unfulfilledOrdersAtMarket))
                         .filter(recipe -> !recipeIsInList(recipe, companyInformation.getKnownRecipes()))
                         .collect(Collectors.toUnmodifiableList());
 
         Random dice = new Random();
-        addIdeasProducingDesiredOutput(Math.min(recipiesWithDesiredOutput.size(), numberOfIdeasToGenerate), dice, recipiesWithDesiredOutput, newIdeas);
+        addIdeasProducingDesiredOutput(Math.min(recipesWithDesiredOutput.size(), numberOfIdeasToGenerate), dice, recipesWithDesiredOutput, newIdeas);
         fillNewIdeasUpWithCompletelyRandomIdeas(numberOfIdeasToGenerate - newIdeas.size(), dice, newIdeas);
 
 
@@ -113,11 +113,11 @@ public class InnovateOurRecipiesBoardMeeting {
         return false;
     }
 
-    private static void addIdeasProducingDesiredOutput(int numberOfIdeasToGenerate, Random dice, List<Recipe> recipiesWithDesiredOutput, List<KnownRecipe> newIdeas) {
-        if (recipiesWithDesiredOutput.size() > 0) {
-            for (int i = 0; i < Math.min(numberOfIdeasToGenerate, recipiesWithDesiredOutput.size()); ++i) {
-                int newRecipeIndex = dice.nextInt(recipiesWithDesiredOutput.size());
-                KnownRecipe idea = new KnownRecipe(recipiesWithDesiredOutput.get(newRecipeIndex), 100);
+    private static void addIdeasProducingDesiredOutput(int numberOfIdeasToGenerate, Random dice, List<Recipe> recipesWithDesiredOutput, List<KnownRecipe> newIdeas) {
+        if (recipesWithDesiredOutput.size() > 0) {
+            for (int i = 0; i < Math.min(numberOfIdeasToGenerate, recipesWithDesiredOutput.size()); ++i) {
+                int newRecipeIndex = dice.nextInt(recipesWithDesiredOutput.size());
+                KnownRecipe idea = new KnownRecipe(recipesWithDesiredOutput.get(newRecipeIndex), 100);
                 newIdeas.add(idea);
             }
         }

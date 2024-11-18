@@ -6,9 +6,9 @@ import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 public class FoundingBoardMeeting {
     public FoundingBoardMeeting(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
-        InnovateOurRecipiesBoardMeeting.investInNewCompletelyRandomProductionRecipe(companyInformation, companyDailyReport);
-        new InnovateOurRecipiesBoardMeeting(companyInformation, companyDailyReport, StockListing.ofEmpty());
-        new InnovateOurRecipiesBoardMeeting(companyInformation, companyDailyReport, StockListing.ofEmpty());
+        InnovateOurRecipesBoardMeeting.investInNewCompletelyRandomProductionRecipe(companyInformation, companyDailyReport);
+        new InnovateOurRecipesBoardMeeting(companyInformation, companyDailyReport, StockListing.ofEmpty());
+        new InnovateOurRecipesBoardMeeting(companyInformation, companyDailyReport, StockListing.ofEmpty());
     }
 
 }

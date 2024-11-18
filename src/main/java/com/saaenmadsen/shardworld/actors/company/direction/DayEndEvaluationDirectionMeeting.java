@@ -10,13 +10,13 @@ import com.saaenmadsen.shardworld.modeltypes.SkuAndCount;
 public class DayEndEvaluationDirectionMeeting {
 
     public DayEndEvaluationDirectionMeeting(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
-        updateExpectedDailySalesForRecipies(companyInformation, companyDailyReport);
+        updateExpectedDailySalesForRecipes(companyInformation, companyDailyReport);
         companyDailyReport.setLiquidityDayEnd(companyInformation.getMoneyBox().getMoney());
     }
 
 
 
-    private static void updateExpectedDailySalesForRecipies(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
+    private static void updateExpectedDailySalesForRecipes(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
         for (KnownRecipe myRecipe : companyInformation.getKnownRecipes()) {
             int totalDailySaleValueForRecipeOutputs = 0;
             for (SkuAndCount output : myRecipe.getRecipe().getOutputs().skuAndCounts) {
