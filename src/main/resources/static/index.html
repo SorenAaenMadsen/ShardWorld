@@ -45,23 +45,6 @@
         }
 
 
-
-        .itemMenu {
-            grid-area: menu;
-        }
-
-        .itemMain {
-            grid-area: main;
-        }
-
-        .itemRight {
-            grid-area: right;
-        }
-
-        .itemFooter {
-            grid-area: footer;
-        }
-
         .grid-container {
             display: grid;
             grid-template-areas:
@@ -69,7 +52,6 @@
     'menu main main main right right'
     'menu footer footer footer footer footer';
             gap: 10px;
-            background-color: #2196F3;
             padding: 10px;
         }
 
@@ -79,16 +61,35 @@
             vertical-align: top;
             padding: 10px 0;
             font-size: 18px;
-            border: 1px solid black; /* Thin black border for grid items */
+            /*border: 1px solid black; /* Thin black border for grid items */
         }
 
         /* Specific cell with background image */
         .grid-item-header {
+            height: 120px;
             background-image: url('/images/2750230775.jpeg'); /* Path to the image */
             background-size: cover; /* Scale image to cover the cell */
             background-repeat: no-repeat; /* Prevent tiling */
             background-position: center; /* Center the image */
             grid-area: header;
+        }
+
+        .itemMenu {
+            width: 200px;
+            grid-area: menu;
+        }
+
+        .itemMain {
+            grid-area: main;
+        }
+
+        .itemRight {
+            width: 500px;
+            grid-area: right;
+        }
+
+        .itemFooter {
+            grid-area: footer;
         }
 
     </style>
