@@ -2,7 +2,7 @@ package com.saaenmadsen.shardworld.unittest.company;
 
 import com.saaenmadsen.shardworld.actors.company.*;
 import com.saaenmadsen.shardworld.actors.company.direction.DayEndEvaluationDirectionMeeting;
-import com.saaenmadsen.shardworld.actors.company.direction.DesiceWhatToBuyAtMarket;
+import com.saaenmadsen.shardworld.actors.company.direction.DesideWhatToBuyAtMarket;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.constants.Recipe;
@@ -52,7 +52,7 @@ public class RecipeAndProductionForecastTest {
         when(companyInformation.getKnownRecipes()).thenReturn(knownRecipes);
         when(companyInformation.getPriceList()).thenReturn(PriceList.ofDefault());
 
-        DesiceWhatToBuyAtMarket buyDecision = new DesiceWhatToBuyAtMarket(companyInformation, mock(CompanyDailyReport.class));
+        DesideWhatToBuyAtMarket buyDecision = new DesideWhatToBuyAtMarket(companyInformation, mock(CompanyDailyReport.class));
 
         StockListing buylist = buyDecision.decide();
         assertEquals(8, buylist.getSkuCount(StockKeepUnit.WOOD_KG.getArrayId()));

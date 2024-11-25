@@ -162,7 +162,7 @@ function createCompanyDayReportsTable(data) {
 
         const keyCell = document.createElement('td');
         keyCell.innerHTML = value.label;
-        keyCell.style.fontWeight = 'bold';
+        keyCell.style.fontWeight = 'normal';
         keyCell.style.padding = '8px';
         keyCell.style.border = '1px solid #A9A9A9'
 

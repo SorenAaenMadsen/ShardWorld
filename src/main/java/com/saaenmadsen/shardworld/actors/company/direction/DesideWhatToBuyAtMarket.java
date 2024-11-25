@@ -12,13 +12,13 @@ import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class DesiceWhatToBuyAtMarket {
+public class DesideWhatToBuyAtMarket {
 
     private StockListing shoppingList;
     private final CompanyInformation companyInformation;
     private final CompanyDailyReport companyDailyReport;
 
-    public DesiceWhatToBuyAtMarket(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
+    public DesideWhatToBuyAtMarket(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
         this.companyInformation = companyInformation;
         this.companyDailyReport = companyDailyReport;
         this.shoppingList = StockListing.ofEmpty();

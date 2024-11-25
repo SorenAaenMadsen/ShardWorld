@@ -73,9 +73,10 @@ public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainA
         getContext().getLog().info("ShardCountry Constructor Start");
 
         CompanyInformation strategicStockpile = CompanyInformationBuilder
-                .ofWorldDefault("strategic-stockpile", worldSettings)
+                .ofWorldDefault("1-strategic-stockpile", worldSettings)
                 .withCulture(CompanyCultureBuilder.of(CompanyCulture_InnovativenessLevel.LOW_INNOVATIVE, CompanyCulture_StockManagementLevel.HIGH_STOCK_BUFFER).build())
                 .withCompanyType(CompanyType.STOCKPILE)
+                .withMoney(10000000)
                 .build();
 
         allCompanies.add(

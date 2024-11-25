@@ -7,6 +7,7 @@ import com.saaenmadsen.shardworld.constants.worldsettings.WorldRunMode;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
 import com.saaenmadsen.shardworld.statistics.*;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,6 +26,7 @@ public class ShardWorld {
     // Records for display in the browser.
     public record WorldStatusKeyValue(String label, String value) {
     }
+
     public record DataPoint(String label, int data) {
     }
 
@@ -43,12 +45,12 @@ public class ShardWorld {
         worldActor = akka.actor.typed.ActorSystem.create(A_ShardWorld.create(worldSettings, worldStatisticsReceiver), "MyWorld");
     }
 
-    public void start(){
+    public void start() {
         log.info("Starting ShardWorld");
         worldActor.tell(new C_ShardWorldSystemStart());
     }
 
-    public void advanceOneDay(){
+    public void advanceOneDay() {
         log.info("Advancing ShardWorld another day");
         worldActor.tell(new C_ShardWorldAdvanceDays(1));
     }
@@ -57,7 +59,7 @@ public class ShardWorld {
         return worldStatisticsReceiver.getLatestSummary();
     }
 
-    public List<WorldStatusKeyValue> getWorldStatus() {
+    public List<WorldStatusKeyValue> getWorldCompanyStatusHtmlTableInput() {
         List<WorldStatusKeyValue> worldStatus = new ArrayList<>();
         WorldDayStats lastReportedDay = worldStatisticsReceiver.getLastReportedDay();
 
@@ -66,16 +68,34 @@ public class ShardWorld {
             String countryId = countryDayStats.countryId();
             for (CompanyDayStats companyDayStats : countryDayStats.companyDayStats()) {
                 String label = countryId + " " + companyDayStats.companyId();
-                String value = companyDayStats.companyDailyReport().getDailyReport();
-                worldStatus.add(new WorldStatusKeyValue(label, value));
+                String companyDailyOverviewHtml = buildCompanyDailyOverview(companyDayStats);
+                worldStatus.add(new WorldStatusKeyValue(label, companyDailyOverviewHtml));
             }
         }
         worldStatus.sort(Comparator.comparing(WorldStatusKeyValue::label));
 
-        worldStatus.add(0,new WorldStatusKeyValue("Day", ""+ lastReportedDay.dayId()));
+        worldStatus.add(0, new WorldStatusKeyValue("Day", "" + lastReportedDay.dayId()));
 
 
         return worldStatus;
+    }
+
+    @NotNull
+    private static String buildCompanyDailyOverview(CompanyDayStats companyDayStats) {
+        String companyDailyOverviewHtml =
+                "<table style=\"font-weight:normal\">\n" +
+                        "  <tr>\n" +
+//                        "    <td  style=\"width:15px\">Company: <b>"+companyDayStats.companyId()+"</b></td>\n" +
+//                        "    <th>Day: "+companyDayStats.day()+"</th>\n" +
+                        "    <td style=\"width:150px\">Daily Revenue: <b>"+companyDayStats.marketDayRevenue()+"</b></td>\n" +
+                        "    <td style=\"width:150px\" style=\"padding-left:15px\">Liquidity: <b>" + companyDayStats.companyDailyReport().getDayEndLiquidity()+ "</b></td>\n" +
+                        "  </tr>\n" +
+                        "</table>" +
+                "<details>\n" +
+                        "  <summary>Daily executive report</summary>\n" +
+                        "  <p>" + companyDayStats.companyDailyReport().getDailyReport() + "</p>\n" +
+                        "</details>";
+        return companyDailyOverviewHtml;
     }
 
 }

@@ -9,10 +9,12 @@ import java.util.List;
 
 public record CompanyDayStats(@JsonIgnore CompanyDailyReport companyDailyReport,
                               String companyId,
+                              int day,
                               java.util.List<KnownRecipe> companyRecipes,
                               @JsonIgnore StockListing unsoldGoods,
                               @JsonIgnore StockListing companyWarehouse,
                               Long dayEndLiquidity,
+                              Long marketDayRevenue,
                               PrintableStockListing companyWarehouseMap,
                               PrintableStockListing unsoldGoodsMap,
                               PrintableDailyReport dailyReportPrint) {
@@ -21,10 +23,12 @@ public record CompanyDayStats(@JsonIgnore CompanyDailyReport companyDailyReport,
         this(
                 companyDailyReport,
                 companyDailyReport.getCompanyId(),
+                companyDailyReport.getDayId(),
                 companyRecipes,
                 unsoldGoods,
                 companyWarehouse,
                 companyDailyReport.getDayEndLiquidity(),
+                companyDailyReport.getMarketDayRevenue(),
                 new PrintableStockListing(companyWarehouse),
                 new PrintableStockListing(unsoldGoods),
                 new PrintableDailyReport(companyDailyReport)

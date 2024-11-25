@@ -1,7 +1,5 @@
 package com.saaenmadsen.shardworld.webapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saaenmadsen.shardworld.ShardWorld;
 import com.saaenmadsen.shardworld.statistics.WorldEndStatsWorld;
 import org.slf4j.Logger;
@@ -41,7 +39,7 @@ public class WebGraphController {
     public ResponseEntity<List<ShardWorld.WorldStatusKeyValue>> getWorldControlStatus() {
         log.info("WebGraphController GET getWorldControlStatus");
         // Fetch or generate your data here
-        List<ShardWorld.WorldStatusKeyValue> data = ShardWorld.instance.getWorldStatus();
+        List<ShardWorld.WorldStatusKeyValue> data = ShardWorld.instance.getWorldCompanyStatusHtmlTableInput();
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 

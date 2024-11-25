@@ -10,13 +10,8 @@ import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
-import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
-import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
-
-import java.util.ArrayList;
-import java.util.Optional;
 
 public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompanyCommand> {
     private String companyId;
@@ -103,7 +98,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         getContext().getLog().debug("onReceiveMarketOpenForBuyers: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
         companyInformation.setPriceList(message.priceList());
 
-        StockListing shoppingList = new DesiceWhatToBuyAtMarket(companyInformation, companyDailyReport).decide();
+        StockListing shoppingList = new DesideWhatToBuyAtMarket(companyInformation, companyDailyReport).decide();
 
         message.countryMarket().tell(
                 new C_BuyOrder(
