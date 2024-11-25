@@ -1,7 +1,6 @@
 package com.saaenmadsen.shardworld.statistics;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.saaenmadsen.shardworld.ShardWorld;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
@@ -28,23 +27,28 @@ public record WorldEndStatsWorld(@JsonIgnore StockListing finalWorldTotalStock,
      * }
      */
     @JsonIgnore
-    public Map<String, Object> getPricesInAllCountriesAsDataPointsForWebGraph() {
+    public Map<String, Object> getPricesInAllCountriesAsDataPointsForWebGraph(String country, String usageCategory) {
         Map<String, Object> response = new HashMap<>();
 
         List<Map<String, Object>> skuData = new ArrayList<>();
 
         for (StockKeepUnit sku : StockKeepUnit.values()) {
+            if(!usageCategory.isEmpty() && sku.getUsageCategory().equals(usageCategory)) {
 
-            Map<String, Object> skuEntry = new HashMap<>();
-            skuEntry.put("sku", sku.name());
+                Map<String, Object> skuEntry = new HashMap<>();
+                skuEntry.put("sku", sku.name());
 
-            List<Integer> prices = new ArrayList<>();
-            for (WorldEndStatsCountry worldEndStatsCountry : worldEndStatsCountries) {
-                prices.add(worldEndStatsCountry.marketDayStats().marketDailyReport().getPriceListDayEnd().getPrice(sku.getArrayId()));
+                List<Integer> prices = new ArrayList<>();
+                for (WorldEndStatsCountry worldEndStatsCountry : worldEndStatsCountries) {
+                    if (worldEndStatsCountry.countryId().equals(country)) {
+                        prices.add(worldEndStatsCountry.marketDayStats().marketDailyReport().getPriceListDayEnd().getPrice(sku.getArrayId()));
+                    }
+                }
+                skuEntry.put("prices", prices);
+                skuData.add(skuEntry);
             }
-            skuEntry.put("prices", prices);
-            skuData.add(skuEntry);
         }
+
         skuData.sort(Comparator.comparing(map -> (String) map.get("sku")));
 
         response.put("countries", worldEndStatsCountries.stream().map(c->c.getCountryId()).collect(Collectors.toUnmodifiableList()));

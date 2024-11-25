@@ -18,7 +18,7 @@ function loadTabContent(page, textContent) {
                 loadWorldStatus(); // Load world status for "World Control" tab
             } else if (page === 'resource-status.html') {
                 loadResourceStatus();
-                renderGlobalMarketPriceChart();
+                renderResourceOverviewWidgets();
             }
 
             // Activate the correct tab
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // resources/static/js/main.js
 
 // Fetches data from the REST API
-async function fetchGlobalMarketPrices(usageCategory, country) {
+async function fetchGlobalMarketPrices(country, usageCategory) {
     const params = new URLSearchParams();
     params.append('country', country);
     if (usageCategory) {
@@ -213,7 +213,8 @@ async function fetchGlobalMarketPrices(usageCategory, country) {
 
 // Generates Chart.js-compatible data from the API response
 function generateGlobalMarketPriceChartData(data) {
-    const countries = data.countries;
+    // const countries = data.countries;
+    const countries = [''];
     const skuData = data.skuData;
 
     const datasets = skuData.map((skuEntry, index) => {
@@ -233,12 +234,29 @@ function generateGlobalMarketPriceChartData(data) {
 }
 
 // Renders the Chart.js bar chart
-async function renderGlobalMarketPriceChart() {
-    const data = await fetchGlobalMarketPrices("country-00000");
-    const chartData = generateGlobalMarketPriceChartData(data);
+function renderResourceOverviewWidgets() {
+    renderWidget("1", "Raw material");
+    renderWidget("2", "Fuel");
+    renderWidget("3", "Ore");
+    renderWidget("4", "Tools");
+    renderWidget("5", "Apparel");
+    renderWidget("6", "Other");
+}
 
-    const ctx = document.getElementById('worldMarketPriceChart').getContext('2d');
-    let chartStatus = Chart.getChart('worldMarketPriceChart'); // <canvas> id
+async function renderWidget(widgetId, usageCategory) {
+
+    const canvasId = "resourceStatusWidget"+widgetId+"Canvas";
+    const headerId = "widget"+widgetId+"title";
+
+    const widgetTitle = document.getElementById(headerId);
+    widgetTitle.outerHTML = '<h3 id=headerId>'+usageCategory+' Prices</h3>';
+
+    const data = await fetchGlobalMarketPrices("country-00000", usageCategory);
+    const chartData = generateGlobalMarketPriceChartData(data);
+    chartData
+
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    let chartStatus = Chart.getChart(canvasId); // <canvas> id
     if (chartStatus != undefined) {
         chartStatus.destroy();
     }
@@ -253,25 +271,25 @@ async function renderGlobalMarketPriceChart() {
                     stacked: false,
                     title: {
                         display: true,
-                        text: 'Country'
+                        text: 'Price'
                     }
                 },
                 y: {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Price (USD)'
+                        text: 'Stock keep unit'
                     }
                 }
             },
             plugins: {
                 legend: {
-                    display: false // Hides legend box, since we're putting labels on bars
+                    display: false, // Hides legend box, since we're putting labels on bars
                 },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `${context.dataset.label}: $${context.parsed.y.toFixed(0)}`;
+                            return `$${context.parsed.y.toFixed(0)}`;
                         }
                     }
                 },

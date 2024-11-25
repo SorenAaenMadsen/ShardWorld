@@ -32,7 +32,7 @@ public class WebGraphController {
             ) {
         log.info("WebGraphController GET getGraphData_marketPriceDayEnd. country:" + country + " usageCategory:" + usageCategory);
         WorldEndStatsWorld latestSummary = ShardWorld.instance.getLatestSummary();
-        return new ResponseEntity<>(latestSummary.getPricesInAllCountriesAsDataPointsForWebGraph(), HttpStatus.OK);
+        return new ResponseEntity<>(latestSummary.getPricesInAllCountriesAsDataPointsForWebGraph(country, usageCategory), HttpStatus.OK);
     }
 
     @GetMapping("/world/status")

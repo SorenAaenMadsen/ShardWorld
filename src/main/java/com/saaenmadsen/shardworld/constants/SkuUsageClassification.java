@@ -2,6 +2,8 @@ package com.saaenmadsen.shardworld.constants;
 
 public enum SkuUsageClassification {
     RAW_MATERIAL("Raw material"),
+    METAL("Metal"),
+    Wood("Wood"),
     FUEL("Fuel"),
     APPAREL("Apparel"),
     FOOD("Food"),
@@ -9,7 +11,8 @@ public enum SkuUsageClassification {
     ANIMAL("Animal"),
     ORE("Ore"),
     JEWELRY("Jewelry"),
-    OTHER("Other");
+    OTHER("Other"),
+    INACTIVE("Inactive");
     private final String printableName;
 
     SkuUsageClassification(String printableName) {
