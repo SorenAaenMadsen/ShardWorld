@@ -8,10 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -31,17 +28,12 @@ public class WebGraphController {
     }
 
     @GetMapping("/data/marketpricesdayend")
-    public ResponseEntity<Map<String, Object>> getGraphData_marketPriceDayEnd() {
-        log.info("WebGraphController GET getGraphData_marketPriceDayEnd");
+    public ResponseEntity<Map<String, Object>> getGraphData_marketPriceDayEnd(
+            @RequestParam(value = "country", required = true) String country,
+            @RequestParam(value = "usagecategory", required = false) String usageCategory
+            ) {
+        log.info("WebGraphController GET getGraphData_marketPriceDayEnd. country:" + country + " usageCategory:" + usageCategory);
         WorldEndStatsWorld latestSummary = ShardWorld.instance.getLatestSummary();
-
-//        try {
-//            ObjectMapper mapper = new ObjectMapper();
-//            log.info("WebGraphController getGraphData_marketPriceDayEnd : " +mapper.writeValueAsString( latestSummary.getPricesInAllCountriesAsDataPointsForWebGraph()));
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-
         return new ResponseEntity<>(latestSummary.getPricesInAllCountriesAsDataPointsForWebGraph(), HttpStatus.OK);
     }
 

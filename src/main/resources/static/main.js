@@ -194,8 +194,20 @@ document.addEventListener('DOMContentLoaded', () => {
 // resources/static/js/main.js
 
 // Fetches data from the REST API
-async function fetchGlobalMarketPrices() {
-    const response = await fetch('/api/data/marketpricesdayend');
+async function fetchGlobalMarketPrices(usageCategory, country) {
+    const params = new URLSearchParams();
+    params.append('country', country);
+    if (usageCategory) {
+        params.append('usagecategory', usageCategory);
+    }
+    // Build the full URL with query parameters
+    const url = `/api/data/marketpricesdayend${params.toString() ? '?' + params.toString() : ''}`;
+
+    // Fetch the data
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
     return response.json();
 }
 
@@ -222,7 +234,7 @@ function generateGlobalMarketPriceChartData(data) {
 
 // Renders the Chart.js bar chart
 async function renderGlobalMarketPriceChart() {
-    const data = await fetchGlobalMarketPrices();
+    const data = await fetchGlobalMarketPrices("country-00000");
     const chartData = generateGlobalMarketPriceChartData(data);
 
     const ctx = document.getElementById('worldMarketPriceChart').getContext('2d');

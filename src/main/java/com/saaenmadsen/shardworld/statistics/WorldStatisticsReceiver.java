@@ -8,6 +8,7 @@ import com.saaenmadsen.shardworld.Main;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +46,15 @@ public class WorldStatisticsReceiver {
         if (dayStatistics.size() > maxDayReportsToKeep) {
             dayStatistics.removeFirst();
         }
+        worldEndStatus = createSummary();
     }
 
     public WorldEndStatsWorld getLatestSummary() {
+        return worldEndStatus;
+    }
+
+    @NotNull
+    private WorldEndStatsWorld createSummary() {
         List<WorldEndStatsCountry> worldEndStatsCountries = new ArrayList<>();
         StockListing finalTotalWorldStock = StockListing.ofEmpty();
         for (CountryDayStats countryDayStats : dayStatistics.getLast().countryDayStats()) {
