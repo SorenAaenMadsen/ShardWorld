@@ -220,8 +220,8 @@ function generateGlobalMarketPriceChartData(data) {
         return {
             label: skuEntry.sku,
             data: skuEntry.prices,
-            backgroundColor: `hsl(${index * 60}, 70%, 60%)`,
-            borderColor: `hsl(${index * 60}, 70%, 50%)`,
+            backgroundColor: `hsl(${index * 28+40}, 40%, 40%)`,
+            borderColor: `hsl(${index * 28+40}, 40%, 10%)`,
             borderWidth: 1
         };
     });
