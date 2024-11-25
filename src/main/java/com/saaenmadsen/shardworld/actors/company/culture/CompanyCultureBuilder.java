@@ -13,8 +13,17 @@ public class CompanyCultureBuilder {
         this.stockManagementLevel = CompanyCulture_StockManagementLevel.getRandom(dice);;
     }
 
+    private CompanyCultureBuilder(CompanyCulture_InnovativenessLevel innovativenessLevel, CompanyCulture_StockManagementLevel stockManagementLevel) {
+        this.innovativenessLevel = innovativenessLevel;
+        this.stockManagementLevel = stockManagementLevel;
+    }
+
     public static CompanyCultureBuilder ofRandom(){
         return new CompanyCultureBuilder();
+    }
+
+    public static CompanyCultureBuilder of(CompanyCulture_InnovativenessLevel innovativenessLevel, CompanyCulture_StockManagementLevel stockManagementLevel){
+        return new CompanyCultureBuilder(innovativenessLevel, stockManagementLevel);
     }
 
     public CompanyCulture_InnovativenessLevel getInnovativenessLevel() {

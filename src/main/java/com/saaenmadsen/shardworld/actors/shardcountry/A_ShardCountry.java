@@ -8,6 +8,11 @@ import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
+import com.saaenmadsen.shardworld.actors.company.CompanyInformationBuilder;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyCultureBuilder;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture_InnovativenessLevel;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture_StockManagementLevel;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.actors.countrymarket.A_CountryMarket;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_StartMarketDayCycle;
 import com.saaenmadsen.shardworld.actors.shardworld.A_ShardWorld;
@@ -67,6 +72,19 @@ public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainA
         this.worldActorReference = worldActorReference;
         getContext().getLog().info("ShardCountry Constructor Start");
 
+        CompanyInformation strategicStockpile = CompanyInformationBuilder
+                .ofWorldDefault("strategic-stockpile", worldSettings)
+                .withCulture(CompanyCultureBuilder.of(CompanyCulture_InnovativenessLevel.LOW_INNOVATIVE, CompanyCulture_StockManagementLevel.HIGH_STOCK_BUFFER).build())
+                .withCompanyType(CompanyType.STOCKPILE)
+                .build();
+
+        allCompanies.add(
+                context.spawn(
+                        A_ShardCompany.create(strategicStockpile, context.getSelf(), worldSettings),
+                        strategicStockpile.getCompanyId()
+                )
+        );
+
         for (CompanyInformation companyInformation : worldSettings.startCompanies()) {
             allCompanies.add(
                     context.spawn(
@@ -84,6 +102,7 @@ public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainA
                             , companyName)
             );
         }
+
         countryMarket = context.spawn(A_CountryMarket.create(context.getSelf(), worldSettings), "market");
 
         getContext().getLog().info("ShardCountry Constructor Completed");
