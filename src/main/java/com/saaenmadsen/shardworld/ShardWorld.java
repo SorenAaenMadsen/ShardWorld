@@ -87,8 +87,8 @@ public class ShardWorld {
                         "  <tr>\n" +
 //                        "    <td  style=\"width:15px\">Company: <b>"+companyDayStats.companyId()+"</b></td>\n" +
 //                        "    <th>Day: "+companyDayStats.day()+"</th>\n" +
-                        "    <td style=\"width:150px\">Daily Revenue: <b>"+companyDayStats.marketDayRevenue()+"</b></td>\n" +
-                        "    <td style=\"width:150px\" style=\"padding-left:15px\">Liquidity: <b>" + companyDayStats.companyDailyReport().getDayEndLiquidity()+ "</b></td>\n" +
+                        "    <td style=\"width:250px\">Daily Revenue: <b>"+companyDayStats.marketDayRevenue()+"</b></td>\n" +
+                        "    <td style=\"width:250px\" style=\"padding-left:15px\">Liquidity: <b>" + companyDayStats.companyDailyReport().getDayEndLiquidity()+ "</b></td>\n" +
                         "  </tr>\n" +
                         "</table>" +
                 "<details>\n" +
