@@ -98,7 +98,7 @@
         }
 
         .itemRight {
-            width: 500px;
+            width: 543px;
             height: 1050px;
             grid-area: right;
             overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
@@ -109,6 +109,28 @@
             width: 100%;
             height: 50px;
         }
+
+        /* Widget styling */
+        .widget-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 equal-width columns */
+            gap: 15px; /* Space between widgets */
+            padding: 15px;
+
+        }
+
+        /* Widget styling */
+        .widget {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+        }
+
 
     </style>
 </head>
@@ -136,8 +158,7 @@
     </div>
     <div class="itemRight">
         <!-- Tab Content (Initially Empty) -->
-        <canvas id="worldWideResourceChart" width="500" height="500"></canvas>
-        <canvas id="worldMarketPriceChart" width="500" height="1500"></canvas>
+        <canvas id="worldWideResourceChart" width="480" ></canvas>
         <div id="right-tab-content"></div>
     </div>
     <div class="itemFooter">

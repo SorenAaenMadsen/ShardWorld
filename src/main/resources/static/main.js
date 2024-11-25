@@ -18,6 +18,7 @@ function loadTabContent(page, textContent) {
                 loadWorldStatus(); // Load world status for "World Control" tab
             } else if (page === 'resource-status.html') {
                 loadResourceStatus();
+                renderGlobalMarketPriceChart();
             }
 
             // Activate the correct tab
@@ -135,7 +136,7 @@ function advanceDay() {
 
 function loadWorldStatus() {
     fetchWorldStockChartDataAndCreateChart('totalworldresourses', 'worldWideResourceChart');
-    renderGlobalMarketPriceChart();
+
     fetch('http://localhost:8080/api/world/status')
         .then(response => response.json())
         .then(data => {
@@ -186,7 +187,6 @@ function createCompanyDayReportsTable(data) {
 // Call loadWorldStatus when the "World Control" tab is loaded
 document.addEventListener('DOMContentLoaded', () => {
     loadTabContent('world-control.html', 'World Control');
-    renderGlobalMarketPriceChart();
 });
 
 
