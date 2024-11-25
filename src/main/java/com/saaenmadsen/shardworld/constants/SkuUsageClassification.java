@@ -12,7 +12,8 @@ public enum SkuUsageClassification {
     ORE("Ore"),
     JEWELRY("Jewelry"),
     OTHER("Other"),
-    INACTIVE("Inactive");
+    INACTIVEMETAL("Inactive"),
+    INACTIVETOOLS("Inactive");
     private final String printableName;
 
     SkuUsageClassification(String printableName) {

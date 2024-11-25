@@ -78,7 +78,7 @@ function createChart(data, apiResource, htmlChartElementId) {
         options: {
             indexAxis: 'y', // Set to 'y' for horizontal bars
             responsive: false,  // Disable responsive resizing
-
+            animation: false,
             scales: {
                 y: {
                     beginAtZero: true
@@ -98,10 +98,6 @@ function createChart(data, apiResource, htmlChartElementId) {
         }
     });
 }
-
-
-
-
 
 
 let currentDay = 0;
@@ -142,6 +138,7 @@ function loadWorldStatus() {
         .then(data => {
             console.log('World status data:', data); // Debugging log
             createCompanyDayReportsTable(data);  // Populate the table with the data
+            renderResourceOverviewWidgets();
         })
         .catch(error => console.error('Error fetching world status:', error));
 }
@@ -149,39 +146,41 @@ function loadWorldStatus() {
 // Function to populate the table with the status data
 function createCompanyDayReportsTable(data) {
     const tableContainer = document.getElementById('company-day-reports');
-    tableContainer.innerHTML = ''; // Clear any existing table content
+    if (tableContainer) {
+        tableContainer.innerHTML = ''; // Clear any existing table content
 
-    const table = document.createElement('table');
+        const table = document.createElement('table');
 
-    table.style.borderCollapse = 'collapse';
+        table.style.borderCollapse = 'collapse';
 
-    const tbody = document.createElement('tbody');
+        const tbody = document.createElement('tbody');
 
-    // Loop through each key-value pair and create a row
-    for (const [key, value] of Object.entries(data)) {
-        const row = document.createElement('tr');
+        // Loop through each key-value pair and create a row
+        for (const [key, value] of Object.entries(data)) {
+            const row = document.createElement('tr');
 
-        const keyCell = document.createElement('td');
-        keyCell.innerHTML = value.label;
-        keyCell.style.fontWeight = 'normal';
-        keyCell.style.padding = '8px';
-        keyCell.style.border = '1px solid #A9A9A9'
+            const keyCell = document.createElement('td');
+            keyCell.innerHTML = value.label;
+            keyCell.style.fontWeight = 'normal';
+            keyCell.style.padding = '8px';
+            keyCell.style.border = '1px solid #A9A9A9'
 
-        // Set fixed width of company identifier column:
-        keyCell.style.width = '300px'; // Set fixed width for key cells
+            // Set fixed width of company identifier column:
+            keyCell.style.width = '300px'; // Set fixed width for key cells
 
-        const valueCell = document.createElement('td');
-        valueCell.innerHTML = value.value;
-        valueCell.style.padding = '8px';
-        valueCell.style.border = '1px solid #A9A9A9'
+            const valueCell = document.createElement('td');
+            valueCell.innerHTML = value.value;
+            valueCell.style.padding = '8px';
+            valueCell.style.border = '1px solid #A9A9A9'
 
-        row.appendChild(keyCell);
-        row.appendChild(valueCell);
-        tbody.appendChild(row);
+            row.appendChild(keyCell);
+            row.appendChild(valueCell);
+            tbody.appendChild(row);
+        }
+
+        table.appendChild(tbody);
+        tableContainer.appendChild(table);
     }
-
-    table.appendChild(tbody);
-    tableContainer.appendChild(table);
 }
 
 // Call loadWorldStatus when the "World Control" tab is loaded
@@ -235,21 +234,23 @@ function generateGlobalMarketPriceChartData(data) {
 
 // Renders the Chart.js bar chart
 function renderResourceOverviewWidgets() {
-    renderWidget("1", "Raw material");
-    renderWidget("2", "Fuel");
-    renderWidget("3", "Ore");
-    renderWidget("4", "Tools");
-    renderWidget("5", "Apparel");
-    renderWidget("6", "Other");
+    if (document.getElementById("resource-status-tab")) {
+        renderWidget("1", "Raw material");
+        renderWidget("2", "Fuel");
+        renderWidget("3", "Ore");
+        renderWidget("4", "Tools");
+        renderWidget("5", "Apparel");
+        renderWidget("6", "Metal");
+    }
 }
 
 async function renderWidget(widgetId, usageCategory) {
 
-    const canvasId = "resourceStatusWidget"+widgetId+"Canvas";
-    const headerId = "widget"+widgetId+"title";
+    const canvasId = "resourceStatusWidget" + widgetId + "Canvas";
+    const headerId = "widget" + widgetId + "title";
 
     const widgetTitle = document.getElementById(headerId);
-    widgetTitle.outerHTML = '<h3 id=headerId>'+usageCategory+' Prices</h3>';
+    widgetTitle.innerHTML = '<h3 id=headerId>' + usageCategory + ' Prices</h3>';
 
     const data = await fetchGlobalMarketPrices("country-00000", usageCategory);
     const chartData = generateGlobalMarketPriceChartData(data);
@@ -266,6 +267,7 @@ async function renderWidget(widgetId, usageCategory) {
         options: {
             indexAxis: 'y', // Set to 'y' for horizontal bars
             responsive: false,  // Disable responsive resizing
+            animation: false,
             scales: {
                 x: {
                     stacked: false,
@@ -288,7 +290,7 @@ async function renderWidget(widgetId, usageCategory) {
                 },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             return `$${context.parsed.y.toFixed(0)}`;
                         }
                     }
@@ -300,7 +302,7 @@ async function renderWidget(widgetId, usageCategory) {
                     font: {
                         weight: 'bold'
                     },
-                    formatter: function(value, context) {
+                    formatter: function (value, context) {
                         return `${context.dataset.label}: $${value.toFixed(0)}`; // Label with good name and price
                     }
                 }
