@@ -3,6 +3,8 @@ package com.saaenmadsen.shardworld.actors.company.direction;
 import com.saaenmadsen.shardworld.actors.company.CompanyDailyReport;
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
+import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
@@ -23,9 +25,27 @@ public class DesiceWhatToBuyAtMarket {
     }
 
     public StockListing decide() {
-        addRawMaterialsForTwoMostProfitableRecipes(companyInformation);
-        addToolsForRecipesWithNoProductionLine(companyInformation);
-        return shoppingList;
+        switch (companyInformation.getCompanyType()) {
+            case CompanyType.PRODUCTION:
+                addRawMaterialsForTwoMostProfitableRecipes(companyInformation);
+                addToolsForRecipesWithNoProductionLine(companyInformation);
+                return shoppingList;
+            case STOCKPILE:
+                addStrategicStorageRequirements(companyInformation);
+                return shoppingList;
+            case RETAIL:
+                return shoppingList;
+        }
+        throw new IllegalArgumentException("Unknown company type: " + companyInformation.getCompanyType());
+    }
+
+    private void addStrategicStorageRequirements(CompanyInformation companyInformation) {
+        for(int skuId=0;skuId< StockKeepUnit.values().length;skuId++) {
+            int alreadyInStock = companyInformation.getWarehouse().getSkuCount(skuId);
+            double factor = Math.pow(companyInformation.getCulture().getStockManagementLevel().getLevel(), 1.5);
+            int wishedStrategicStockpile = (int) (1000*factor);
+            shoppingList.getStock()[skuId] = wishedStrategicStockpile - alreadyInStock;
+        }
     }
 
     private void addToolsForRecipesWithNoProductionLine(CompanyInformation companyInformation) {

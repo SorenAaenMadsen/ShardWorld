@@ -23,6 +23,10 @@ public class CompanyInformation {
     private final CompanyType companyType;
 
 
+    public CompanyType getCompanyType() {
+        return companyType;
+    }
+
     public CompanyInformation(String companyId, CompanyType companyType, CompanyCulture culture, CompanyFlawor companyFlawor, StockListing warehouse, List<KnownRecipe> myRecipes, int workers, Random dice, PriceList priceList, MoneyBox moneyBox) {
         this.companyId = companyId;
         this.companyType = companyType;
