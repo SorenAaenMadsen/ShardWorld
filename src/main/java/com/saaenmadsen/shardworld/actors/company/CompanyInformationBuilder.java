@@ -2,6 +2,7 @@ package com.saaenmadsen.shardworld.actors.company;
 
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCultureBuilder;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
@@ -22,6 +23,7 @@ public class CompanyInformationBuilder {
     private Random dice;
     private PriceList priceList;
     private MoneyBox moneyBox;
+    CompanyType companyType;
 
     private CompanyInformationBuilder(String companyId, WorldSettings worldSettings) {
         this.companyId = companyId;
@@ -33,6 +35,7 @@ public class CompanyInformationBuilder {
         this.companyFlawor = new CompanyFlawor();
         this.moneyBox = new MoneyBox();
         moneyBox.addMoney(worldSettings.companyInitialMoney());
+        this.companyType = CompanyType.PRODUCTION;
     }
 
     private CompanyInformationBuilder(
@@ -96,9 +99,15 @@ public class CompanyInformationBuilder {
         return this;
     }
 
+    public CompanyInformationBuilder withCompanyType(CompanyType companyType) {
+        this.companyType = companyType;
+        return this;
+    }
+
     public CompanyInformation build() {
         return new CompanyInformation(
                 companyId,
+                companyType,
                 culture,
                 companyFlawor,
                 warehouse,

@@ -1,6 +1,7 @@
 package com.saaenmadsen.shardworld.actors.company;
 
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
@@ -19,9 +20,12 @@ public class CompanyInformation {
     private Random dice;
     private PriceList priceList;
     private MoneyBox moneyBox;
+    private final CompanyType companyType;
 
-    public CompanyInformation(String companyId, CompanyCulture culture, CompanyFlawor companyFlawor, StockListing warehouse, List<KnownRecipe> myRecipes, int workers, Random dice, PriceList priceList, MoneyBox moneyBox) {
+
+    public CompanyInformation(String companyId, CompanyType companyType, CompanyCulture culture, CompanyFlawor companyFlawor, StockListing warehouse, List<KnownRecipe> myRecipes, int workers, Random dice, PriceList priceList, MoneyBox moneyBox) {
         this.companyId = companyId;
+        this.companyType = companyType;
         this.culture = culture;
         this.companyFlawor = companyFlawor;
         this.warehouse = warehouse;
