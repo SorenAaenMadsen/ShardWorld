@@ -44,10 +44,7 @@
             height: 300px;
         }
 
-        /* Grid layout */
-        .itemHeader {
-            grid-area: header;
-        }
+
 
         .itemMenu {
             grid-area: menu;
@@ -82,6 +79,16 @@
             vertical-align: top;
             padding: 10px 0;
             font-size: 18px;
+            border: 1px solid black; /* Thin black border for grid items */
+        }
+
+        /* Specific cell with background image */
+        .grid-item-header {
+            background-image: url('/images/2750230775.jpeg'); /* Path to the image */
+            background-size: cover; /* Scale image to cover the cell */
+            background-repeat: no-repeat; /* Prevent tiling */
+            background-position: center; /* Center the image */
+            grid-area: header;
         }
 
     </style>
@@ -89,7 +96,7 @@
 <body>
 
 <div class="grid-container">
-    <div class="itemHeader">
+    <div class="grid-item-header">
         <div id="header-text"></div>
         <div class="tabs">
             <!-- Tabs Navigation -->
