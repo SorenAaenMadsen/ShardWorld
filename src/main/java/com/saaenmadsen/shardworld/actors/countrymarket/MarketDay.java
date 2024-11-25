@@ -89,14 +89,20 @@ public class MarketDay {
         marketBooths.forEach(booth -> totalUnsoldGoods.addStockFromList(booth.boothStock));
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             int oldPrice = newestPriceList.getPrice(i);
-            newestPriceList.setPrice(i, calculateNewPrice(oldPrice, totalGoodsForSale.getSkuCount(i), totalUnsoldGoods.getSkuCount(i), unfulfilledOrders.getSkuCount(i)));
+            newestPriceList.setPrice(i, calculateNewPrice(oldPrice, totalGoodsForSale.getSkuCount(i), totalUnsoldGoods.getSkuCount(i), unfulfilledOrders.getSkuCount(i), calculateMaxPrice(i)));
             log.debug("Price of " + StockKeepUnit.values()[i].getProductName() + " from " + oldPrice + "  to " + newestPriceList.getPrice(i));
         }
     }
 
-    public static int calculateNewPrice(int oldPrice, int amountForSale, int amountUnsold, int unfulfilledOrders) {
+    private int calculateMaxPrice(int skuId) {
+        return StockKeepUnit.values()[skuId].getInitialPrice()*2;
+    }
+
+    public static int calculateNewPrice(int oldPrice, int amountForSale, int amountUnsold, int unfulfilledOrders, int maxPrice) {
         int newPrice = adjustDueToUnsoldGoods(oldPrice, amountForSale, amountUnsold);
-        return adjustDueToUnfulfilledOrders(newPrice, amountForSale, unfulfilledOrders);
+        newPrice = adjustDueToUnfulfilledOrders(newPrice, amountForSale, unfulfilledOrders);
+        newPrice = Math.min(newPrice, maxPrice);
+        return newPrice;
     }
 
     private static int adjustDueToUnsoldGoods(int oldPrice, int amountForSale, int amountUnsold) {

@@ -26,7 +26,6 @@ public record SkuAndCount(StockKeepUnit sku, int amount) {
 
     public static Optional<SkuAndCount> from(StockKeepUnit sku, int amount) {
         if (null == sku) return Optional.empty();
-        if (sku.equals(StockKeepUnit.NULL)) return Optional.empty();
         return Optional.of(new SkuAndCount(sku, amount));
     }
 
