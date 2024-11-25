@@ -151,8 +151,8 @@ function createCompanyDayReportsTable(data) {
     tableContainer.innerHTML = ''; // Clear any existing table content
 
     const table = document.createElement('table');
-    table.style.width = '1000px';
-    table.border = '1';
+
+    table.style.borderCollapse = 'collapse';
 
     const tbody = document.createElement('tbody');
 
@@ -164,18 +164,15 @@ function createCompanyDayReportsTable(data) {
         keyCell.innerHTML = value.label;
         keyCell.style.fontWeight = 'bold';
         keyCell.style.padding = '8px';
+        keyCell.style.border = '1px solid #A9A9A9'
 
-        // Set fixed cell dimensions
+        // Set fixed width of company identifier column:
         keyCell.style.width = '300px'; // Set fixed width for key cells
-        keyCell.style.height = '80px'; // Set fixed height for key cells
 
         const valueCell = document.createElement('td');
         valueCell.innerHTML = value.value;
         valueCell.style.padding = '8px';
-
-        // Set fixed cell dimensions
-        valueCell.style.width = '700px'; // Set fixed width for value cells
-        valueCell.style.height = '80px'; // Set fixed height for value cells
+        valueCell.style.border = '1px solid #A9A9A9'
 
         row.appendChild(keyCell);
         row.appendChild(valueCell);
