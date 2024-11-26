@@ -15,6 +15,8 @@ import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
 import com.saaenmadsen.shardworld.statistics.PrintableStockListing;
 
+import java.util.Optional;
+
 public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompanyCommand> {
     private String companyId;
     private final akka.actor.typed.ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor;
@@ -23,8 +25,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
 
 
     private CompanyInformation companyInformation;
-
-
+    private Optional<ProductionPlanningAndExecution.PartialProduction> partialProduction = Optional.empty();
 
 
     public interface ShardCompanyCommand {
@@ -85,7 +86,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         companyDailyReport = new CompanyDailyReport(companyId, message.dayId());
         companyInformation.setPriceList(message.priceList());
 
-        new ProductionPlanningAndExecution(companyInformation, companyDailyReport);
+        this.partialProduction = new ProductionPlanningAndExecution(companyInformation, companyDailyReport, partialProduction).execute();
 
         StockListing forSaleList = new DesiceWhatToSellAtMarket(companyInformation, companyDailyReport).getForSaleList();
         message.countryMarket().tell(new C_SendSkuToMarketForSale(forSaleList, getContext().getSelf()));

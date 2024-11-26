@@ -16,7 +16,7 @@ public class CompanyInformation {
     private CompanyFlawor companyFlawor;
     private StockListing warehouse;
     private List<KnownRecipe> myRecipes;
-    private int workers = 10;
+    private int workers = 50;
     private Random dice;
     private PriceList priceList;
     private MoneyBox moneyBox;

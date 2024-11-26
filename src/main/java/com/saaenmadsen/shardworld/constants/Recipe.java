@@ -299,12 +299,20 @@ public enum Recipe {
         return myRawMaterials.getSkuCount(inputProduct.sku().getArrayId()) / inputProduct.amount();
     }
 
-    public void runProduction(int numberOfRuns, StockListing stock) {
-        for (SkuAndCount input : inputs.skuAndCounts) {
-            stock.addStockAmount(input.sku().getArrayId(), -input.amount() * numberOfRuns);
-        }
+    public void consumeRawMaterialsAndAddFinishedProducts(int numberOfRuns, StockListing stock) {
+        consumeRawMaterials(numberOfRuns, stock);
+        addOutputsToStock(numberOfRuns, stock);
+    }
+
+    public void addOutputsToStock(int numberOfRuns, StockListing stock) {
         for (SkuAndCount output : outputs.skuAndCounts) {
             stock.addStockAmount(output.sku().getArrayId(), output.amount() * numberOfRuns);
+        }
+    }
+
+    public void consumeRawMaterials(int numberOfRuns, StockListing stock) {
+        for (SkuAndCount input : inputs.skuAndCounts) {
+            stock.addStockAmount(input.sku().getArrayId(), -input.amount() * numberOfRuns);
         }
     }
 
