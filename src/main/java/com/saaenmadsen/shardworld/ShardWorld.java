@@ -82,6 +82,7 @@ public class ShardWorld {
 
     @NotNull
     private static String buildCompanyDailyOverview(CompanyDayStats companyDayStats) {
+
         String companyDailyOverviewHtml =
                 "<table style=\"font-weight:normal\">\n" +
                         "  <tr>\n" +

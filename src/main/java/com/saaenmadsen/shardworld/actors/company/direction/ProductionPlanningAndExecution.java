@@ -3,6 +3,7 @@ package com.saaenmadsen.shardworld.actors.company.direction;
 import com.saaenmadsen.shardworld.actors.company.CompanyDailyReport;
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.recipechoice.RecipeChoiceReport;
 
 import java.util.List;
@@ -12,22 +13,24 @@ import java.util.stream.Collectors;
 public class ProductionPlanningAndExecution {
 
     public ProductionPlanningAndExecution(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
-        attemptToSetupProductionLinesForRecipes(companyInformation);
+        if (companyInformation.getCompanyType().equals(CompanyType.PRODUCTION)) {
+            attemptToSetupProductionLinesForRecipes(companyInformation);
 
-        List<KnownRecipe> availableProductionLines = companyInformation.getKnownRecipes().stream().filter(knownRecipe -> knownRecipe.isProductionLine()).collect(Collectors.toUnmodifiableList());
+            List<KnownRecipe> availableProductionLines = companyInformation.getKnownRecipes().stream().filter(knownRecipe -> knownRecipe.isProductionLine()).collect(Collectors.toUnmodifiableList());
 
-        RecipeChoiceReport productionLineSelectionReport = RecipeChoiceReport.evaluateRecipesForProfitability(
-                availableProductionLines,
-                companyInformation.getWarehouse(),
-                companyInformation.getPriceList(),
-                companyInformation.calculateWorkTimeAvailable()
-        );
+            RecipeChoiceReport productionLineSelectionReport = RecipeChoiceReport.evaluateRecipesForProfitability(
+                    availableProductionLines,
+                    companyInformation.getWarehouse(),
+                    companyInformation.getPriceList(),
+                    companyInformation.calculateWorkTimeAvailable()
+            );
 
-        if (productionLineSelectionReport.productionChoices().isEmpty()) {
-            String reasoning = productionLineSelectionReport.nonSelectedChoices().stream().map(nonSelected -> nonSelected.recipe().name() + ":" + nonSelected.selectionReport()).collect(Collectors.joining(","));
-            companyDailyReport.appendToDailyReport("No production. " + reasoning);
+            if (productionLineSelectionReport.productionChoices().isEmpty()) {
+                String reasoning = productionLineSelectionReport.nonSelectedChoices().stream().map(nonSelected -> nonSelected.recipe().name() + ":" + nonSelected.selectionReport()).collect(Collectors.joining(","));
+                companyDailyReport.appendToDailyReport("No production. " + reasoning);
+            }
+            doProduction(companyInformation, companyDailyReport, productionLineSelectionReport);
         }
-        doProduction(companyInformation, companyDailyReport, productionLineSelectionReport);
     }
 
     private static void doProduction(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport, RecipeChoiceReport productionLineSelectionReport) {

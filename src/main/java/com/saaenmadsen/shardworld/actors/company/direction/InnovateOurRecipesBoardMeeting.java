@@ -3,6 +3,7 @@ package com.saaenmadsen.shardworld.actors.company.direction;
 import com.saaenmadsen.shardworld.actors.company.CompanyDailyReport;
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.modeltypes.SkuAndCount;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
@@ -18,12 +19,14 @@ public class InnovateOurRecipesBoardMeeting {
 
 
     public InnovateOurRecipesBoardMeeting(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport, StockListing unfulfilledOrdersAtMarket) {
-        if (companyInformation.getCulture().getInnovativenessLevel().getLevel() == 1) {
-            return;
-        } else {
-            reduceNumberOfKnownrecipesToMax5(companyInformation, companyDailyReport);
+        if (companyInformation.getCompanyType().equals(CompanyType.PRODUCTION)) {
+            if (companyInformation.getCulture().getInnovativenessLevel().getLevel() == 1) {
+                return;
+            } else {
+                reduceNumberOfKnownrecipesToMax5(companyInformation, companyDailyReport);
 //            investInBestOfXRandomProductionRecipes(companyInformation, companyDailyReport, unfulfilledOrdersAtMarket, companyInformation.getCulture().getInnovativenessLevel().getLevel() / 2);
-            investInDesiredProductionRecipe(companyInformation, companyDailyReport, unfulfilledOrdersAtMarket, companyInformation.getCulture().getInnovativenessLevel().getLevel() / 2);
+                investInDesiredProductionRecipe(companyInformation, companyDailyReport, unfulfilledOrdersAtMarket, companyInformation.getCulture().getInnovativenessLevel().getLevel() / 2);
+            }
         }
     }
 

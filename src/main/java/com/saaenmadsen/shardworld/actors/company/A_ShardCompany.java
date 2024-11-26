@@ -3,6 +3,7 @@ package com.saaenmadsen.shardworld.actors.company;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.actors.company.direction.*;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_BuyOrder;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_EndMarketDay;
@@ -12,6 +13,7 @@ import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
+import com.saaenmadsen.shardworld.statistics.PrintableStockListing;
 
 public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompanyCommand> {
     private String companyId;
@@ -118,9 +120,12 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
-
+        if(this.companyInformation.getCompanyType().equals(CompanyType.STOCKPILE)){
+            this.companyDailyReport.appendToDailyReport("Bought:<br>" + new PrintableStockListing(message.purchasedGoods()).toString());
+        }
         this.companyInformation.getMoneyBox().addMoney(message.unspentMoney().getMoney());
         this.companyInformation.getWarehouse().addStockFromList(message.purchasedGoods());
+
 
         return Behaviors.same();
     }

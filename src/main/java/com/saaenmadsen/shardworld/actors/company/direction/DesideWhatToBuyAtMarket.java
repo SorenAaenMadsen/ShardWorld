@@ -31,7 +31,7 @@ public class DesideWhatToBuyAtMarket {
                 addToolsForRecipesWithNoProductionLine(companyInformation);
                 return shoppingList;
             case STOCKPILE:
-                addStrategicStorageRequirements(companyInformation);
+                addBuyOrderForCheapGoods(companyInformation);
                 return shoppingList;
             case RETAIL:
                 return shoppingList;
@@ -39,12 +39,15 @@ public class DesideWhatToBuyAtMarket {
         throw new IllegalArgumentException("Unknown company type: " + companyInformation.getCompanyType());
     }
 
-    private void addStrategicStorageRequirements(CompanyInformation companyInformation) {
+    private void addBuyOrderForCheapGoods(CompanyInformation companyInformation) {
         for(int skuId=0;skuId< StockKeepUnit.values().length;skuId++) {
-            int alreadyInStock = companyInformation.getWarehouse().getSkuCount(skuId);
-            double factor = Math.pow(companyInformation.getCulture().getStockManagementLevel().getLevel(), 1.5);
-            int wishedStrategicStockpile = (int) (1000*factor);
-            shoppingList.getStock()[skuId] = wishedStrategicStockpile - alreadyInStock;
+            boolean isCurrentPriceLowerThanBasePrice = companyInformation.getPriceList().getPrice(skuId) < StockKeepUnit.values()[skuId].getInitialPrice();
+            if(isCurrentPriceLowerThanBasePrice) {
+                int alreadyInStock = companyInformation.getWarehouse().getSkuCount(skuId);
+                double factor = Math.pow(companyInformation.getCulture().getStockManagementLevel().getLevel(), 1.5);
+                int wishedStrategicStockpile = (int) (1000 * factor);
+                shoppingList.getStock()[skuId] = wishedStrategicStockpile - alreadyInStock;
+            }
         }
     }
 

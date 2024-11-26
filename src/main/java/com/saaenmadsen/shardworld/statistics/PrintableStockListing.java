@@ -30,4 +30,9 @@ public class PrintableStockListing {
     public List<ShardWorld.DataPoint> getAsDataPointsForWebGraph() {
         return this.stream().map(stock -> new ShardWorld.DataPoint(stock.getKey(), stock.getValue())).collect(Collectors.toUnmodifiableList());
     }
+
+    @Override
+    public String toString() {
+        return getAsDataPointsForWebGraph().stream().map(dataPoint -> String.format("%1000s %s",dataPoint.data(), dataPoint.label())).collect(Collectors.joining("<br>"));
+    }
 }
