@@ -36,15 +36,6 @@ public class ListSkuAndCount {
         skuAndCounts.add(skuAndCount);
     }
 
-    public boolean isAnySkuInList(Iterable<StockKeepUnit> skuList) {
-        for (StockKeepUnit stockKeepUnit : skuList) {
-            if (isSkuInList(stockKeepUnit)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean areAllIn(Iterable<StockKeepUnit> skuList) {
         for (SkuAndCount skuAndCount : this.skuAndCounts) {
             boolean found = false;

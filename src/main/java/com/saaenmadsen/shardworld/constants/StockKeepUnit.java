@@ -36,12 +36,12 @@ public enum StockKeepUnit {
     LAPIS_LAZULI (29, "Lapis Lazuli", SkuUsageClassification.OTHER, "", "", 2318),
     MILD_STEEL (30, "Mild Steel", SkuUsageClassification.METAL, "", "Mild steel is a type of carbon steel with a low amount of carbon. It is also known as low carbon steel. ", 2318),
     WOOD_TOOLS (31, "Wood tools", SkuUsageClassification.TOOLS, "kg", "", 378),
-    MEAT_CHICKEN (32, "Meat, Chicken", SkuUsageClassification.FOOD, "", "", 33),
-    MEET_BEEF (33, "Meet, Beef", SkuUsageClassification.FOOD, "", "", 33),
-    MEET_PORK (34, "Meet, Pork", SkuUsageClassification.FOOD, "", "", 33),
-    PEAS (35, "Peas", SkuUsageClassification.FOOD, "", "", 33),
+    MEAT_CHICKEN (32, "Meat, Chicken", SkuUsageClassification.FOOD, "", "", 206),
+    MEET_BEEF (33, "Meet, Beef", SkuUsageClassification.FOOD, "", "", 206),
+    MEET_PORK (34, "Meet, Pork", SkuUsageClassification.FOOD, "", "", 206),
+    PEAS (35, "Peas", SkuUsageClassification.FOOD, "", "", 330),
     PIG (36, "Pig", SkuUsageClassification.ANIMAL, "", "", 33),
-    POTATOES (37, "Potatoes", SkuUsageClassification.FOOD, "", "", 33),
+    POTATOES (37, "Potatoes", SkuUsageClassification.FOOD, "", "", 330),
     QUARTZ (38, "Quartz", SkuUsageClassification.OTHER, "", "", 33),
     RICE (39, "Rice", SkuUsageClassification.FOOD, "", "", 33),
     RUBY (40, "Ruby", SkuUsageClassification.OTHER, "", "", 33),
@@ -62,8 +62,8 @@ public enum StockKeepUnit {
     TIN (55, "Tin", SkuUsageClassification.INACTIVEMETAL, "", "", 33),
     TIN_ORE (56, "Tin Ore", SkuUsageClassification.ORE, "", "", 264),
     TOPAZ (57, "Topaz", SkuUsageClassification.OTHER, "", "", 33),
-    ONIONS (58, "Onions", SkuUsageClassification.FOOD, "kg", "", 33),
-    BERRIES (59, "Berries", SkuUsageClassification.FOOD, "kg", "", 33)
+    ONIONS (58, "Onions", SkuUsageClassification.FOOD, "kg", "", 330),
+    BERRIES (59, "Berries", SkuUsageClassification.FOOD, "kg", "", 330)
     ;
 
 

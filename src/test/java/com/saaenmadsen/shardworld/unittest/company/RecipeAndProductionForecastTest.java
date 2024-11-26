@@ -1,6 +1,7 @@
 package com.saaenmadsen.shardworld.unittest.company;
 
 import com.saaenmadsen.shardworld.actors.company.*;
+import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.actors.company.direction.DayEndEvaluationDirectionMeeting;
 import com.saaenmadsen.shardworld.actors.company.direction.DesideWhatToBuyAtMarket;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
@@ -51,6 +52,7 @@ public class RecipeAndProductionForecastTest {
         when(companyInformation.calculateWorkTimeAvailable()).thenReturn(100);
         when(companyInformation.getKnownRecipes()).thenReturn(knownRecipes);
         when(companyInformation.getPriceList()).thenReturn(PriceList.ofDefault());
+        when(companyInformation.getCompanyType()).thenReturn(CompanyType.PRODUCTION);
 
         DesideWhatToBuyAtMarket buyDecision = new DesideWhatToBuyAtMarket(companyInformation, mock(CompanyDailyReport.class));
 

@@ -8,6 +8,8 @@ import com.saaenmadsen.shardworld.statistics.PrintablePriceList;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -35,12 +37,13 @@ public class ReasonablePricesTest {
                         // we have a recipe that produces the SKU without a price.
                         if (recipe.getInputs().areAllIn(skusWithResolvedPrices)) {
                             // And all inputs have their prices resolved.
+                            int rawProductPrice = recipe.calculateRawProductPriceForProductionRun(priceList);
+                            int workerSalary = recipe.getWorkTimeTimes10Minutes()*10;
+                            int waitDaysFromProductionToAvailable = recipe.getCalenderWaitDaysFromProductionToAvailable()*10;
+                            int amountProduced = recipe.getOutputs().skuAndCounts.getFirst().amount();
+
                             if (recipe.getOutputs().size() == 1) {
-                                // And this product is the only output of the recipe. TODO: Probably need to add an else clause to allow more than one output of a recipe!
-                                int rawProductPrice = recipe.calculateRawProductPriceForProductionRun(priceList);
-                                int workerSalary = recipe.getWorkTimeTimes10Minutes()*10;
-                                int waitDaysFromProductionToAvailable = recipe.getCalenderWaitDaysFromProductionToAvailable()*10;
-                                int amountProduced = recipe.getOutputs().skuAndCounts.getFirst().amount();
+                                // And this product is the only output of the recipe.
                                 int newDesiredPrice = (int) ((rawProductPrice + workerSalary + waitDaysFromProductionToAvailable) * 1.1 / amountProduced);
 
                                 assertTrue(skuToMaybeResolve.getProductName() + " [" + skuToMaybeResolve.getArrayId() + "] price resolved to " + newDesiredPrice + ". " +
@@ -50,7 +53,23 @@ public class ReasonablePricesTest {
 
                                 skuWithPrice.add(new SkuWithPrice(newDesiredPrice, skuToMaybeResolve));
                             } else {
-                                throw new RuntimeException("More than one output for "+recipe.name()+", this is not supported yet");
+                                Stream<SkuAndCount> outputsWithPriceAlreadyResolved = recipe.getOutputs().stream().filter(output -> skusWithResolvedPrices.contains(output.sku()));
+                                int valueOfOutputsWithResolvedPrice = outputsWithPriceAlreadyResolved.map(output -> output.amount() * priceList.getPrice(output.sku())).mapToInt(value -> value).sum();
+                                // Now we assume the remaining items are equally valuable. Not really a good decision :)
+                                List<SkuAndCount> outputsWithUnresolvedPrice = recipe.getOutputs().stream().filter(output -> !skusWithResolvedPrices.contains(output.sku())).collect(Collectors.toUnmodifiableList());
+                                int totalAmountOfUnpricedProducts = outputsWithUnresolvedPrice.stream().map(output -> output.amount()).mapToInt(value -> value).sum();
+
+                                int newDesiredPrice = (int) ((rawProductPrice + workerSalary + waitDaysFromProductionToAvailable) * 1.1 / totalAmountOfUnpricedProducts);
+
+                                for (SkuAndCount skuAndCount : outputsWithUnresolvedPrice) {
+                                    assertTrue(skuAndCount.sku().getProductName() + " [" + skuAndCount.sku().getArrayId() + "] price resolved to " + newDesiredPrice + ". " +
+                                                    String.format("rawProductPrice=%s, workerSalary=%s, waitDaysFromProductionToAvailable=%s", rawProductPrice, workerSalary, waitDaysFromProductionToAvailable),
+                                            newDesiredPrice > 0)
+                                    ;
+
+                                    skuWithPrice.add(new SkuWithPrice(newDesiredPrice, skuAndCount.sku()));
+                                }
+//                                  throw new RuntimeException("More than one output for "+recipe.name()+", this is not supported yet");
                             }
                         }
                     }
