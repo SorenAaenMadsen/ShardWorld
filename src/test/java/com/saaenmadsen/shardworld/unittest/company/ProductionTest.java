@@ -6,11 +6,9 @@ import com.saaenmadsen.shardworld.actors.company.CompanyInformationBuilder;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.actors.company.direction.ProductionPlanningAndExecution;
-import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
-import com.saaenmadsen.shardworld.modeltypes.ListSkuAndCount;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +58,7 @@ public class ProductionTest {
         StockKeepUnit producedSku = Recipe.SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING.getOutputs().skuAndCounts.getFirst().sku();
         int totalNeededWorktime = Recipe.SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING.getWorkTimeTimes10Minutes();
         StockListing warehouse = StockListing.ofEmpty();
-        Optional<ProductionPlanningAndExecution.PartialProduction> partialProduction = Optional.of(new ProductionPlanningAndExecution.PartialProduction(Recipe.SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING, totalNeededWorktime-20));
+        Optional<ProductionPlanningAndExecution.PartialProduction> partialProduction = Optional.of(new ProductionPlanningAndExecution.PartialProduction(Recipe.SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING, totalNeededWorktime - 20));
 
         CompanyInformation companyInformation = CompanyInformationBuilder
                 .ofWorldDefault("testcompany", WorldSettingsBuilder.ofDefault().build())
