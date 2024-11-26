@@ -3,27 +3,41 @@
 control     RootGuardian    as rg
 entity      ShardWorld      as sw
 entity      ShardCountry    as sc
-collections Population      as pop
+collections PopGroup      as pop
 entity      CountryMarket   as cm
 collections Companies       as com
 
 rg -> sw : Start System
 sw -> sc : Start Day
 sc -> cm : Start Market Day Cycle
+activate cm
 cm -> com : Market open for sellers
+activate com
 com -> com : production
 com -> cm : Send SKU to market for sale
+deactivate com
+cm -> cm  : All companies have reported sales
 cm -> pop : Market open for buyers
+activate pop
 cm -> com : Market open for buyers
+activate com
 pop -> cm : Buy order
-com -> cm : Buy order
 cm -> pop : Completed Buy Order
+pop -> cm : End Market Day
+deactivate pop
+com -> cm : Buy order
+deactivate com
 cm -> com : Completed Buy Order
+activate com
+cm -> cm  : All companies and popgroups have bought
+deactivate com
 cm -> com : Send unsold SKU to company
+activate com
 cm -> cm : price update
 com -> cm : End Market Day
-pop -> cm : End Market Day
+deactivate com
 cm -> sc : End Market Day Cycle
+deactivate cm
 sc -> sw : End Day
 sw -> rg : Game over
 
