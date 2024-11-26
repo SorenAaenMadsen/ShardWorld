@@ -62,7 +62,8 @@ public enum StockKeepUnit {
     TIN (55, "Tin", SkuUsageClassification.INACTIVEMETAL, "", "", 33),
     TIN_ORE (56, "Tin Ore", SkuUsageClassification.ORE, "", "", 264),
     TOPAZ (57, "Topaz", SkuUsageClassification.OTHER, "", "", 33),
-
+    ONIONS (58, "Onions", SkuUsageClassification.FOOD, "kg", "", 33),
+    BERRIES (59, "Berries", SkuUsageClassification.FOOD, "kg", "", 33)
     ;
 
 

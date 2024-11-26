@@ -6,18 +6,8 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-import com.saaenmadsen.shardworld.actors.company.*;
-import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
-import com.saaenmadsen.shardworld.actors.company.direction.*;
-import com.saaenmadsen.shardworld.actors.countrymarket.C_BuyOrder;
-import com.saaenmadsen.shardworld.actors.countrymarket.C_EndMarketDay;
-import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
-import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
-import com.saaenmadsen.shardworld.modeltypes.StockListing;
-import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
-import com.saaenmadsen.shardworld.statistics.PrintableStockListing;
 
 public class A_PopGroup extends AbstractBehavior<A_PopGroup.PopGroupCommand> {
     private int popCount;
@@ -49,14 +39,14 @@ public class A_PopGroup extends AbstractBehavior<A_PopGroup.PopGroupCommand> {
     public Receive<PopGroupCommand> createReceive() {
         getContext().getLog().debug("ShardCompany createReceive");
         return newReceiveBuilder()
-                .onMessage(C_MarketOpenForBuyers.class, this::onMarketOpenForBuyers)
+                .onMessage(C_RetailShopsOpenForBuyers.class, this::onMarketOpenForBuyers)
                 .build();
     }
 
 
     // ****************** Acions *************************
 
-    private Behavior<PopGroupCommand> onMarketOpenForBuyers(C_MarketOpenForBuyers cMarketOpenForBuyers) {
+    private Behavior<PopGroupCommand> onMarketOpenForBuyers(C_RetailShopsOpenForBuyers cMarketOpenForBuyers) {
         return null;
     }
 

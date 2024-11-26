@@ -63,4 +63,8 @@ public class ListSkuAndCount {
     public int size() {
         return skuAndCounts.size();
     }
+
+    public void addAll(List<SkuAndCount> productProduced) {
+        this.skuAndCounts.addAll(productProduced);
+    }
 }

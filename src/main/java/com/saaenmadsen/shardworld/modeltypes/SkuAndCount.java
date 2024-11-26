@@ -24,9 +24,14 @@ public record SkuAndCount(StockKeepUnit sku, int amount) {
         return Optional.of(new SkuAndCount(StockKeepUnit.getByProductName(productName), Integer.parseInt(amount)));
     }
 
-    public static Optional<SkuAndCount> from(StockKeepUnit sku, int amount) {
+    public static Optional<SkuAndCount> optionalOf(StockKeepUnit sku, int amount) {
         if (null == sku) return Optional.empty();
         return Optional.of(new SkuAndCount(sku, amount));
+    }
+
+    public static SkuAndCount of(StockKeepUnit sku, int amount) {
+        if (null == sku) throw new IllegalArgumentException("sku is null");
+        return new SkuAndCount(sku, amount);
     }
 
     @Override

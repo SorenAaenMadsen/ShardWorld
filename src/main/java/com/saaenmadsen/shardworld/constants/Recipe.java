@@ -6,6 +6,7 @@ import com.saaenmadsen.shardworld.modeltypes.SkuAndCount;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.recipechoice.ProductionImpactReport;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Stream;
@@ -36,7 +37,60 @@ public enum Recipe {
     SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING(22, "Shaft Furnace Crucible Hard Steel Smelting", "Hard Steel", "150", "Using a Shaft Furnace, the temperature of the iron can be brought to 1,300-1,500 degree Celsius, high enough to produce molten iron, especially with effective bellows. TODO: More description here", "Wrought Iron", "160", "Charcoal", "240", "Null", "0", "", "3200", "", "", "", "Iron tools", "30", "Stone tools", "70", "Null", "0"),
     PRIMITIVE_CHARCOAL_BURNING(23, "Primitive Charcoal burning", StockKeepUnit.CHARCOAL, 50, "Description", StockKeepUnit.FIREWOOD_KG, 180, null, 0, null, 0, 0, 48, new SkillLevel(Skill.WOODWORKER, 3), null, null, null, 0, null, 0, null, 0),
     PRIMITIVE_STONE_TOOLS(24, "Primitive Stone Tools", StockKeepUnit.STONE_TOOLS, 1, "Making stone tools with only the tools and ingredients which can be found in nature.", null, 0, null, 0, null, 0, 0, 80, new SkillLevel(Skill.STONEWORKER, 1), null, null, null, 0, null, 0, null, 0),
-    PRIMITIVE_WOOD_TOOLS(25, "Primitive Wood Tools", StockKeepUnit.WOOD_TOOLS, 1, "Making wooden tools with only the tools which can be found in nature.", StockKeepUnit.WOOD_KG, 2, null, 0, null, 0, 0, 30, new SkillLevel(Skill.WOODWORKER, 1), null, null, null, 0, null, 0, null, 0);;
+    PRIMITIVE_WOOD_TOOLS(25, "Primitive Wood Tools", StockKeepUnit.WOOD_TOOLS, 1, "Making wooden tools with only the tools which can be found in nature.", StockKeepUnit.WOOD_KG, 2, null, 0, null, 0, 0, 30, new SkillLevel(Skill.WOODWORKER, 1), null, null, null, 0, null, 0, null, 0),
+
+    GATHER_FOODS(26, "Gather foods",
+            "Walking around, gathering what edible materials can be found.",
+            180, 0, // workTime_times10Minutes and calenderWaitTimeFromProductionToAvailable
+            // Produces
+            List.of(SkuAndCount.of(StockKeepUnit.POTATOES, 2),SkuAndCount.of(StockKeepUnit.ONIONS, 1),SkuAndCount.of(StockKeepUnit.BERRIES, 2),SkuAndCount.of(StockKeepUnit.PEAS, 1)),
+            // Raw materials
+            List.of(),
+            // Skill requirements
+            List.of(new SkillLevel(Skill.GATHERER, 1)),
+            // Tool_Requirements
+            List.of(SkuAndCount.of(StockKeepUnit.WOOD_TOOLS, 1))
+    ),
+    HUNTING_BOW_AND_STONE_TIPPED_ARROW(26, "Hunting with stone tipped arrows",
+            "Hunting, using a wooden bow and arrows tipped with stone",
+            600, 0, // workTime_times10Minutes and calenderWaitTimeFromProductionToAvailable
+            // Produces
+            List.of(SkuAndCount.of(StockKeepUnit.MEAT_CHICKEN, 12),SkuAndCount.of(StockKeepUnit.MEET_PORK, 10)),
+            // Raw materials
+            List.of(),
+            // Skill requirements
+            List.of(new SkillLevel(Skill.HUNTER, 1)),
+            // Tool_Requirements
+            List.of(SkuAndCount.of(StockKeepUnit.WOOD_TOOLS, 1))
+    ),
+    HUNTING_BOW_AND_IRON_TIPPED_ARROW(26, "Hunting with iron tipped arrows",
+            "Hunting, using a wooden bow and arrows tipped with iron",
+            600, 0, // workTime_times10Minutes and calenderWaitTimeFromProductionToAvailable
+            // Produces
+            List.of(SkuAndCount.of(StockKeepUnit.MEAT_CHICKEN, 12),SkuAndCount.of(StockKeepUnit.MEET_PORK, 10),SkuAndCount.of(StockKeepUnit.MEET_BEEF, 10)),
+            // Raw materials
+            List.of(),
+            // Skill requirements
+            List.of(new SkillLevel(Skill.HUNTER, 1)),
+            // Tool_Requirements
+            List.of(SkuAndCount.of(StockKeepUnit.WOOD_TOOLS, 1))
+    ),
+    ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private final ListSkuAndCount inputs = new ListSkuAndCount();
     private final ListSkuAndCount toolRequirements = new ListSkuAndCount();
     private final ListSkuAndCount outputs = new ListSkuAndCount();
@@ -48,6 +102,28 @@ public enum Recipe {
 
     private final int calenderWaitDaysFromProductionToAvailable;
     private final int workTimeTimes10Minutes;
+
+    Recipe(
+            int recipeId,
+            String recipeName,
+            String processDescription,
+            int workTime_times10Minutes,
+            int calenderWaitTimeFromProductionToAvailable,
+            List<SkuAndCount> productProduced,
+            List<SkuAndCount> rawMaterials,
+            List<SkillLevel> skillsRequired,
+            List<SkuAndCount> toolsRequired) {
+        this.recipeId = recipeId;
+        this.recipeName = recipeName;
+        this.processDescription = processDescription;
+        this.calenderWaitDaysFromProductionToAvailable = calenderWaitTimeFromProductionToAvailable;
+        this.workTimeTimes10Minutes = workTime_times10Minutes;
+
+        outputs.addAll(productProduced);
+        inputs.addAll(rawMaterials);
+        toolRequirements.addAll(toolsRequired);
+    }
+
 //    private final int skillLevel1;
 //    private final int skillLevel2;
 
@@ -157,15 +233,15 @@ public enum Recipe {
         this.recipeName = recipeName;
 
 
-        Optional<SkuAndCount> output1 = SkuAndCount.from(productProduced, producedAmount);
+        Optional<SkuAndCount> output1 = SkuAndCount.optionalOf(productProduced, producedAmount);
         output1.ifPresent(outputs::add);
 
         this.processDescription = processDescription;
-        Optional<SkuAndCount> input1 = SkuAndCount.from(input_1, input_1_amount);
+        Optional<SkuAndCount> input1 = SkuAndCount.optionalOf(input_1, input_1_amount);
         input1.ifPresent(inputs::add);
-        Optional<SkuAndCount> input2 = SkuAndCount.from(input_2, input_2_amount);
+        Optional<SkuAndCount> input2 = SkuAndCount.optionalOf(input_2, input_2_amount);
         input2.ifPresent(inputs::add);
-        Optional<SkuAndCount> input3 = SkuAndCount.from(input_3, input_3_amount);
+        Optional<SkuAndCount> input3 = SkuAndCount.optionalOf(input_3, input_3_amount);
         input3.ifPresent(inputs::add);
 
         this.calenderWaitDaysFromProductionToAvailable = calenderWaitTimeFromProductionToAvailable;
@@ -174,11 +250,11 @@ public enum Recipe {
 //        skillLevel1 = Integer.parseInt(skillLevel_1);
 //        skillLevel2 = Integer.parseInt(skillLevel_2);
 
-        Optional<SkuAndCount> toolRequirement1 = SkuAndCount.from(Tool_Requirement_1, Tool_Requirement_1_amount);
+        Optional<SkuAndCount> toolRequirement1 = SkuAndCount.optionalOf(Tool_Requirement_1, Tool_Requirement_1_amount);
         toolRequirement1.ifPresent(inputs::add);
-        Optional<SkuAndCount> toolRequirement2 = SkuAndCount.from(Tool_Requirement_2, Tool_Requirement_2_amount);
+        Optional<SkuAndCount> toolRequirement2 = SkuAndCount.optionalOf(Tool_Requirement_2, Tool_Requirement_2_amount);
         toolRequirement2.ifPresent(inputs::add);
-        Optional<SkuAndCount> toolRequirement3 = SkuAndCount.from(Tool_Requirement_3, Tool_Requirement_3_amount);
+        Optional<SkuAndCount> toolRequirement3 = SkuAndCount.optionalOf(Tool_Requirement_3, Tool_Requirement_3_amount);
         toolRequirement3.ifPresent(inputs::add);
     }
 
@@ -240,11 +316,17 @@ public enum Recipe {
         return calenderWaitDaysFromProductionToAvailable;
     }
 
-    public ListSkuAndCount getInputs() {return inputs; }
+    public ListSkuAndCount getInputs() {
+        return inputs;
+    }
+
     public ListSkuAndCount getOutputs() {
         return outputs;
     }
-    public ListSkuAndCount getToolRequirements() { return toolRequirements; }
+
+    public ListSkuAndCount getToolRequirements() {
+        return toolRequirements;
+    }
 
     public int getRecipeId() {
         return recipeId;
