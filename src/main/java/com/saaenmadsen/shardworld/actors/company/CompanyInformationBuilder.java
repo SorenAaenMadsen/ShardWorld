@@ -94,6 +94,11 @@ public class CompanyInformationBuilder {
         return this;
     }
 
+    public CompanyInformationBuilder withWorkers(int workers) {
+        this.workers = workers;
+        return this;
+    }
+
     public CompanyInformationBuilder withKnownRecipe(KnownRecipe knownRecipe) {
         this.myRecipes.add(knownRecipe);
         return this;
@@ -101,6 +106,11 @@ public class CompanyInformationBuilder {
 
     public CompanyInformationBuilder withCompanyType(CompanyType companyType) {
         this.companyType = companyType;
+        return this;
+    }
+
+    public CompanyInformationBuilder withWarehouse(StockListing warehouse) {
+        this.warehouse = warehouse;
         return this;
     }
 
