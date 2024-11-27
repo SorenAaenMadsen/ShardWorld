@@ -15,13 +15,14 @@ public class MarketDay {
 
     public List<MarketBooth> marketBooths;
     public List<C_BuyB2BOrder> b2bBuyOrderList;
+    public List<C_BuyPopOrder> popBuyOrderList;
     public int companiesDoneWithMarketDay;
 
     public StockListing getUnfulfilledOrders() {
         return unfulfilledOrders;
     }
 
-    private StockListing unfulfilledOrders= StockListing.ofEmpty();
+    private StockListing unfulfilledOrders = StockListing.ofEmpty();
     private StockListing totalUnsoldGoods;
     private StockListing totalGoodsForSale = StockListing.ofEmpty();
     private MarketDailyReport marketDailyReport;
@@ -41,6 +42,7 @@ public class MarketDay {
         }
         marketBooths = new ArrayList<>();
         b2bBuyOrderList = new ArrayList<>();
+        popBuyOrderList = new ArrayList<>();
 
         companiesDoneWithMarketDay = 0;
         marketDailyReport = new MarketDailyReport(dayId);
@@ -89,19 +91,24 @@ public class MarketDay {
         marketBooths.forEach(booth -> totalUnsoldGoods.addStockFromList(booth.boothStock));
         for (int i = 0; i < StockKeepUnit.values().length; ++i) {
             int oldPrice = newestPriceList.getPrice(i);
-            newestPriceList.setPrice(i, calculateNewPrice(oldPrice, totalGoodsForSale.getSkuCount(i), totalUnsoldGoods.getSkuCount(i), unfulfilledOrders.getSkuCount(i), calculateMaxPrice(i)));
+            newestPriceList.setPrice(i, calculateNewPrice(oldPrice, totalGoodsForSale.getSkuCount(i), totalUnsoldGoods.getSkuCount(i), unfulfilledOrders.getSkuCount(i), calculateMaxPrice(i), calculateMinPrice(i)));
             log.debug("Price of " + StockKeepUnit.values()[i].getProductName() + " from " + oldPrice + "  to " + newestPriceList.getPrice(i));
         }
     }
 
     private int calculateMaxPrice(int skuId) {
-        return StockKeepUnit.values()[skuId].getInitialPrice()*2;
+        return StockKeepUnit.values()[skuId].getInitialPrice() * 2;
     }
 
-    public static int calculateNewPrice(int oldPrice, int amountForSale, int amountUnsold, int unfulfilledOrders, int maxPrice) {
+    private int calculateMinPrice(int skuId) {
+        return 1 + StockKeepUnit.values()[skuId].getInitialPrice() / 2;
+    }
+
+    public static int calculateNewPrice(int oldPrice, int amountForSale, int amountUnsold, int unfulfilledOrders, int maxPrice, int minPrice) {
         int newPrice = adjustDueToUnsoldGoods(oldPrice, amountForSale, amountUnsold);
         newPrice = adjustDueToUnfulfilledOrders(newPrice, amountForSale, unfulfilledOrders);
         newPrice = Math.min(newPrice, maxPrice);
+        newPrice = Math.max(newPrice, minPrice);
         return newPrice;
     }
 
@@ -142,7 +149,7 @@ public class MarketDay {
         if (unfulfilledOrders == 0) {
             return oldPrice;
         }
-        if(amountForSale==0){
+        if (amountForSale == 0) {
             return (int) (oldPrice * 1.15);
         }
         int percentRequirementsFulfilledBucketsOfTen = (10 * unfulfilledOrders) / (10 * amountForSale);
@@ -180,5 +187,9 @@ public class MarketDay {
         marketDailyReport.setForSaleList(this.totalGoodsForSale);
         marketDailyReport.setUnsoldGoods(this.totalUnsoldGoods);
         return this.marketDailyReport;
+    }
+
+    public boolean enoughBuyersHaveDoneTheirBusiness(int numberOfCompaniesToFinish, int numberOfPopGroupsToFinish) {
+        return b2bBuyOrderList.size() >= numberOfCompaniesToFinish && popBuyOrderList.size() >= numberOfPopGroupsToFinish;
     }
 }

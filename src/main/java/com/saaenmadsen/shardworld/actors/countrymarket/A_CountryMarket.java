@@ -8,6 +8,7 @@ import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.actors.company.*;
 import com.saaenmadsen.shardworld.actors.popgroup.A_PopGroup;
+import com.saaenmadsen.shardworld.actors.popgroup.C_CompletedPopBuyOrder;
 import com.saaenmadsen.shardworld.actors.popgroup.C_MarketOpenForPopBuyers;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
@@ -100,7 +101,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
                 )
         );
 
-        if (marketDay.b2bBuyOrderList.size() >= allCompanies.size()) {
+        if (marketDay.enoughBuyersHaveDoneTheirBusiness(allCompanies.size(), allPopGroups.size())) {
             // All buyers have done their business:
             closeDownMarketForToday();
         }
@@ -134,6 +135,21 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
     private Behavior<CountryMarketCommand> onBuyPopOrder(C_BuyPopOrder message) {
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info("Pop buy order is in {}", message.toString());
+        }
+        marketDay.popBuyOrderList.add(message);
+        MoneyBox buyersMoney = message.moneyBox();
+        getContext().getLog().debug("Market pop buyer {} money is {}", message.popGroupName(), message.moneyBox().getMoney());
+
+        message.buyer().tell(
+                new C_CompletedPopBuyOrder(
+                        marketDay.doShoppingAndReturnShoppingCart(message.wishList(), buyersMoney),
+                        buyersMoney
+                )
+        );
+
+        if (marketDay.enoughBuyersHaveDoneTheirBusiness(allCompanies.size(), allPopGroups.size())) {
+            // All buyers have done their business:
+            closeDownMarketForToday();
         }
         return Behaviors.same();
     }

@@ -88,6 +88,7 @@ public class A_PopGroup extends AbstractBehavior<A_PopGroup.PopGroupCommand> {
     private Behavior<PopGroupCommand> onCompletedPopBuyOrder(C_CompletedPopBuyOrder message) {
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info("Buy order complete for Popgroup " + popGroupName + " {}", message.toString());
+            moneyBox.mergeMoneyBox(message.unspentMoney());
         }
         return Behaviors.same();
     }

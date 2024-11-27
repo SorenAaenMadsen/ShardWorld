@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
+import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
 public record C_CompletedPopBuyOrder(
+        StockListing boughtStuff,
         MoneyBox unspentMoney
     ) implements A_PopGroup.PopGroupCommand{
 
