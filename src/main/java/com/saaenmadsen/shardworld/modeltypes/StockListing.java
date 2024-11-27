@@ -82,6 +82,10 @@ public class StockListing {
         this.addStockAmount(skuId, -addAmount);
     }
 
+    public void addStockAmount(StockKeepUnit sku, int addAmount) {
+        addStockAmount(sku.getArrayId(), addAmount);
+    }
+
     public void addStockAmount(int skuId, int addAmount) {
         stock[skuId] += addAmount;
         if(stock[skuId]<0) {

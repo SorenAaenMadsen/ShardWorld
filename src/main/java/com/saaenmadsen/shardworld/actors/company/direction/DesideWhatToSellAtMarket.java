@@ -4,11 +4,11 @@ import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
 import com.saaenmadsen.shardworld.actors.company.CompanyDailyReport;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
-public class DesiceWhatToSellAtMarket {
+public class DesideWhatToSellAtMarket {
 
     private final StockListing forSaleList;
 
-    public DesiceWhatToSellAtMarket(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
+    public DesideWhatToSellAtMarket(CompanyInformation companyInformation, CompanyDailyReport companyDailyReport) {
         this.forSaleList = justSetItAllForSale(companyInformation, companyDailyReport);
     }
 

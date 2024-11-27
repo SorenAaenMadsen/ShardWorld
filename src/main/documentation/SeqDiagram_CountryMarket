@@ -18,17 +18,17 @@ com -> pop : pay salary
 com -> cm : Send SKU to market for sale
 deactivate com
 cm -> cm  : All companies have reported sales
-cm -> pop : Market open for buyers
+cm -> pop : Market open for pop buyers
 activate pop
-cm -> com : Market open for buyers
+cm -> com : Market open for B2B buyers
 activate com
 pop -> cm : Buy order
-cm -> pop : Completed Buy Order
+cm -> pop : Completed Pop Buy Order
 pop -> cm : End Market Day
 deactivate pop
 com -> cm : Buy order
 deactivate com
-cm -> com : Completed Buy Order
+cm -> com : Completed B2B Buy Order
 activate com
 cm -> cm  : All companies and popgroups have bought
 deactivate com

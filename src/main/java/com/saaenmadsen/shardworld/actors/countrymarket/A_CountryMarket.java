@@ -7,6 +7,8 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import com.saaenmadsen.shardworld.actors.company.*;
+import com.saaenmadsen.shardworld.actors.popgroup.A_PopGroup;
+import com.saaenmadsen.shardworld.actors.popgroup.C_MarketOpenForPopBuyers;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_EndMarketDayCycle;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
@@ -26,6 +28,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
 
 
     private List<ActorRef<A_ShardCompany.ShardCompanyCommand>> allCompanies;
+    private List<ActorRef<A_PopGroup.PopGroupCommand>> allPopGroups;
     private int dayId;
 
     public interface CountryMarketCommand {
@@ -47,10 +50,13 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         return newReceiveBuilder()
                 .onMessage(C_StartMarketDayCycle.class, this::onReceiveStartMarketDayCycle)
                 .onMessage(C_SendSkuToMarketForSale.class, this::onReceiveSendSkuToMarketForSale)
-                .onMessage(C_BuyOrder.class, this::onReceiveBuyOrder)
-                .onMessage(C_EndMarketDay.class, this::onReceiveEndMarketDay)
+                .onMessage(C_BuyB2BOrder.class, this::onReceiveB2BBuyOrder)
+                .onMessage(C_EndB2BMarketDay.class, this::onReceiveEndMarketDay)
+                .onMessage(C_BuyPopOrder.class, this::onBuyPopOrder)
+                .onMessage(C_EndPopMarketDay.class, this::onEndPopMarketDay)
                 .build();
     }
+
 
     private Behavior<CountryMarketCommand> onReceiveStartMarketDayCycle(C_StartMarketDayCycle message) {
         if (worldSettings.logAkkaMessages()) {
@@ -59,6 +65,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         marketDay = new MarketDay(marketDay, message.dayId());
 
         this.allCompanies = message.allCompanies();
+        this.allPopGroups = message.allPopGroups();
         this.dayId = message.dayId();
         message.allCompanies().forEach(c -> c.tell(new C_MarketOpenForSellers(message.dayId(), marketDay.getNewestPriceList(), getContext().getSelf())));
         return Behaviors.same();
@@ -72,27 +79,28 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         marketDay.addBooth(sellersBooth);
         if (marketDay.marketBooths.size() >= allCompanies.size()) {
             // This could be a state shift :)
-            allCompanies.forEach(c -> c.tell(new C_MarketOpenForBuyers(dayId, marketDay.getNewestPriceList(), getContext().getSelf())));
+            allCompanies.forEach(c -> c.tell(new C_MarketOpenForB2BBuyers(dayId, marketDay.getNewestPriceList(), getContext().getSelf())));
+            allPopGroups.forEach(c -> c.tell(new C_MarketOpenForPopBuyers(dayId, marketDay.getNewestPriceList(), getContext().getSelf())));
         }
         return Behaviors.same();
     }
 
-    private Behavior<CountryMarketCommand> onReceiveBuyOrder(C_BuyOrder message) {
+    private Behavior<CountryMarketCommand> onReceiveB2BBuyOrder(C_BuyB2BOrder message) {
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info("Market got message {}", message.toString());
         }
-        marketDay.buyOrderList.add(message);
+        marketDay.b2bBuyOrderList.add(message);
         MoneyBox buyersMoney = message.moneyBox();
         getContext().getLog().debug("Market buyer {} money is {}", message.buyerCompanyId(), message.moneyBox().getMoney());
 
         message.buyer().tell(
-                new C_CompletedBuyOrder(
+                new C_CompletedB2BBuyOrder(
                         marketDay.doShoppingAndReturnShoppingCart(message.wishList(), buyersMoney),
                         buyersMoney
                 )
         );
 
-        if (marketDay.buyOrderList.size() >= allCompanies.size()) {
+        if (marketDay.b2bBuyOrderList.size() >= allCompanies.size()) {
             // All buyers have done their business:
             closeDownMarketForToday();
         }
@@ -111,7 +119,7 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         );
     }
 
-    private Behavior<CountryMarketCommand> onReceiveEndMarketDay(C_EndMarketDay message) {
+    private Behavior<CountryMarketCommand> onReceiveEndMarketDay(C_EndB2BMarketDay message) {
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info("Company is home from market safely {}", message.toString());
         }
@@ -123,6 +131,18 @@ public class A_CountryMarket extends AbstractBehavior<A_CountryMarket.CountryMar
         return Behaviors.same();
     }
 
+    private Behavior<CountryMarketCommand> onBuyPopOrder(C_BuyPopOrder message) {
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("Pop buy order is in {}", message.toString());
+        }
+        return Behaviors.same();
+    }
 
+    private Behavior<CountryMarketCommand> onEndPopMarketDay(C_EndPopMarketDay message) {
+        if (worldSettings.logAkkaMessages()) {
+            getContext().getLog().info("Pop marked day complete {}", message.toString());
+        }
+        return Behaviors.same();
+    }
 }
 

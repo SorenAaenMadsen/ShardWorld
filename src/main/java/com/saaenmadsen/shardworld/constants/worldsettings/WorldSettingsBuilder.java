@@ -1,7 +1,6 @@
 package com.saaenmadsen.shardworld.constants.worldsettings;
 
 import com.saaenmadsen.shardworld.actors.company.CompanyInformation;
-import com.saaenmadsen.shardworld.actors.company.CompanyInformationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +75,7 @@ public class WorldSettingsBuilder {
         );
     }
 
-    public WorldSettingsBuilder withAkkaMessageLogging() {
+    public WorldSettingsBuilder withAkkaMessageLoggingTrue() {
         this.logAkkaMessages = true;
         return this;
     }

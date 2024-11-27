@@ -42,7 +42,7 @@ public class CompanyInformation {
     }
 
     public int calculateWorkTimeAvailable() {
-        int totalEmployees = employeeGroups.stream().map(employeeGroup -> employeeGroup.getCount()).mapToInt(Integer::intValue).sum();
+        int totalEmployees = employeeGroups.stream().map(employeeGroup -> employeeGroup.getPopCount()).mapToInt(Integer::intValue).sum();
         int workhoursPrDay = 8;
         int tenMinuteIncrementsPrHour = 6;
         return totalEmployees * workhoursPrDay * tenMinuteIncrementsPrHour;

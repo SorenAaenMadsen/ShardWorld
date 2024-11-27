@@ -1,25 +1,24 @@
-package com.saaenmadsen.shardworld.actors.company;
+package com.saaenmadsen.shardworld.actors.popgroup;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
-import com.saaenmadsen.shardworld.modeltypes.StockListing;
+import com.saaenmadsen.shardworld.modeltypes.PriceList;
 
-public record C_CompletedBuyOrder(
-        StockListing purchasedGoods,
+public record C_CompletedPopBuyOrder(
         MoneyBox unspentMoney
-) implements A_ShardCompany.ShardCompanyCommand {
+    ) implements A_PopGroup.PopGroupCommand{
 
-    public static C_CompletedBuyOrder fromJson(String json) {
+    public static C_CompletedPopBuyOrder fromJson(String json){
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(json, C_CompletedBuyOrder.class);
+            return mapper.readValue(json, C_CompletedPopBuyOrder.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String toJson() {
+    public String toJson(){
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -27,6 +26,10 @@ public record C_CompletedBuyOrder(
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    @Override
+    public String toString() {
+        return toJson();
     }
 }

@@ -30,6 +30,10 @@ public record C_MarketOpenForSellers(
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    @Override
+    public String toString() {
+        return toJson();
     }
 }

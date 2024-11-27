@@ -76,49 +76,50 @@ public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainA
         this.worldActorReference = worldActorReference;
         getContext().getLog().info("ShardCountry Constructor Start");
 
+        // Spawn a strategic stockpile, which the player will later control
         CompanyInformation strategicStockpile = CompanyInformationBuilder
                 .ofWorldDefault("1-strategic-stockpile", worldSettings)
                 .withCulture(CompanyCultureBuilder.of(CompanyCulture_InnovativenessLevel.LOW_INNOVATIVE, CompanyCulture_StockManagementLevel.HIGH_STOCK_BUFFER).build())
                 .withCompanyType(CompanyType.STOCKPILE)
                 .withMoney(10000000)
                 .build();
-
-        allCompanies.add(
-                context.spawn(
-                        A_ShardCompany.create(strategicStockpile, context.getSelf(), worldSettings),
-                        strategicStockpile.getCompanyId()
-                )
-        );
-
-        for (CompanyInformation companyInformation : worldSettings.startCompanies()) {
-            for (EmployeeGroup employeeGroup : companyInformation.getEmployeeGroups()) {
-                Behavior<A_PopGroup.PopGroupCommand> popGroupCommandBehavior = A_PopGroup.create(employeeGroup.getCount(), employeeGroup.getEmployeeCategory(), context.getSelf(), worldSettings);
-                ActorRef<A_PopGroup.PopGroupCommand> popGroup = context.spawn(popGroupCommandBehavior, this.countryId+"-PopGroup-"+this.popGroupId++);
-                employeeGroup.setPopGroupRef(popGroup);
-            }
-
-            allCompanies.add(
-                    context.spawn(
-                            A_ShardCompany.create(companyInformation, context.getSelf(), worldSettings),
-                            companyInformation.getCompanyId()
-                    )
-            );
+        spawnCompanyAndPopGroupActors_AddWorkerPopLinkToCompanyInformation(context, worldSettings, strategicStockpile);
 
 
-        }
-
-        for (int i = allCompanies.size(); i < this.worldSettings.companyCount(); ++i) {
+        // Spawn production companies
+        List<CompanyInformation> myStartCompanies = new ArrayList<>();
+        myStartCompanies.addAll(worldSettings.startCompanies());
+        for (int i = myStartCompanies.size(); i < this.worldSettings.companyCount(); ++i) {
             String companyName = "company-" + String.format("%05d", i);
-            allCompanies.add(
-                    context.spawn(
-                            A_ShardCompany.create(companyName, context.getSelf(), worldSettings)
-                            , companyName)
-            );
+            myStartCompanies.add(CompanyInformationBuilder.ofWorldDefault(companyName, worldSettings).build());
         }
 
+        for (CompanyInformation companyInformation : myStartCompanies ) {
+            spawnCompanyAndPopGroupActors_AddWorkerPopLinkToCompanyInformation(context, worldSettings, companyInformation);
+        }
+
+        // Spawn country market
         countryMarket = context.spawn(A_CountryMarket.create(context.getSelf(), worldSettings), "market");
 
         getContext().getLog().info("ShardCountry Constructor Completed");
+    }
+
+    private void spawnCompanyAndPopGroupActors_AddWorkerPopLinkToCompanyInformation(ActorContext<CountryMainActorCommand> context, WorldSettings worldSettings, CompanyInformation companyInformation) {
+        for (EmployeeGroup employeeGroup : companyInformation.getEmployeeGroups()) {
+            String popGroupName = this.countryId + "-PopGroup-" + this.popGroupId++;
+            Behavior<A_PopGroup.PopGroupCommand> popGroupCommandBehavior = A_PopGroup.create(popGroupName, employeeGroup.getPopCount(), employeeGroup.getEmployeeCategory(), context.getSelf(), worldSettings);
+
+            ActorRef<A_PopGroup.PopGroupCommand> popGroupActor = context.spawn(popGroupCommandBehavior, popGroupName);
+            employeeGroup.setPopGroupRef(popGroupActor);
+            allPopGroups.add(popGroupActor);
+        }
+
+        allCompanies.add(
+                context.spawn(
+                        A_ShardCompany.create(companyInformation, context.getSelf(), worldSettings),
+                        companyInformation.getCompanyId()
+                )
+        );
     }
 
     @Override
@@ -137,7 +138,7 @@ public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainA
         }
         companyDayEnds = new ArrayList<>();
         endMarketDayCycle = Optional.empty();
-        countryMarket.tell(new C_StartMarketDayCycle(message.dayId(), allCompanies));
+        countryMarket.tell(new C_StartMarketDayCycle(message.dayId(), allCompanies, allPopGroups));
         return Behaviors.same();
     }
 

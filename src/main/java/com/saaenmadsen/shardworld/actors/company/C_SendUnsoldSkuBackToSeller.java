@@ -30,4 +30,9 @@ public record C_SendUnsoldSkuBackToSeller(
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public String toString() {
+        return toJson();
+    }
 }

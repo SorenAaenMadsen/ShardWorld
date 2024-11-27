@@ -5,12 +5,15 @@ import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.actors.company.direction.*;
-import com.saaenmadsen.shardworld.actors.countrymarket.C_BuyOrder;
-import com.saaenmadsen.shardworld.actors.countrymarket.C_EndMarketDay;
+import com.saaenmadsen.shardworld.actors.company.workers.EmployeeGroup;
+import com.saaenmadsen.shardworld.actors.countrymarket.C_BuyB2BOrder;
+import com.saaenmadsen.shardworld.actors.countrymarket.C_EndB2BMarketDay;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_SendSkuToMarketForSale;
+import com.saaenmadsen.shardworld.actors.popgroup.C_PaySalary;
 import com.saaenmadsen.shardworld.actors.shardcountry.C_CompanyDayEnd;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
+import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import com.saaenmadsen.shardworld.statistics.CompanyDayStats;
 import com.saaenmadsen.shardworld.statistics.PrintableStockListing;
@@ -31,10 +34,6 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
     public interface ShardCompanyCommand {
     }
 
-    public static Behavior<ShardCompanyCommand> create(String companyName, akka.actor.typed.ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
-        return Behaviors.setup(context -> new A_ShardCompany(context, companyName, countryActor, worldSettings));
-    }
-
     public static Behavior<ShardCompanyCommand> create(CompanyInformation companyInformation, akka.actor.typed.ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
         return Behaviors.setup(context -> new A_ShardCompany(context, companyInformation, countryActor, worldSettings));
     }
@@ -50,27 +49,14 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         getContext().getLog().debug(companyId + "Constructor done");
     }
 
-    public A_ShardCompany(ActorContext<ShardCompanyCommand> context, String companyId, akka.actor.typed.ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
-        super(context);
-        getContext().getLog().debug(companyId + "Constructor start");
-        this.companyId = companyId;
-        this.countryActor = countryActor;
-        this.worldSettings = worldSettings;
-        this.companyInformation = CompanyInformationBuilder.ofWorldDefault(companyId, worldSettings).build();
-        this.companyDailyReport = new CompanyDailyReport(companyId, 0);
-        new FoundingBoardMeeting(companyInformation, companyDailyReport);
-        getContext().getLog().debug("After constructor: " + companyId + " got money {}", companyInformation.getMoneyBox().getMoney());
-        getContext().getLog().debug(companyId + "Constructor done");
-    }
-
 
     @Override
     public Receive<ShardCompanyCommand> createReceive() {
         getContext().getLog().debug("ShardCompany createReceive");
         return newReceiveBuilder()
                 .onMessage(C_MarketOpenForSellers.class, this::onReceiveMarketOpenForSellers)
-                .onMessage(C_CompletedBuyOrder.class, this::onReceiveCompletedBuyOrder)
-                .onMessage(C_MarketOpenForBuyers.class, this::onReceiveMarketOpenForBuyers)
+                .onMessage(C_CompletedB2BBuyOrder.class, this::onReceiveCompletedBuyOrder)
+                .onMessage(C_MarketOpenForB2BBuyers.class, this::onReceiveMarketOpenForBuyers)
                 .onMessage(C_SendUnsoldSkuBackToSeller.class, this::onSendUnsoldSkuBackToSeller)
                 .build();
     }
@@ -87,14 +73,33 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         companyInformation.setPriceList(message.priceList());
 
         this.partialProduction = new ProductionPlanningAndExecution(companyInformation, companyDailyReport, partialProduction).execute();
-
-        StockListing forSaleList = new DesiceWhatToSellAtMarket(companyInformation, companyDailyReport).getForSaleList();
+        paySalaries();
+        StockListing forSaleList = new DesideWhatToSellAtMarket(companyInformation, companyDailyReport).getForSaleList();
         message.countryMarket().tell(new C_SendSkuToMarketForSale(forSaleList, getContext().getSelf()));
 
         return Behaviors.same();
     }
 
-    private Behavior<ShardCompanyCommand> onReceiveMarketOpenForBuyers(C_MarketOpenForBuyers message) {
+    private void paySalaries() {
+        for (EmployeeGroup employeeGroup : this.companyInformation.getEmployeeGroups()) {
+            if(employeeGroup.getPopGroupRef().isPresent()) {
+
+                int totalSalary = employeeGroup.getTotalSalary();
+                MoneyBox moneyBox = this.companyInformation.getMoneyBox();
+                if(moneyBox.getMoney()>totalSalary) {
+                    employeeGroup.getPopGroupRef().get().tell(new C_PaySalary(moneyBox.withdrawMoneyBox(totalSalary)));
+                } else {
+                    getContext().getLog().info(companyId + " did not pay it's workers!");
+                    companyDailyReport.appendToDailyReport("Not enough money to pay salary to " + employeeGroup.getEmployeeCategory().getPrintableName());
+                    // TODO: This is kind of important to the workers to fix ;)
+                }
+            } else {
+                throw new RuntimeException("Company " + this.companyId + " had employee group " + employeeGroup + " with no reference to PopGroup!");
+            }
+        }
+    }
+
+    private Behavior<ShardCompanyCommand> onReceiveMarketOpenForBuyers(C_MarketOpenForB2BBuyers message) {
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
@@ -104,7 +109,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         StockListing shoppingList = new DesideWhatToBuyAtMarket(companyInformation, companyDailyReport).decide();
 
         message.countryMarket().tell(
-                new C_BuyOrder(
+                new C_BuyB2BOrder(
                         shoppingList,
                         companyInformation.getMoneyBox().newBoxWithAllTheMoeny(),
                         getContext().getSelf(),
@@ -117,7 +122,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
 
 
 
-    private Behavior<ShardCompanyCommand> onReceiveCompletedBuyOrder(C_CompletedBuyOrder message) {
+    private Behavior<ShardCompanyCommand> onReceiveCompletedBuyOrder(C_CompletedB2BBuyOrder message) {
         if (worldSettings.logAkkaMessages()) {
             getContext().getLog().info(companyId + " got message {}", message.toString());
         }
@@ -149,7 +154,7 @@ public class A_ShardCompany extends AbstractBehavior<A_ShardCompany.ShardCompany
         if (companyInformation.timeForTacticalBoardMeeting()) {
             new InnovateOurRecipesBoardMeeting(companyInformation, companyDailyReport, message.unfulfilledOrders());
         }
-        message.market().tell(new C_EndMarketDay(this.companyId));
+        message.market().tell(new C_EndB2BMarketDay(this.companyId));
         countryActor.tell(new C_CompanyDayEnd(new CompanyDayStats(companyDailyReport, companyInformation.getKnownRecipes(), companyDailyReport.getUnsoldGoods(), companyInformation.getWarehouse().createDuplicate())));
         return Behaviors.same();
     }

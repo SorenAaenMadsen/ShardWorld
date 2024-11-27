@@ -14,7 +14,7 @@ public class MarketDay {
     private PriceList priceListDayStart;
 
     public List<MarketBooth> marketBooths;
-    public List<C_BuyOrder> buyOrderList;
+    public List<C_BuyB2BOrder> b2bBuyOrderList;
     public int companiesDoneWithMarketDay;
 
     public StockListing getUnfulfilledOrders() {
@@ -40,7 +40,7 @@ public class MarketDay {
             this.newestPriceList = PriceList.ofDefault();
         }
         marketBooths = new ArrayList<>();
-        buyOrderList = new ArrayList<>();
+        b2bBuyOrderList = new ArrayList<>();
 
         companiesDoneWithMarketDay = 0;
         marketDailyReport = new MarketDailyReport(dayId);
@@ -71,8 +71,8 @@ public class MarketDay {
         return marketBooths;
     }
 
-    public List<C_BuyOrder> getBuyOrderList() {
-        return buyOrderList;
+    public List<C_BuyB2BOrder> getBuyOrderList() {
+        return b2bBuyOrderList;
     }
 
     public int getCompaniesDoneWithMarketDay() {

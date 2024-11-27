@@ -25,7 +25,7 @@ public class CountryMarketCycleTest {
 
     @Test
     public void runWorldWithTestUtil() {
-        WorldSettings worldSettings = WorldSettingsBuilder.ofDefault().withAkkaMessageLogging().build();
+        WorldSettings worldSettings = WorldSettingsBuilder.ofDefault().withAkkaMessageLoggingTrue().build();
 
         IntegrationTestUtil countryLevelIntegrationTestUtil = new IntegrationTestUtil(worldSettings);
 

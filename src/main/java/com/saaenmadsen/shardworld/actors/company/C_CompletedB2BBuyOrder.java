@@ -1,24 +1,26 @@
-package com.saaenmadsen.shardworld.actors.countrymarket;
+package com.saaenmadsen.shardworld.actors.company;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saaenmadsen.shardworld.actors.company.A_ShardCompany;
+import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 
-public record C_SendSkuToMarketForSale(
-        StockListing forSaleList,
-        akka.actor.typed.ActorRef<A_ShardCompany.ShardCompanyCommand> seller) implements A_CountryMarket.CountryMarketCommand{
+public record C_CompletedB2BBuyOrder(
+        StockListing purchasedGoods,
+        MoneyBox unspentMoney
+) implements A_ShardCompany.ShardCompanyCommand {
 
-    public static C_SendSkuToMarketForSale fromJson(String json){
+    public static C_CompletedB2BBuyOrder fromJson(String json) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(json, C_SendSkuToMarketForSale.class);
+            return mapper.readValue(json, C_CompletedB2BBuyOrder.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String toJson(){
+    public String toJson() {
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(this);
