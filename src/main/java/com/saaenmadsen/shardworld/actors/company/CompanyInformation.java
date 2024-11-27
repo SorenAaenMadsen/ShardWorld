@@ -3,6 +3,7 @@ package com.saaenmadsen.shardworld.actors.company;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
+import com.saaenmadsen.shardworld.actors.company.workers.EmployeeGroup;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
@@ -16,7 +17,7 @@ public class CompanyInformation {
     private CompanyFlawor companyFlawor;
     private StockListing warehouse;
     private List<KnownRecipe> myRecipes;
-    private int workers = 50;
+    private List<EmployeeGroup> employeeGroups;
     private Random dice;
     private PriceList priceList;
     private MoneyBox moneyBox;
@@ -27,21 +28,24 @@ public class CompanyInformation {
         return companyType;
     }
 
-    public CompanyInformation(String companyId, CompanyType companyType, CompanyCulture culture, CompanyFlawor companyFlawor, StockListing warehouse, List<KnownRecipe> myRecipes, int workers, Random dice, PriceList priceList, MoneyBox moneyBox) {
+    public CompanyInformation(String companyId, CompanyType companyType, CompanyCulture culture, CompanyFlawor companyFlawor, StockListing warehouse, List<KnownRecipe> myRecipes, List<EmployeeGroup> employeeGroups, Random dice, PriceList priceList, MoneyBox moneyBox) {
         this.companyId = companyId;
         this.companyType = companyType;
         this.culture = culture;
         this.companyFlawor = companyFlawor;
         this.warehouse = warehouse;
         this.myRecipes = myRecipes;
-        this.workers = workers;
+        this.employeeGroups = employeeGroups;
         this.dice = dice;
         this.priceList = priceList;
         this.moneyBox = moneyBox;
     }
 
     public int calculateWorkTimeAvailable() {
-        return workers * 8;
+        int totalEmployees = employeeGroups.stream().map(employeeGroup -> employeeGroup.getCount()).mapToInt(Integer::intValue).sum();
+        int workhoursPrDay = 8;
+        int tenMinuteIncrementsPrHour = 6;
+        return totalEmployees * workhoursPrDay * tenMinuteIncrementsPrHour;
     }
 
     public Random getDice() {
@@ -80,12 +84,12 @@ public class CompanyInformation {
         this.myRecipes = myRecipes;
     }
 
-    public int getWorkers() {
-        return workers;
+    public List<EmployeeGroup> getEmployeeGroups() {
+        return employeeGroups;
     }
 
-    public void setWorkers(int workers) {
-        this.workers = workers;
+    public void setEmployeeGroups(List<EmployeeGroup> employeeGroups) {
+        this.employeeGroups = employeeGroups;
     }
 
     public boolean timeForTacticalBoardMeeting() {

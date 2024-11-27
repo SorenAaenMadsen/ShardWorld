@@ -4,6 +4,8 @@ import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCultureBuilder;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.actors.company.flawor.CompanyFlawor;
+import com.saaenmadsen.shardworld.actors.company.workers.EmployeeCategory;
+import com.saaenmadsen.shardworld.actors.company.workers.EmployeeGroup;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 import com.saaenmadsen.shardworld.modeltypes.MoneyBox;
 import com.saaenmadsen.shardworld.modeltypes.PriceList;
@@ -19,7 +21,7 @@ public class CompanyInformationBuilder {
     private CompanyFlawor companyFlawor;
     private StockListing warehouse;
     private List<KnownRecipe> myRecipes;
-    private int workers = 10;
+    private List<EmployeeGroup> employeeGroups;
     private Random dice;
     private PriceList priceList;
     private MoneyBox moneyBox;
@@ -36,6 +38,7 @@ public class CompanyInformationBuilder {
         this.moneyBox = new MoneyBox();
         moneyBox.addMoney(worldSettings.companyInitialMoney());
         this.companyType = CompanyType.PRODUCTION;
+        this.employeeGroups = List.of(EmployeeGroup.of(EmployeeCategory.WORKER, 9), EmployeeGroup.of(EmployeeCategory.OWNER, 1));
     }
 
     private CompanyInformationBuilder(
@@ -44,7 +47,7 @@ public class CompanyInformationBuilder {
             CompanyFlawor companyFlawor,
             StockListing warehouse,
             List<KnownRecipe> myRecipes,
-            int workers,
+            List<EmployeeGroup> employeeGroups,
             Random dice,
             PriceList priceList,
             MoneyBox moneyBox) {
@@ -53,7 +56,7 @@ public class CompanyInformationBuilder {
         this.companyFlawor = companyFlawor;
         this.warehouse = warehouse;
         this.myRecipes = myRecipes;
-        this.workers = workers;
+        this.employeeGroups = employeeGroups;
         this.dice = dice;
         this.priceList = priceList;
         this.moneyBox = moneyBox;
@@ -76,7 +79,7 @@ public class CompanyInformationBuilder {
                 new CompanyFlawor(),
                 StockListing.ofEmpty(),
                 new ArrayList<>(),
-                10,
+                List.of(EmployeeGroup.of(EmployeeCategory.WORKER, 9), EmployeeGroup.of(EmployeeCategory.OWNER, 1)),
                 new Random(),
                 PriceList.ofDefault(),
                 moneyBox
@@ -94,8 +97,8 @@ public class CompanyInformationBuilder {
         return this;
     }
 
-    public CompanyInformationBuilder withWorkers(int workers) {
-        this.workers = workers;
+    public CompanyInformationBuilder withWorkers(List<EmployeeGroup> employeeGroups) {
+        this.employeeGroups = employeeGroups;
         return this;
     }
 
@@ -122,7 +125,7 @@ public class CompanyInformationBuilder {
                 companyFlawor,
                 warehouse,
                 myRecipes,
-                workers,
+                employeeGroups,
                 dice,
                 priceList,
                 moneyBox

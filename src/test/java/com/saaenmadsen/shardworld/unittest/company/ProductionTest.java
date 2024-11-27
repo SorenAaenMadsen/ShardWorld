@@ -6,12 +6,15 @@ import com.saaenmadsen.shardworld.actors.company.CompanyInformationBuilder;
 import com.saaenmadsen.shardworld.actors.company.KnownRecipe;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
 import com.saaenmadsen.shardworld.actors.company.direction.ProductionPlanningAndExecution;
+import com.saaenmadsen.shardworld.actors.company.workers.EmployeeCategory;
+import com.saaenmadsen.shardworld.actors.company.workers.EmployeeGroup;
 import com.saaenmadsen.shardworld.constants.Recipe;
 import com.saaenmadsen.shardworld.constants.StockKeepUnit;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettingsBuilder;
 import com.saaenmadsen.shardworld.modeltypes.StockListing;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,7 +31,7 @@ public class ProductionTest {
                 .ofWorldDefault("testcompany", WorldSettingsBuilder.ofDefault().build())
                 .withCompanyType(CompanyType.PRODUCTION)
                 .withWarehouse(warehouse)
-                .withWorkers(10)
+                .withWorkers(List.of(EmployeeGroup.of(EmployeeCategory.WORKER, 9), EmployeeGroup.of(EmployeeCategory.OWNER, 1)))
                 .withKnownRecipe(new KnownRecipe(Recipe.SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING, 1000))
                 .build();
         CompanyDailyReport report = new CompanyDailyReport("testcompany", 1);
@@ -40,7 +43,7 @@ public class ProductionTest {
                 equalTo(true));
         assertThat("",
                 partialProduction1.get().alreadyAllocatedTime(),
-                equalTo(80));
+                equalTo(480));
         assertThat("",
                 partialProduction1.get().recipe(),
                 equalTo(Recipe.SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING));
@@ -49,7 +52,7 @@ public class ProductionTest {
         Optional<ProductionPlanningAndExecution.PartialProduction> partialProduction2 = productionPlanningAndExecution2.execute();
         assertThat("",
                 partialProduction2.get().alreadyAllocatedTime(),
-                equalTo(160));
+                equalTo(960));
 
     }
 
@@ -64,7 +67,7 @@ public class ProductionTest {
                 .ofWorldDefault("testcompany", WorldSettingsBuilder.ofDefault().build())
                 .withCompanyType(CompanyType.PRODUCTION)
                 .withWarehouse(warehouse)
-                .withWorkers(10)
+                .withWorkers(List.of(EmployeeGroup.of(EmployeeCategory.WORKER, 9), EmployeeGroup.of(EmployeeCategory.OWNER, 1)))
                 .withKnownRecipe(new KnownRecipe(Recipe.SHAFT_FURNACE_CRUCIBLE_HARD_STEEL_SMELTING, 1000))
                 .build();
         CompanyDailyReport report = new CompanyDailyReport("testcompany", 1);
