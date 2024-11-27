@@ -13,8 +13,10 @@ import com.saaenmadsen.shardworld.actors.company.culture.CompanyCultureBuilder;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture_InnovativenessLevel;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyCulture_StockManagementLevel;
 import com.saaenmadsen.shardworld.actors.company.culture.CompanyType;
+import com.saaenmadsen.shardworld.actors.company.workers.EmployeeGroup;
 import com.saaenmadsen.shardworld.actors.countrymarket.A_CountryMarket;
 import com.saaenmadsen.shardworld.actors.countrymarket.C_StartMarketDayCycle;
+import com.saaenmadsen.shardworld.actors.popgroup.A_PopGroup;
 import com.saaenmadsen.shardworld.actors.shardworld.A_ShardWorld;
 import com.saaenmadsen.shardworld.actors.shardworld.C_WorldDayEnd;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
@@ -42,11 +44,13 @@ import java.util.Optional;
  * For now, I will NOT be using the FSM (Final State Machine) implementation pattern - crawl before walking and all that...
  */
 public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainActorCommand> {
+    private int popGroupId = 0;
     private WorldSettings worldSettings;
     private final ActorRef<A_ShardWorld.WorldCommand> worldActorReference;
     private final String countryId;
 
     private List<ActorRef<A_ShardCompany.ShardCompanyCommand>> allCompanies = new ArrayList<>();
+    private List<ActorRef<A_PopGroup.PopGroupCommand>> allPopGroups = new ArrayList<>();
     private ActorRef<A_CountryMarket.CountryMarketCommand> countryMarket;
 
     List<C_CompanyDayEnd> companyDayEnds = new ArrayList<>();
@@ -87,12 +91,20 @@ public class A_ShardCountry extends AbstractBehavior<A_ShardCountry.CountryMainA
         );
 
         for (CompanyInformation companyInformation : worldSettings.startCompanies()) {
+            for (EmployeeGroup employeeGroup : companyInformation.getEmployeeGroups()) {
+                Behavior<A_PopGroup.PopGroupCommand> popGroupCommandBehavior = A_PopGroup.create(employeeGroup.getCount(), employeeGroup.getEmployeeCategory(), context.getSelf(), worldSettings);
+                ActorRef<A_PopGroup.PopGroupCommand> popGroup = context.spawn(popGroupCommandBehavior, this.countryId+"-PopGroup-"+this.popGroupId++);
+                employeeGroup.setPopGroupRef(popGroup);
+            }
+
             allCompanies.add(
                     context.spawn(
                             A_ShardCompany.create(companyInformation, context.getSelf(), worldSettings),
                             companyInformation.getCompanyId()
                     )
             );
+
+
         }
 
         for (int i = allCompanies.size(); i < this.worldSettings.companyCount(); ++i) {

@@ -6,10 +6,12 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
+import com.saaenmadsen.shardworld.actors.company.workers.EmployeeCategory;
 import com.saaenmadsen.shardworld.actors.shardcountry.A_ShardCountry;
 import com.saaenmadsen.shardworld.constants.worldsettings.WorldSettings;
 
 public class A_PopGroup extends AbstractBehavior<A_PopGroup.PopGroupCommand> {
+    private EmployeeCategory employeeCategory;
     private int popCount;
     private int ageDistribution[];
 
@@ -20,12 +22,13 @@ public class A_PopGroup extends AbstractBehavior<A_PopGroup.PopGroupCommand> {
     public interface PopGroupCommand {
     }
 
-    public static Behavior<PopGroupCommand> create(int popCount, ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
-        return Behaviors.setup(context -> new A_PopGroup(context, popCount, countryActor, worldSettings));
+    public static Behavior<PopGroupCommand> create(int popCount, EmployeeCategory employeeCategory, ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
+        return Behaviors.setup(context -> new A_PopGroup(context, popCount, employeeCategory, countryActor, worldSettings));
     }
 
-    public A_PopGroup(ActorContext<PopGroupCommand> context, int popCount, ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
+    public A_PopGroup(ActorContext<PopGroupCommand> context, int popCount, EmployeeCategory employeeCategory, ActorRef<A_ShardCountry.CountryMainActorCommand> countryActor, WorldSettings worldSettings) {
         super(context);
+        this.employeeCategory = employeeCategory;
         getContext().getLog().debug("PopGroup Constructor start");
         this.popCount = popCount;
         this.countryActor = countryActor;
