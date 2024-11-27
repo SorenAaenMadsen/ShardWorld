@@ -14,6 +14,7 @@ activate cm
 cm -> com : Market open for sellers
 activate com
 com -> com : production
+com -> pop : pay salary
 com -> cm : Send SKU to market for sale
 deactivate com
 cm -> cm  : All companies have reported sales
